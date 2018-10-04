@@ -10,43 +10,40 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="214dp"
-            android:layout_height="48dp"
-            android:text="hihihih"
-            tools:layout_editor_absoluteX="16dp"
-            tools:layout_editor_absoluteY="16dp"/>
+        android:background="@drawable/sport"
+        android:gravity="bottom"
+        android:orientation="vertical"
+        android:padding="20dp">
 
 
-        <Button
-            android:id="@+id/button_login"
-            android:layout_width="218dp"
-            android:layout_height="89dp"
-            android:layout_marginTop="200dp"
-            android:text="Button"
-            tools:layout_editor_absoluteX="29dp"
-            tools:layout_editor_absoluteY="86dp"/>
-
-        <EditText
-            android:id="@+id/editText"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/iconlist"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:text="Name"
-            tools:layout_editor_absoluteX="0dp"
-            tools:layout_editor_absoluteY="201dp"/>
+            android:orientation="horizontal">
 
-        <EditText
-            android:id="@+id/editText2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="textPassword"
-            tools:layout_editor_absoluteX="0dp"
-            tools:layout_editor_absoluteY="263dp"/>
+            <ImageView
+                android:id="@+id/imageViewLineChart"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_weight="1"
+                android:scaleType="centerInside"
+                android:src="@drawable/linechart"/>
+
+            <ImageView
+                android:id="@+id/imageViewApi"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_weight="1"
+                android:scaleType="centerInside"
+                android:src="@drawable/api"/>
+
+            <ImageView
+                android:id="@+id/imageViewVideoBtn"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_weight="1"
+                android:src="@drawable/video"/>
+        </LinearLayout>
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

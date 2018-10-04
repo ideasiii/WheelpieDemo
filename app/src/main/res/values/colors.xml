@@ -3,4 +3,29 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="black_overlay">#66000000</color>
+    <color name="White">#FFFFFFFF</color>
+    <color name="Gray">#ff999999</color>
+    <color name="Black">#FF000000</color>
+    <color name="Blue">#01B4F5</color>
+    <color name="Focus_Blue">#FF4CAFDD</color>
+    <color name="Trans_Black">#4c000000</color>
+    <color name="Black_Gray">#EE303030</color>
+
+    <drawable name="Gray">#ff999999</drawable>
+    <drawable name="LineGray">#80808080</drawable>
+    <drawable name="transparent_background">#00000000</drawable>
+
+    <color name="Gray_White">#FFD8D8D8</color>
+    <color name="Black_List">#FF171717</color>
+    <color name="List_BG">#FF222222</color>
+    <color name="custom_theme_color">#00000000</color>
+    <color name="transparent">#ff0000</color>
+    <color name="display_page_header">#f4f4f4f2</color>
+    <color name="border_line">#d0d0d0</color>
+    <color name="display_page_footbar">#f4f4f4</color>
+    <color name="header_book_name">#0d0d0d</color>
+    <color name="title_color">#0d0d0d</color>
+    <color name="chap_background">#e3e2e2</color>
+    <color name="dim_foreground_dark">#bebebe</color>
 </resources>

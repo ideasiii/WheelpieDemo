@@ -9,18 +9,17 @@ import org.iii.wheelpiedemo.R;
 public class VideoActivity extends Activity
 {
     RelativeLayout rlMain = null;
-    private static VideoPlayer					videoPlayer		= null;
-    
+    private static VideoPlayer videoPlayer = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video);
         rlMain = findViewById(R.id.rlVideoMain);
-    
-       // videoPlayer = new VideoPlayer(this);
-       // videoPlayer.showController(true);
-    
-       // rlMain.addView(videoPlayer);
+
+        videoPlayer = new VideoPlayer(this);
+        videoPlayer.showController(true);
+        rlMain.addView(videoPlayer);
     }
 }

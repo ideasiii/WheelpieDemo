@@ -1494,17 +1494,5 @@ public class Activity_BikePowerSampler extends Activity
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        switch(item.getItemId())
-        {
-            case R.id.menu_reset:
-                resetPcc();
-                textView_status.setText("Resetting...");
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
+    
 }

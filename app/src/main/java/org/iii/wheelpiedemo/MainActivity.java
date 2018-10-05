@@ -19,6 +19,7 @@ public class MainActivity extends Activity
     final int ACTIVITY_LINE_CHART = 0;
     final int ACTIVITY_API_CLIENT = 1;
     final int ACTIVITY_VIDEO = 2;
+    final int ACTIVITY_ANT = 3;
     
     /**
      * 宣告視窗物件變數
@@ -26,6 +27,7 @@ public class MainActivity extends Activity
     ImageView imageViewLineChart = null;
     ImageView imageViewApi = null;
     ImageView imageViewVideo = null;
+    ImageView imageViewANT = null;
     
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -46,10 +48,12 @@ public class MainActivity extends Activity
         imageViewLineChart = findViewById(R.id.imageViewLineChart);
         imageViewApi = findViewById(R.id.imageViewApi);
         imageViewVideo = findViewById(R.id.imageViewVideoBtn);
+        imageViewANT = findViewById(R.id.imageViewANT);
         
         imageViewLineChart.setOnClickListener(viewOnClick);
         imageViewApi.setOnClickListener(viewOnClick);
         imageViewVideo.setOnClickListener(viewOnClick);
+        imageViewANT.setOnClickListener(viewOnClick);
     }
     
     /**
@@ -72,6 +76,9 @@ public class MainActivity extends Activity
                 case R.id.imageViewVideoBtn:
                     showActive(ACTIVITY_VIDEO);
                     break;
+                case R.id.imageViewANT:
+                    showActive(ACTIVITY_ANT);
+                    break;
             }
             
         }
@@ -93,6 +100,10 @@ public class MainActivity extends Activity
                 break;
             case ACTIVITY_VIDEO:
                 intent = new Intent(this, VideoActivity.class);
+                break;
+            case ACTIVITY_ANT:
+                intent = new Intent(this, com.dsi.ant.antplus.pluginsampler.heartrate
+                        .Activity_SearchUiHeartRateSampler.class);
                 break;
         }
         

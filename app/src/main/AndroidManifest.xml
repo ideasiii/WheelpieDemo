@@ -9,11 +9,11 @@
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
         android:largeHeap="true"
-        android:theme="@style/AppTheme"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:screenOrientation="portrait"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
         <activity android:name=".MainActivity">
             <intent-filter>
@@ -27,6 +27,12 @@
         <activity android:name=".sample.ApiActivity">
         </activity>
         <activity android:name=".sample.VideoActivity">
+        </activity>
+        <activity
+            android:name="com.dsi.ant.antplus.pluginsampler.heartrate.Activity_SearchUiHeartRateSampler"
+            android:configChanges="orientation"
+            android:label="Heart Rate Plugin Sampler"
+            android:screenOrientation="portrait">
         </activity>
     </application>
 

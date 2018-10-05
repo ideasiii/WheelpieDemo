@@ -352,17 +352,5 @@ public class Activity_EnvironmentSampler extends Activity
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        switch(item.getItemId())
-        {
-            case R.id.menu_reset:
-                resetPcc();
-                tv_status.setText("Resetting...");
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
+   
 }

@@ -569,20 +569,7 @@ public class Activity_GenericRemoteControlSampler extends Activity
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        switch(item.getItemId())
-        {
-            case R.id.menu_reset:
-                initScanDisplay();
-                handleReset();
-                tv_status.setText("Resetting...");
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
+    
 
     @Override
     public void onDestroy()

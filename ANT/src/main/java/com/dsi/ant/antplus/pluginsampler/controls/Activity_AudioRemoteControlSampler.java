@@ -592,19 +592,7 @@ public class Activity_AudioRemoteControlSampler extends Activity
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        switch(item.getItemId())
-        {
-            case R.id.menu_reset:
-                handleReset();
-                tv_status.setText("Resetting...");
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
+    
 
     @Override
     public void onDestroy()

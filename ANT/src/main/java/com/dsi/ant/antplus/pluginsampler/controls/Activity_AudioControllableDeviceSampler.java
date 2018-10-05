@@ -246,20 +246,7 @@ public class Activity_AudioControllableDeviceSampler extends Activity
         getMenuInflater().inflate(R.menu.activity_heart_rate, menu);
         return true;
     }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        switch(item.getItemId())
-        {
-            case R.id.menu_reset:
-                resetPcc();
-                tv_status.setText("Resetting...");
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
+    
 
     // Very rudimentary simulation just for testing, cycle through values every 2 seconds
     class SimulateDataTask extends TimerTask

@@ -23,7 +23,102 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/ANT/src/main/java/com/dsi/ant/antplus/pluginsampler/Activity_BikeCadenceSampler.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ANT/src/main/java/com/dsi/ant/antplus/pluginsampler/Activity_BikePowerSampler.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ANT/src/main/java/com/dsi/ant/antplus/pluginsampler/Activity_BikeSpeedDistanceSampler.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ANT/src/main/java/com/dsi/ant/antplus/pluginsampler/Activity_EnvironmentSampler.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ANT/src/main/java/com/dsi/ant/antplus/pluginsampler/Activity_StrideSdmSampler.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ANT/src/main/java/com/dsi/ant/antplus/pluginsampler/bloodpressure/Activity_BloodPressureSampler.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ANT/src/main/java/com/dsi/ant/antplus/pluginsampler/controls/Activity_AudioControllableDeviceSampler.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ANT/src/main/java/com/dsi/ant/antplus/pluginsampler/controls/Activity_AudioRemoteControlSampler.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ANT/src/main/java/com/dsi/ant/antplus/pluginsampler/controls/Activity_GenericControllableDeviceSampler.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ANT/src/main/java/com/dsi/ant/antplus/pluginsampler/controls/Activity_GenericRemoteControlSampler.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ANT/src/main/java/com/dsi/ant/antplus/pluginsampler/controls/Activity_VideoControllableDeviceSampler.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ANT/src/main/java/com/dsi/ant/antplus/pluginsampler/controls/Activity_VideoRemoteControlSampler.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ANT/src/main/java/com/dsi/ant/antplus/pluginsampler/fitnessequipment/Activity_FitnessEquipmentSampler.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ANT/src/main/java/com/dsi/ant/antplus/pluginsampler/geocache/Activity_GeoScanList.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ANT/src/main/java/com/dsi/ant/antplus/pluginsampler/heartrate/Activity_HeartRateDisplayBase.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ANT/src/main/java/com/dsi/ant/antplus/pluginsampler/watchdownloader/Activity_WatchScanList.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ANT/src/main/java/com/dsi/ant/antplus/pluginsampler/weightscale/Activity_WeightScaleSampler.java">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/app/build.gradle">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/AndroidManifest.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/org/iii/wheelpiedemo/MainActivity.java">
           <value>
             <set />
           </value>
@@ -38,7 +133,17 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/app/src/main/res/layout/activity_video.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/build.gradle">
           <value>
             <set />
           </value>

@@ -10,7 +10,7 @@
     <color name="Blue">#01B4F5</color>
     <color name="Focus_Blue">#FF4CAFDD</color>
     <color name="Trans_Black">#4c000000</color>
-    <color name="Black_Gray">#EE303030</color>
+    <color name="Black_Gray">#ee303030</color>
 
     <drawable name="Gray">#ff999999</drawable>
     <drawable name="LineGray">#80808080</drawable>

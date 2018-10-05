@@ -31,12 +31,12 @@
                 android:src="@drawable/ant"/>
 
             <ImageView
-                android:id="@+id/imageView1"
+                android:id="@+id/imageViewSpeech"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:layout_weight="1"
                 android:scaleType="centerInside"
-                />
+                android:src="@drawable/speech" />
 
             <ImageView
                 android:id="@+id/imageView2"

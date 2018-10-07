@@ -1,3 +1,8 @@
+/**
+ * 這是一個多執行續與message queue的練習
+ * 如何讓視窗畫面在多執行緒下能順暢的更換視窗
+ */
+
 package org.iii.wheelpiedemo.sample;
 
 import android.app.Activity;
@@ -14,6 +19,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
@@ -37,7 +43,12 @@ public class SnowActivity extends Activity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        /*Linux中，使用nice value（以下成為nice值）來設定一個進程的優先級，系統任務調度器根據nice值合理安排調度。
+          nice的取值範圍為-20到19。通常情況下，nice的默認值為0。視具體操作系統而定。nice的值越大，進程的優先級就越低，
+          獲得CPU調用的機會越少，nice值越小，進程的優先級則越高，獲得CPU調用的機會越多。
+          THREAD_PRIORITY_AUDIO 聲音線程的標準級別，代碼中無法設置為該優先級，值為 -16。*/
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_AUDIO);
+
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -66,14 +77,12 @@ public class SnowActivity extends Activity
         mView = null;
         super.onDestroy();
     }
-    
+
     private void initDisplay()
     {
-        Display display = this.getWindow().getWindowManager().getDefaultDisplay();
-
-        mDisplayWidth = display.getWidth();
-        mDisplayHeight = display.getHeight();
-        display = null;
+        DisplayMetrics metrics = this.getResources().getDisplayMetrics();
+        mDisplayWidth = metrics.widthPixels;
+        mDisplayHeight = metrics.heightPixels;
     }
 
     private class mainView extends View
@@ -209,15 +218,19 @@ public class SnowActivity extends Activity
             mbmpBackground = mbmpBackground2;
         }
 
+        /**
+         * 設定筆刷
+         */
         private void initPaint()
         {
             mPaintWhite = new Paint();
             mPaintBlue = new Paint();
             mPaintFireball = new Paint();
-            mPaintWhite.setAntiAlias(true);
+            mPaintWhite.setAntiAlias(true); // 去鋸齒
             mPaintBlue.setAntiAlias(true);
             mPaintFireball.setAntiAlias(true);
 
+            // 畫漸進色圓
             Shader linearGradient = new LinearGradient(0, 0, 24, 24, Color.WHITE, Color.GRAY,
                                                        Shader.TileMode.MIRROR);
 
@@ -248,7 +261,7 @@ public class SnowActivity extends Activity
                     mainView.this.fireballThd.mnFireballCount = 0;
                     mainView.this.fireballThd.getHandler().sendEmptyMessage(
                             mainView.UPDATE_FIREBALL);
-                    mnClickCount++;
+                    ++mnClickCount;
 
                     if (4 <= mnClickCount)
                     {
@@ -581,6 +594,7 @@ public class SnowActivity extends Activity
             Message msg1 = new Message();
 
             msg1.what = nWhat;
+            // 每 nDuration 時間發送一次
             mHandler.sendMessageDelayed(msg1, nDuration);
             msg1 = null;
         }

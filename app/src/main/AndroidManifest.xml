@@ -22,15 +22,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".sample.LineChart"></activity>
-        <activity android:name=".sample.ApiActivity"></activity>
-        <activity android:name=".sample.VideoActivity"></activity>
+        <activity android:name=".sample.LineChart" />
+        <activity android:name=".sample.ApiActivity" />
+        <activity android:name=".sample.VideoActivity" />
         <activity
             android:name="com.dsi.ant.antplus.pluginsampler.heartrate.Activity_SearchUiHeartRateSampler"
             android:configChanges="orientation"
             android:label="Heart Rate Plugin Sampler"
-            android:screenOrientation="portrait"></activity>
-        <activity android:name=".sample.SpeechActivity"></activity>
+            android:screenOrientation="portrait" />
+        <activity android:name=".sample.SpeechActivity" />
+        <activity android:name=".sample.SnowActivity"></activity>
     </application>
 
 </manifest>

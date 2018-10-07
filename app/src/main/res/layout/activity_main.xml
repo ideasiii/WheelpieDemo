@@ -39,12 +39,12 @@
                 android:src="@drawable/speech" />
 
             <ImageView
-                android:id="@+id/imageView2"
+                android:id="@+id/imageViewSnow"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:layout_weight="1"
                 android:scaleType="centerInside"
-                />
+                android:src="@drawable/snow" />
         </LinearLayout>
 
         <LinearLayout

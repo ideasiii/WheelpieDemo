@@ -7,6 +7,7 @@ import android.view.View;
 
 import org.iii.wheelpiedemo.sample.ApiActivity;
 import org.iii.wheelpiedemo.sample.LineChart;
+import org.iii.wheelpiedemo.sample.SnowActivity;
 import org.iii.wheelpiedemo.sample.SpeechActivity;
 import org.iii.wheelpiedemo.sample.VideoActivity;
 
@@ -22,6 +23,7 @@ public class MainActivity extends Activity
         put(R.id.imageViewANT, com.dsi.ant.antplus.pluginsampler.heartrate
                 .Activity_SearchUiHeartRateSampler.class);
         put(R.id.imageViewSpeech, SpeechActivity.class);
+        put(R.id.imageViewSnow, SnowActivity.class);
     }};
 
     @Override

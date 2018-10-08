@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Message;
 import android.view.View;
 
+import org.iii.wheelpiedemo.common.Logs;
 import org.iii.wheelpiedemo.login.LoginActivity;
 import org.iii.wheelpiedemo.sample.ApiActivity;
 import org.iii.wheelpiedemo.sample.LineChart;
@@ -21,7 +22,7 @@ import android.os.Handler;
 public class MainActivity extends Activity
 {
     private final int MSG_RUN_LOGIN = 0;
-    
+
     static final HashMap<Integer, Class<?>> mapActivity = new HashMap<Integer, Class<?>>()
     {{
         put(R.id.imageViewLineChart, LineChart.class);
@@ -32,35 +33,36 @@ public class MainActivity extends Activity
         put(R.id.imageViewSpeech, SpeechActivity.class);
         put(R.id.imageViewSnow, SnowActivity.class);
     }};
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
+
         for (int ImageViewId : mapActivity.keySet())
             findViewById(ImageViewId).setOnClickListener(viewOnClick);
     }
-    
+
     @Override
     protected void onStart()
     {
         super.onStart();
-        handler.sendEmptyMessageAtTime(MSG_RUN_LOGIN, 3000);
+        handler.sendEmptyMessageDelayed(MSG_RUN_LOGIN, 5000);
     }
-    
+
     private View.OnClickListener viewOnClick = new View.OnClickListener()
     {
         @Override
         public void onClick(View v)
         {
+            handler.removeMessages(MSG_RUN_LOGIN);
             Intent intent = null;
             intent = new Intent(MainActivity.this, mapActivity.get(v.getId()));
             startActivity(intent);
         }
     };
-    
+
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler()
     {
@@ -70,6 +72,8 @@ public class MainActivity extends Activity
             switch (msg.what)
             {
                 case MSG_RUN_LOGIN:
+                    handler.removeMessages(MSG_RUN_LOGIN);
+                    Logs.showTrace("show login");
                     Intent intent = null;
                     intent = new Intent(MainActivity.this, LoginActivity.class);
                     startActivity(intent);

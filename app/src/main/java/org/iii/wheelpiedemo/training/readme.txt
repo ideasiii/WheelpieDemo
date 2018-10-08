@@ -1,0 +1,2 @@
+training
+運動訓練 收集Device資訊

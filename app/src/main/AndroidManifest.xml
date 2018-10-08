@@ -32,6 +32,7 @@
             android:screenOrientation="portrait" />
         <activity android:name=".sample.SpeechActivity" />
         <activity android:name=".sample.SnowActivity"></activity>
+        <activity android:name=".login.LoginActivity"></activity>
     </application>
 
 </manifest>

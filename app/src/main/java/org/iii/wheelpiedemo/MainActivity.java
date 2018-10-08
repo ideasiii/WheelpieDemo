@@ -50,6 +50,15 @@ public class MainActivity extends Activity
         super.onStart();
         handler.sendEmptyMessageDelayed(MSG_RUN_LOGIN, 5000);
     }
+    
+
+    @Override
+    protected void onPause()
+    {
+        handler.removeMessages(MSG_RUN_LOGIN);
+        super.onPause();
+
+    }
 
     private View.OnClickListener viewOnClick = new View.OnClickListener()
     {

@@ -19,4 +19,6 @@
     <string name="monitoring">monitoring</string>
     <string name="ExerciseModel">訓練類型</string>
     <string name="Exercise">訓練模式</string>
+
+    <string name="course_start_training">開始訓練</string>
 </resources>

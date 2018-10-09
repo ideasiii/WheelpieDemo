@@ -26,5 +26,5 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="53dp"
-        android:src="@drawable/speech" />
+        android:src="@drawable/chat_record_logo_green_status" />
 </RelativeLayout>

@@ -11,6 +11,7 @@ import android.widget.PopupWindow;
 import android.view.ViewGroup.LayoutParams;
 
 import org.iii.wheelpiedemo.R;
+import org.iii.wheelpiedemo.course.CourseActivity;
 
 
 public class LoginActivity extends AppCompatActivity {
@@ -42,7 +43,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void showLoginBtnClicked(View view){
-//        showLoginBtn.setText("AWESOME");
         View popupContentView = LayoutInflater.from(LoginActivity.this).inflate(R.layout.login_popup, null);
         final PopupWindow popupWindow = new PopupWindow(popupContentView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT,true);
         popupWindow.setAnimationStyle(R.style.login_popUpAnim);
@@ -63,7 +63,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void fbButtonClicked() {
-//        startActivity(new Intent(this, DashboardActivity.class));
-        fbLoginBtn.setText("AWESOME");
+        startActivity(new Intent(this, CourseActivity.class));
+//        fbLoginBtn.setText("AWESOME");
     }
 }

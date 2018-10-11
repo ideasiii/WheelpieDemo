@@ -34,7 +34,7 @@
             android:layout_height="80dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="50dp"
-            app:srcCompat="@drawable/coachlogo" />
+            app:srcCompat="@drawable/login_coachlogo" />
 
         <TextView
             android:id="@+id/textView"
@@ -109,7 +109,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:background="@drawable/fb_login_btn_bg"
+            android:background="@drawable/login_fbloginbtn_bg"
             android:text="FACEBOOK" />
 
     </LinearLayout>

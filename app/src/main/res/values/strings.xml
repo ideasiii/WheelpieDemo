@@ -21,4 +21,10 @@
     <string name="Exercise">訓練模式</string>
 
     <string name="course_start_training">開始訓練</string>
+
+    <!--<string name="facebook_app_id">251368738980489</string> <string name="fb_login_protocol_scheme">fb251368738980489</string>-->
+    <string name="facebook_app_id">349387872208649</string> <string name="fb_login_protocol_scheme">fb349387872208649</string>
+
+    <string name="preference_file_key">org.iii.wheelpiedemo.PREFERENCE_FILE_KEY</string>
+
 </resources>

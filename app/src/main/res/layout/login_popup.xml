@@ -40,7 +40,7 @@
             android:id="@+id/textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="80dp"
+            android:layout_marginTop="50dp"
             android:text="USERNAME" />
 
         <EditText
@@ -104,13 +104,24 @@
                 android:background="@android:color/darker_gray" />
         </LinearLayout>
 
-        <Button
-            android:id="@+id/button4"
+        <!--<Button-->
+            <!--android:id="@+id/button4"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_marginTop="10dp"-->
+            <!--android:background="@drawable/login_fbloginbtn_bg"-->
+            <!--android:text="FACEBOOK" />-->
+
+        <com.facebook.login.widget.LoginButton
+            android:id="@+id/login_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/login_fbloginbtn_bg"
-            android:text="FACEBOOK" />
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="30dp"
+            android:layout_marginTop="30dp"
+            android:paddingBottom="10sp"
+            android:paddingTop="10sp"
+            android:textSize="14sp" />
 
     </LinearLayout>
 

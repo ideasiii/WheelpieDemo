@@ -21,4 +21,11 @@
         <item name="android:windowEnterAnimation">@anim/login_in_bottomtotop</item>
         <item name="android:windowExitAnimation">@anim/login_out_toptobottom</item>
     </style>
+
+    <style name="courseTitle" parent="TextAppearance.AppCompat.Title">
+    </style>
+
+    <style name="courseStep" parent="TextAppearance.AppCompat.Subhead">
+        <item name="android:paddingLeft">20dp</item>
+    </style>
 </resources>

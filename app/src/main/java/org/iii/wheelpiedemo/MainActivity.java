@@ -14,6 +14,7 @@ import org.iii.wheelpiedemo.sample.LineChart;
 import org.iii.wheelpiedemo.sample.SnowActivity;
 import org.iii.wheelpiedemo.sample.SpeechActivity;
 import org.iii.wheelpiedemo.sample.VideoActivity;
+import org.iii.wheelpiedemo.training.TrainingActivity;
 
 import java.util.HashMap;
 
@@ -48,7 +49,7 @@ public class MainActivity extends Activity
     protected void onStart()
     {
         super.onStart();
-        handler.sendEmptyMessageDelayed(MSG_RUN_LOGIN, 5000);
+       // handler.sendEmptyMessageDelayed(MSG_RUN_LOGIN, 5000);
     }
     
 

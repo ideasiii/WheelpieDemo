@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="org.iii.wheelpiedemo">
+          xmlns:tools="http://schemas.android.com/tools"
+          package="org.iii.wheelpiedemo">
 
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:allowBackup="false"
@@ -18,22 +18,23 @@
         <activity android:name=".MainActivity">
         <!--<activity android:name=".training.TrainingActivity">-->
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".sample.LineChart" />
-        <activity android:name=".sample.ApiActivity" />
-        <activity android:name=".sample.VideoActivity" />
+        <activity android:name=".sample.LineChart"/>
+        <activity android:name=".sample.ApiActivity"/>
+        <activity android:name=".sample.VideoActivity"/>
         <activity
             android:name="com.dsi.ant.antplus.pluginsampler.heartrate.Activity_SearchUiHeartRateSampler"
             android:configChanges="orientation"
             android:label="Heart Rate Plugin Sampler"
-            android:screenOrientation="portrait" />
-        <activity android:name=".sample.SpeechActivity" />
+            android:screenOrientation="portrait"/>
+        <activity android:name=".sample.SpeechActivity"/>
         <activity android:name=".sample.SnowActivity"></activity>
         <activity android:name=".login.LoginActivity"></activity>
+        <activity android:name=".training.TrainingActivity"></activity>
     </application>
 
 </manifest>

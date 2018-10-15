@@ -1,5 +1,6 @@
 package org.iii.wheelpiedemo.training;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.os.SystemClock;
@@ -12,7 +13,10 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import org.iii.wheelpiedemo.MainActivity;
 import org.iii.wheelpiedemo.R;
+import org.iii.wheelpiedemo.login.LoginActivity;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -102,9 +106,9 @@ public class TrainingActivity extends AppCompatActivity
             // TODO Auto-generated method stub
             
             //一開始的時候message先丟3
-            Message IniMessage = new Message();
-            IniMessage.what = 3;
-            handler.sendMessage(IniMessage);
+//            Message IniMessage = new Message();
+//            IniMessage.what = 3;
+//            handler.sendMessage(IniMessage);
             
             if (startflag)
             {
@@ -173,7 +177,12 @@ public class TrainingActivity extends AppCompatActivity
                 switch (v.getId())
                 {
                     case R.id.startbutton:
-                        setContentView(view2);//按了之後跳到第2個視窗
+//                        setContentView(view2);//按了之後跳到第2個視窗
+                        Intent intent = null;
+                        intent = new Intent(TrainingActivity.this, com.dsi.ant.antplus.pluginsampler
+                                .heartrate.Activity_SearchUiHeartRateSampler.class);
+                        startActivity(intent);
+    
                         if (startflag)
                         {
                             startflag = false;

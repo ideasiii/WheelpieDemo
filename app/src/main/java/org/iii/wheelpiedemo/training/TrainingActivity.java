@@ -14,12 +14,19 @@ import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.iii.more.restapiclient.Config;
+import org.iii.more.restapiclient.Response;
 import org.iii.wheelpiedemo.MainActivity;
 import org.iii.wheelpiedemo.R;
+import org.iii.wheelpiedemo.common.Logs;
 import org.iii.wheelpiedemo.login.LoginActivity;
 
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import org.iii.wheelpiedemo.common.RestApiHeaderClient;
+import org.json.JSONObject;
 
 /**
  * Created by YCTsai on 2018/10/8
@@ -31,6 +38,9 @@ public class TrainingActivity extends AppCompatActivity
     private TextView timer;
     private boolean startflag = false;
     private int tsec = 0, csec = 0, cmin = 0, chr = 0;
+    private static RestApiHeaderClient restApiHeaderClient = new RestApiHeaderClient();
+    private static String trainingAPIURL = "https://dsicoach.win/api/plan/my-training/dayTraining";
+    private final int MSG_DAY_TRAINING_API_RESPONSE = 0;
     
     //TimerTask無法直接改變元件因此要透過Handler來當橋樑
     @SuppressLint("HandlerLeak")
@@ -140,6 +150,33 @@ public class TrainingActivity extends AppCompatActivity
         
     };
     
+    private void requestTodayTrainingAPI(String dateString)
+    {
+        restApiHeaderClient.setResponseListener(todayTrainingResponseListener);
+        HashMap<String, String> param = new HashMap<String, String>();
+        param.put("trainingDate", dateString);
+        HashMap<String, String> headers = new HashMap<String, String>();
+        headers.put("Authorization", "Bearer " +
+                "2h39l3nV4iiYucuXax7Mw6PEQMh4cjkFX7AeW3yVcaiLyIhAHRdAPLixkgS5Mvpv0FcWJMnXUyO9ssEkeb60VyBWm4yEVoPZ1jXIAcnO3ZM9qIgcRXiTKdEYkOTcZWFryyo2hFTgQwMVpprXDpGyBlHJUru8g9QOeOYNYET9jsRUz0IX6e6bPuw3K3FNsBfHmUbukwYgEnDBLP6VYOAul9njlS4DKVda3yD6WGFXcjkbKeRtPb8dY98dJkpXsWUg");
+        Response response = new Response();
+        int nResponse_id = restApiHeaderClient.HttpsGet(trainingAPIURL, Config.HTTP_DATA_TYPE.X_WWW_FORM,
+                param, response, headers);
+        Logs.showTrace("[API] http response id: " + nResponse_id);
+    }
+    
+    private RestApiHeaderClient.ResponseListener todayTrainingResponseListener = new RestApiHeaderClient
+            .ResponseListener()
+    {
+        @Override
+        public void onResponse(JSONObject jsonObject)
+        {
+            Logs.showTrace("[API] onResponse Data: " + jsonObject.toString());
+            Message message = new Message();
+            message.what = MSG_DAY_TRAINING_API_RESPONSE;
+            message.obj = jsonObject;
+            handler.sendMessage(message);
+        }
+    };
     
     
     @Override
@@ -149,7 +186,7 @@ public class TrainingActivity extends AppCompatActivity
         setContentView(R.layout.training_main);
         
         //畫面切換
-        LayoutInflater inflater =  getLayoutInflater();
+        LayoutInflater inflater = getLayoutInflater();
         final View view1 = inflater.inflate(R.layout.training_main, null);//找出第一個視窗
         final View view2 = inflater.inflate(R.layout.training_device_connection, null);//找出第二個視窗
         setContentView(view1); //顯示目前第一個視窗
@@ -182,7 +219,7 @@ public class TrainingActivity extends AppCompatActivity
                         intent = new Intent(TrainingActivity.this, com.dsi.ant.antplus.pluginsampler
                                 .heartrate.Activity_SearchUiHeartRateSampler.class);
                         startActivity(intent);
-    
+                        
                         if (startflag)
                         {
                             startflag = false;
@@ -210,10 +247,6 @@ public class TrainingActivity extends AppCompatActivity
         });
         
         
-        
-        
-        
-        
     }
-
+    
 }

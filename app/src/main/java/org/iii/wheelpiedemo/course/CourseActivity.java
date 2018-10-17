@@ -54,6 +54,7 @@ public class CourseActivity extends AppCompatActivity {
     private static String courseAPIURL = "https://dsicoach.win/api/plan/my-course/plan/day-view";
     private static String trainingAPIURL = "https://dsicoach.win/api/plan/my-training/dayTraining";
     private static String warmUpVideoURI = "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4";
+    private final String PREF_USER_TOKEN_KEY = "userToken";
     private final int MSG_DAY_TRAINING_API_RESPONSE = 0;
     private final int MSG_DAY_VIEW_API_RESPONSE = 1;
     private final int MSG_CONTENT_VIEW_LOGIN = 2;
@@ -77,8 +78,8 @@ public class CourseActivity extends AppCompatActivity {
             // 設定開始訓練按鈕
             findViewById(R.id.button_start_training).setOnClickListener(btnTrainingStartOnClick);
             // 呼叫當日課程訓練API
-            requestTodayTrainingAPI("2018-10-08");
-            //requestTodayTrainingAPI(getTodayDate());
+            //requestTodayTrainingAPI("2018-10-08");
+            requestTodayTrainingAPI(getTodayDate());
         } else {
             sendMessage(MSG_CONTENT_VIEW_LOGIN);
         }
@@ -89,7 +90,7 @@ public class CourseActivity extends AppCompatActivity {
 
         SharedPreferences sharedPref = getSharedPreferences(
             getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        userToken = sharedPref.getString("userToken", null);
+        userToken = sharedPref.getString(PREF_USER_TOKEN_KEY, null);
 
         if (userToken != null) {
             isLoggedIn = true;
@@ -105,7 +106,7 @@ public class CourseActivity extends AppCompatActivity {
         {
             Intent intent = null;
             intent = new Intent(CourseActivity.this, TrainingActivity.class);
-            //startActivity(intent);
+            startActivity(intent);
         }
     };
 

@@ -23,11 +23,7 @@ public class DashboardActivity extends AppCompatActivity{
     private final String LOG_TAG = "DashboardActivity";
     private Boolean onPageStart = Boolean.FALSE;
     private Boolean isTokenInjected = Boolean.FALSE;
-    //    private Boolean onPageFinish = Boolean.FALSE;
-//    private String userToken = "MWjFNXslcPx2MIRqoSkFQLhpGwu7G11zcRRJGt9Zgk5rpQHL3AbDDwS3u0DO6l3vasYnaY5ce4QZSCJvNpCkV7QUDRuiOklqXn8YOaNVitzzZ5ZGkH9stnNeI8VsA1dsB2eVenqWvqu2rXiNVnFlPAeLsZVquOL5df8POkRYte3AEwXX45VFrJKYGHjNABMboFrBfyPmE8QHl1MVx9afK9QeOEVmNl5sh70uLam8qp8eDhXqTfS8M3nXxW2VLUut";
     private String userToken;
-
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,31 +43,14 @@ public class DashboardActivity extends AppCompatActivity{
         webview.getSettings().setDomStorageEnabled(true);
 
         //For testing environment
-//        webview.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        webview.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
 
         webview.setOverScrollMode(WebView.OVER_SCROLL_NEVER);
-        webview.loadUrl("https://coachbot.win/dashboard/");
-//        webview.loadUrl("https://8bf57ec8.ngrok.io/dashboard/");
+//        webview.loadUrl("https://coachbot.win/dashboard/");
+        webview.loadUrl("https://32946ea8.ngrok.io/app/");
     }
 
     private class CustomWebChromeClient extends WebChromeClient {
-        @Override
-        public boolean onConsoleMessage(ConsoleMessage consoleMessage){
-            Log.d("webViewConsoleLog", consoleMessage.message() + " -- From line "
-                    + consoleMessage.lineNumber() + " of "
-                    + consoleMessage.sourceId());
-            return super.onConsoleMessage(consoleMessage);
-        }
-
-        @Override
-        public void onReceivedTitle (WebView view, String title){
-            Log.i(LOG_TAG, "DEBUG: onReceivedTitle : " + title);
-            view.loadUrl(
-                    "javascript:(function() { " +
-                            "window.tokenFromApp = '"+ userToken +"';"
-                            +
-                            "})()");
-        }
 
         @Override
         public void onProgressChanged(WebView view, int newProgress) {
@@ -81,9 +60,12 @@ public class DashboardActivity extends AppCompatActivity{
                     Log.i(LOG_TAG, "DEBUG: onPageFinished at progress : " + newProgress);
                     view.loadUrl(
                             "javascript:(function() { " +
-                                    "console.log(window.tokenFromApp);"
+                                    "let evt = new CustomEvent('tokenInject', {detail:'"+userToken+"'});"
+                                    +
+                                    "window.dispatchEvent(evt);"
                                     +
                                     "})()");
+                    Log.i(LOG_TAG, "DEBUG: token is injected : " + userToken);
                 }
             }else{
                 onPageStart = Boolean.TRUE;

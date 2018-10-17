@@ -46,7 +46,7 @@ public class DashboardActivity extends AppCompatActivity{
         webview.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
 
         webview.setOverScrollMode(WebView.OVER_SCROLL_NEVER);
-        webview.loadUrl("https://coachbot.win/dashboard/");
+        webview.loadUrl("https://coachbot.win/app/dashboard/");
 //        webview.loadUrl("https://32946ea8.ngrok.io/app/");
     }
 

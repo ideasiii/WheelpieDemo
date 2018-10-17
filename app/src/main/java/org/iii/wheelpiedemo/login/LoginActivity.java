@@ -147,8 +147,8 @@ public class LoginActivity extends AppCompatActivity {
                     editor.commit();
 
                     // Switch to course activity
-//                    startActivity(new Intent(LoginActivity.this, CourseActivity.class));
-                    startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
+                    startActivity(new Intent(LoginActivity.this, CourseActivity.class));
+//                    startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
 
                     // Log out user from fb (temp solution to force user logging in every time in case token expired.)
                     LoginManager.getInstance().logOut();

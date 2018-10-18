@@ -49,9 +49,8 @@ public class MainActivity extends Activity
     protected void onStart()
     {
         super.onStart();
-        // handler.sendEmptyMessageDelayed(MSG_RUN_LOGIN, 5000);
+        handler.sendEmptyMessageDelayed(MSG_RUN_LOGIN, 5000);
     }
-    
     
     @Override
     protected void onPause()

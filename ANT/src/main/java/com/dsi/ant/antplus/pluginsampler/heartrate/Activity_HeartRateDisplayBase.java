@@ -60,32 +60,32 @@ public abstract class Activity_HeartRateDisplayBase extends Activity
     AntPlusHeartRatePcc hrPcc = null;
     protected PccReleaseHandle<AntPlusHeartRatePcc> releaseHandle = null;
     
-    TextView tv_status;
+    public TextView tv_status;
     
-    TextView tv_estTimestamp;
+    public TextView tv_estTimestamp;
     
-    TextView tv_rssi;
+    public TextView tv_rssi;
     
-    TextView tv_computedHeartRate;
-    TextView tv_heartBeatCounter;
-    TextView tv_heartBeatEventTime;
+    public TextView tv_computedHeartRate;
+    public TextView tv_heartBeatCounter;
+    public TextView tv_heartBeatEventTime;
     
-    TextView tv_manufacturerSpecificByte;
-    TextView tv_previousHeartBeatEventTime;
+    public TextView tv_manufacturerSpecificByte;
+    public TextView tv_previousHeartBeatEventTime;
     
-    TextView tv_calculatedRrInterval;
+    public TextView tv_calculatedRrInterval;
     
-    TextView tv_cumulativeOperatingTime;
+    public TextView tv_cumulativeOperatingTime;
     
-    TextView tv_manufacturerID;
-    TextView tv_serialNumber;
+    public TextView tv_manufacturerID;
+    public TextView tv_serialNumber;
     
-    TextView tv_hardwareVersion;
-    TextView tv_softwareVersion;
-    TextView tv_modelNumber;
+    public TextView tv_hardwareVersion;
+    public TextView tv_softwareVersion;
+    public TextView tv_modelNumber;
     
-    TextView tv_dataStatus;
-    TextView tv_rrFlag;
+    public TextView tv_dataStatus;
+    public TextView tv_rrFlag;
     Button btn_Active;
     String mstrUUID;
     int mnState;

@@ -156,17 +156,17 @@
 
         </TableLayout>
 
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <ImageView
-                android:id="@+id/imageView5"
-                android:layout_width="250dp"
-                android:layout_height="230dp"
-                app:srcCompat="@drawable/training_monitoring"
-                android:contentDescription="@string/monitoring" />
-        </FrameLayout>
+        <!--<FrameLayout-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content">-->
+        <ImageView
+            android:id="@+id/imageView5"
+            android:layout_width="250dp"
+            android:layout_height="230dp"
+            android:contentDescription="@string/monitoring"
+            android:src="@drawable/training_monitoring"
+            />
+        <!--</FrameLayout>-->
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -190,7 +190,8 @@
                 android:layout_height="wrap_content"
                 android:adjustViewBounds="false"
                 android:cropToPadding="false"
-                app:srcCompat="@drawable/training_startbutton" />
+                android:src="@drawable/training_startbutton"
+                />
 
             <ImageButton
                 android:id="@+id/youtubebutton"

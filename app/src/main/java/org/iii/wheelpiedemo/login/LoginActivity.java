@@ -2,8 +2,11 @@ package org.iii.wheelpiedemo.login;
 import org.iii.wheelpiedemo.dashboard.DashboardActivity;
 import org.json.JSONException;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.support.v7.app.AppCompatActivity;
@@ -22,6 +25,7 @@ import org.iii.wheelpiedemo.R;
 import org.iii.wheelpiedemo.course.CourseActivity;
 
 import com.facebook.CallbackManager;
+import com.facebook.FacebookSdk;
 import com.facebook.login.LoginResult;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -38,12 +42,10 @@ public class LoginActivity extends AppCompatActivity {
     private CallbackManager callbackManager = CallbackManager.Factory.create();
     private String userFbAccessToken;
     private String userToken;
-    private AlertDialog al;
-
     private static RestApiClient restApiClient = new RestApiClient();
     private static final String mstrURL = "https://dsicoach.win/api/user/auth/facebook";
     private String LOG_TAG = "LoginActivity";
-
+    private AlertDialog al;
     private View.OnClickListener loginPopupBtnOnClickListener = new View.OnClickListener(){
         @Override
         public void onClick(View view){
@@ -54,21 +56,25 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        al = new AlertDialog.Builder(this).create();
-
         setContentView(R.layout.login_main);
         loginPopupBtn = findViewById(R.id.login_popup_btn);
-
         loginPopupBtn.setOnClickListener(loginPopupBtnOnClickListener);
+        al = new AlertDialog.Builder(LoginActivity.this).create();
+
+        //Setup Facebook LoginManager
         LoginManager.getInstance().registerCallback(callbackManager,
                 new FacebookCallback<LoginResult>() {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
-                        // get fb access token
+                        // Get fb access token
                         userFbAccessToken = loginResult.getAccessToken().getToken();
                         Log.d(LOG_TAG, userFbAccessToken);
 
-//                        // Send Post to api service to get user token
+                        // UI shows 'Logging in'
+                        al.setMessage("登入中...");
+                        al.show();
+
+                        // Call Virtual Coach API service to signup/signin user.
                         restApiClient.setResponseListener(responseListener);
                         HashMap<String, String> param = new HashMap<String, String>();
                         param.put("account", "facebook");
@@ -82,13 +88,15 @@ public class LoginActivity extends AppCompatActivity {
 
                     @Override
                     public void onCancel() {
-                        // App code
+                        al.setMessage("取消登入...");
+                        al.show();
                         Log.d(LOG_TAG, "onCancelled...");
                     }
 
                     @Override
                     public void onError(FacebookException exception) {
-                        // App code
+                        al.setMessage("登入失敗...");
+                        al.show();
                         Log.d(LOG_TAG, "onError...");
                     }
                 });
@@ -126,28 +134,50 @@ public class LoginActivity extends AppCompatActivity {
             try{
                 Integer statusCode = jsonObject.getInt("code");
                 if(statusCode == 200){
+                    // Extract user token from json response.
                     JSONObject dataObj = new JSONObject(jsonObject.getString("data"));
                     userToken = dataObj.getString("token");
                     Log.d(LOG_TAG, "verification succeed with user token :"+ userToken);
-                    // write the user token into shared preference for other activities to access
+
+                    // Write the user token into shared preference for other activities to access
                     SharedPreferences sharedPref = getSharedPreferences(
                             getString(R.string.preference_file_key), Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPref.edit();
                     editor.putString("userToken", userToken);
                     editor.commit();
 
-                    // switch to course activity
+                    // Switch to course activity
                     startActivity(new Intent(LoginActivity.this, CourseActivity.class));
 //                    startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
 
-                    // Log out user from fb
+                    // Log out user from fb (temp solution to force user logging in every time in case token expired.)
                     LoginManager.getInstance().logOut();
+
+                    // Close LoginActivity
+//                    finish();
                 }else{
                     Log.d(LOG_TAG, "verification failed due to /auth/facebook API Response not 200");
                     LoginManager.getInstance().logOut();
+                    theHandler.sendEmptyMessage(0);
                 }
             }catch(JSONException e){
                 e.printStackTrace();
+            }
+        }
+    };
+
+    @SuppressLint("HandlerLeak")
+    private Handler theHandler = new Handler()
+    {
+        @Override
+        public void handleMessage(Message msg)
+        {
+            switch (msg.what)
+            {
+                case 0:
+                    al.setMessage("登入失敗...");
+                    al.show();
+                    break;
             }
         }
     };

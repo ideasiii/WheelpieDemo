@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">wheelpieDemo</string>
     <string name="title_activity_line_chart">LineChart</string>
-    <string name="ExerciseModelContent">10K4周課程4/30-5/30</string>
-    <string name="ExerciseContent">室內跑步</string>
+    <string name="ExerciseModelContent">ClassName+Date</string>
+    <string name="ExerciseContent">RunningType</string>
     <string name="ExerciseTime">時間</string>
     <string name="ExerciseTimeContent">00:00:00</string>
     <string name="HeartRate">心率</string>
@@ -17,8 +17,8 @@
     <string name="spotifybutton">spotifybutton</string>
     <string name="youtubebutton">youtubebutton</string>
     <string name="monitoring">monitoring</string>
-    <string name="ExerciseModel">訓練類型</string>
-    <string name="Exercise">訓練模式</string>
+    <string name="ExerciseType">訓練類型</string>
+    <string name="ExerciseMode">訓練模式</string>
 
     <string name="course_start_training">開始訓練</string>
 

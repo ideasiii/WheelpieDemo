@@ -43,6 +43,23 @@ public class TrainingActivity extends Activity_HeartRateDisplayBase
     private TextView timer;
     private TextView TrainingType;
     private TextView TrainingMode;
+    public TextView tv_status;
+    public TextView tv_estTimestamp;
+    public TextView tv_rssi;
+    public TextView tv_computedHeartRate;
+    public TextView tv_heartBeatCounter;
+    public TextView tv_heartBeatEventTime;
+    public TextView tv_manufacturerSpecificByte;
+    public TextView tv_previousHeartBeatEventTime;
+    public TextView tv_calculatedRrInterval;
+    public TextView tv_cumulativeOperatingTime;
+    public TextView tv_manufacturerID;
+    public TextView tv_serialNumber;
+    public TextView tv_hardwareVersion;
+    public TextView tv_softwareVersion;
+    public TextView tv_modelNumber;
+    public TextView tv_dataStatus;
+    public TextView tv_rrFlag;
     private boolean startflag = false;
     private int tsec = 0, csec = 0, cmin = 0, chr = 0;
     private static RestApiHeaderClient restApiHeaderClient = new RestApiHeaderClient();
@@ -285,11 +302,30 @@ public class TrainingActivity extends Activity_HeartRateDisplayBase
     
     }
 
-//    @Override
-//    protected void showDataDisplay(String status)
-//    {
-//
-//    }
+    @Override
+    protected void showDataDisplay(String status)
+    {
+        setContentView(R.layout.training_main);
+        
+        tv_status = (TextView) findViewById(R.id.textView_Status);
+        tv_estTimestamp = (TextView) findViewById(R.id.textView_EstTimestamp);
+        tv_rssi = (TextView) findViewById(R.id.textView_Rssi);
+        tv_computedHeartRate = (TextView) findViewById(R.id.textView_ComputedHeartRate);
+        tv_heartBeatCounter = (TextView) findViewById(R.id.textView_HeartBeatCounter);
+        tv_heartBeatEventTime = (TextView) findViewById(R.id.textView_HeartBeatEventTime);
+        tv_manufacturerSpecificByte = (TextView) findViewById(R.id.textView_ManufacturerSpecificByte);
+        tv_previousHeartBeatEventTime = (TextView) findViewById(R.id.textView_PreviousHeartBeatEventTime);
+        tv_calculatedRrInterval = (TextView) findViewById(R.id.textView_CalculatedRrInterval);
+        tv_cumulativeOperatingTime = (TextView) findViewById(R.id.textView_CumulativeOperatingTime);
+        tv_manufacturerID = (TextView) findViewById(R.id.textView_ManufacturerID);
+        tv_serialNumber = (TextView) findViewById(R.id.textView_SerialNumber);
+        tv_hardwareVersion = (TextView) findViewById(R.id.textView_HardwareVersion);
+        tv_softwareVersion = (TextView) findViewById(R.id.textView_SoftwareVersion);
+        tv_modelNumber = (TextView) findViewById(R.id.textView_ModelNumber);
+        tv_dataStatus = (TextView) findViewById(R.id.textView_DataStatus);
+        tv_rrFlag = (TextView) findViewById(R.id.textView_rRFlag);
+    
+    }
     
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -305,9 +341,9 @@ public class TrainingActivity extends Activity_HeartRateDisplayBase
         final ImageView startbutton = (ImageView) view1.findViewById(R.id.startbutton);//找出第一個視窗中的按鈕
         TextView backbutton = (TextView) view2.findViewById(R.id.textView14);//找出第二個視窗中的按鈕
         
-        TrainingMode = (TextView) view1.findViewById(R.id.textView2);//找出第一個視窗中訓練類型的字串框格
-        TrainingType = (TextView) view1.findViewById(R.id.textView12);//找出第一個視窗中訓練模式的字串框格
-        timer = (TextView) view1.findViewById(R.id.timer);
+        TrainingMode = (TextView) view1.findViewById(R.id.exercise_mode_content);//找出第一個視窗中訓練類型的字串框格
+        TrainingType = (TextView) view1.findViewById(R.id.exercise_type_content);//找出第一個視窗中訓練模式的字串框格
+        timer = (TextView) view1.findViewById(R.id.timer_content);
         
         //宣告Timer
         Timer timer01 = new Timer();

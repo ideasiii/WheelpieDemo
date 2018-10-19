@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          package="org.iii.wheelpiedemo">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="org.iii.wheelpiedemo">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="false"
@@ -16,33 +16,52 @@
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
         <activity android:name=".MainActivity">
-        <!--<activity android:name=".training.TrainingActivity">-->
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+            <!-- <activity android:name=".training.TrainingActivity"> -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".sample.LineChart"/>
-        <activity android:name=".sample.ApiActivity"/>
-        <activity android:name=".sample.VideoActivity"/>
+        <activity android:name=".sample.LineChart" />
+        <activity android:name=".sample.ApiActivity" />
+        <activity android:name=".sample.VideoActivity" />
         <activity
             android:name="com.dsi.ant.antplus.pluginsampler.heartrate.Activity_SearchUiHeartRateSampler"
             android:configChanges="orientation"
             android:label="Heart Rate Plugin Sampler"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".sample.SpeechActivity"/>
-        <activity android:name=".sample.SnowActivity"></activity>
-        <activity android:name=".training.TrainingActivity"></activity>
+            android:screenOrientation="portrait" />
+        <activity android:name=".sample.SpeechActivity" />
+        <activity android:name=".sample.SnowActivity" />
+        <activity android:name=".training.TrainingActivity" />
         <activity
             android:name=".login.LoginActivity"
-            android:screenOrientation="portrait" >
-        </activity>
-        <activity android:name=".dashboard.DashboardActivity"></activity>
-        <activity android:name=".course.CourseActivity"></activity>
-        <!--<meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/> <activity android:name="com.facebook.FacebookActivity" android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation" android:label="@string/app_name" /> <activity android:name="com.facebook.CustomTabActivity" android:exported="true"> <intent-filter> <action android:name="android.intent.action.VIEW" /> <category android:name="android.intent.category.DEFAULT" /> <category android:name="android.intent.category.BROWSABLE" /> <data android:scheme="@string/fb_login_protocol_scheme" /> </intent-filter> </activity>-->
-        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/> <activity android:name="com.facebook.FacebookActivity" android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation" android:label="@string/app_name" /> <activity android:name="com.facebook.CustomTabActivity" android:exported="true"> <intent-filter> <action android:name="android.intent.action.VIEW" /> <category android:name="android.intent.category.DEFAULT" /> <category android:name="android.intent.category.BROWSABLE" /> <data android:scheme="@string/fb_login_protocol_scheme" /> </intent-filter> </activity>
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".dashboard.DashboardActivity" />
+        <activity android:name=".course.CourseActivity" />
+        <!-- <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/> <activity android:name="com.facebook.FacebookActivity" android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation" android:label="@string/app_name" /> <activity android:name="com.facebook.CustomTabActivity" android:exported="true"> <intent-filter> <action android:name="android.intent.action.VIEW" /> <category android:name="android.intent.category.DEFAULT" /> <category android:name="android.intent.category.BROWSABLE" /> <data android:scheme="@string/fb_login_protocol_scheme" /> </intent-filter> </activity> -->
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
 
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name" />
+        <activity
+            android:name="com.facebook.CustomTabActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="@string/fb_login_protocol_scheme" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".sample.TrainingSampleActivity"></activity>
     </application>
 
 </manifest>

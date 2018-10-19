@@ -13,6 +13,7 @@ import org.iii.wheelpiedemo.sample.ApiActivity;
 import org.iii.wheelpiedemo.sample.LineChart;
 import org.iii.wheelpiedemo.sample.SnowActivity;
 import org.iii.wheelpiedemo.sample.SpeechActivity;
+import org.iii.wheelpiedemo.sample.TrainingSampleActivity;
 import org.iii.wheelpiedemo.sample.VideoActivity;
 import org.iii.wheelpiedemo.training.TrainingActivity;
 
@@ -33,7 +34,7 @@ public class MainActivity extends Activity
                 .Activity_SearchUiHeartRateSampler.class);
         put(R.id.imageViewSpeech, SpeechActivity.class);
         put(R.id.imageViewSnow, SnowActivity.class);
-        put(R.id.imageViewTrainging, TrainingActivity.class);
+        put(R.id.imageViewTrainging, TrainingSampleActivity.class);
     }};
 
     @Override

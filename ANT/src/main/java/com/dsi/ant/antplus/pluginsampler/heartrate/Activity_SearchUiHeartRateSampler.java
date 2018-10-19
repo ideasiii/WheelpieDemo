@@ -30,20 +30,20 @@ public class Activity_SearchUiHeartRateSampler extends Activity_HeartRateDisplay
 
     @Override
     protected void requestAccessToPcc()
+{
+    Intent intent = getIntent();
+    if (intent.hasExtra(Activity_MultiDeviceSearchSampler.EXTRA_KEY_MULTIDEVICE_SEARCH_RESULT))
     {
-        Intent intent = getIntent();
-        if (intent.hasExtra(Activity_MultiDeviceSearchSampler.EXTRA_KEY_MULTIDEVICE_SEARCH_RESULT))
-        {
-            // device has already been selected through the multi-device search
-            MultiDeviceSearchResult result = intent
+        // device has already been selected through the multi-device search
+        MultiDeviceSearchResult result = intent
                 .getParcelableExtra(Activity_MultiDeviceSearchSampler.EXTRA_KEY_MULTIDEVICE_SEARCH_RESULT);
-            releaseHandle = AntPlusHeartRatePcc.requestAccess(this, result.getAntDeviceNumber(), 0,
-                base_IPluginAccessResultReceiver, base_IDeviceStateChangeReceiver);
-        } else
-        {
-            // starts the plugins UI search
-            releaseHandle = AntPlusHeartRatePcc.requestAccess(this, this,
-                base_IPluginAccessResultReceiver, base_IDeviceStateChangeReceiver);
-        }
+        releaseHandle = AntPlusHeartRatePcc.requestAccess(this, result.getAntDeviceNumber(), 0,
+                                                          base_IPluginAccessResultReceiver, base_IDeviceStateChangeReceiver);
+    } else
+    {
+        // starts the plugins UI search
+        releaseHandle = AntPlusHeartRatePcc.requestAccess(this, this,
+                                                          base_IPluginAccessResultReceiver, base_IDeviceStateChangeReceiver);
     }
+}
 }

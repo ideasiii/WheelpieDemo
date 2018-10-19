@@ -5,10 +5,10 @@
     <color name="colorAccent">#FF4081</color>
     <color name="black_overlay">#66000000</color>
     <color name="White">#FFFFFFFF</color>
-    <color name="Gray">#ff999999</color>
+    <color name="Gray">#999999</color>
     <color name="Black">#FF000000</color>
     <color name="Blue">#01B4F5</color>
-    <color name="Focus_Blue">#FF4CAFDD</color>
+    <color name="Focus_Blue">#4cafdd</color>
     <color name="Trans_Black">#4c000000</color>
     <color name="Black_Gray">#ee303030</color>
 

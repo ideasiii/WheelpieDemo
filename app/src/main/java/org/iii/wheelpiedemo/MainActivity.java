@@ -23,7 +23,7 @@ import android.os.Handler;
 public class MainActivity extends Activity
 {
     private final int MSG_RUN_LOGIN = 0;
-    
+
     static final HashMap<Integer, Class<?>> mapActivity = new HashMap<Integer, Class<?>>()
     {{
         put(R.id.imageViewLineChart, LineChart.class);
@@ -33,33 +33,34 @@ public class MainActivity extends Activity
                 .Activity_SearchUiHeartRateSampler.class);
         put(R.id.imageViewSpeech, SpeechActivity.class);
         put(R.id.imageViewSnow, SnowActivity.class);
+        put(R.id.imageViewTrainging, TrainingActivity.class);
     }};
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
+
         for (int ImageViewId : mapActivity.keySet())
             findViewById(ImageViewId).setOnClickListener(viewOnClick);
     }
-    
+
     @Override
     protected void onStart()
     {
         super.onStart();
         handler.sendEmptyMessageDelayed(MSG_RUN_LOGIN, 5000);
     }
-    
+
     @Override
     protected void onPause()
     {
         handler.removeMessages(MSG_RUN_LOGIN);
         super.onPause();
-        
+
     }
-    
+
     private View.OnClickListener viewOnClick = new View.OnClickListener()
     {
         @Override
@@ -71,7 +72,7 @@ public class MainActivity extends Activity
             startActivity(intent);
         }
     };
-    
+
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler()
     {

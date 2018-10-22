@@ -67,8 +67,9 @@ public class TrainingSampleActivity extends Activity
 
 
     }
+    
 
-
+    
     private void requestAccessToPcc()
     {
         Intent intent = getIntent();
@@ -106,6 +107,7 @@ public class TrainingSampleActivity extends Activity
                     switch (resultCode)
                     {
                         case SUCCESS:
+                            Logs.showTrace("When device connect success. What do u want to do?");
                             hrPcc = result;
 //                            tv_status.setText(result.getDeviceName() + ": " + initialDeviceState);
                             subscribeToHrEvents();

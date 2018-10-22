@@ -9,6 +9,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,6 +27,8 @@ import org.iii.more.restapiclient.Response;
 import org.iii.wheelpiedemo.R;
 import org.iii.wheelpiedemo.common.Logs;
 import org.iii.wheelpiedemo.common.RestApiHeaderClient;
+import org.iii.wheelpiedemo.course.util.AChartEngineUtils;
+import org.iii.wheelpiedemo.course.util.HelloChartUtils;
 import org.iii.wheelpiedemo.login.LoginActivity;
 import org.iii.wheelpiedemo.sample.VideoPlayer;
 import org.iii.wheelpiedemo.training.TrainingActivity;
@@ -34,18 +37,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.TimeZone;
 
-import lecho.lib.hellocharts.model.Axis;
-import lecho.lib.hellocharts.model.BubbleChartData;
-import lecho.lib.hellocharts.model.BubbleValue;
-import lecho.lib.hellocharts.model.ValueShape;
-import lecho.lib.hellocharts.model.Viewport;
-import lecho.lib.hellocharts.util.ChartUtils;
-import lecho.lib.hellocharts.view.BubbleChartView;
+import static org.iii.wheelpiedemo.course.util.ViewUtils.*;
 
 public class CourseActivity extends AppCompatActivity {
 
@@ -81,7 +76,7 @@ public class CourseActivity extends AppCompatActivity {
             //requestTodayTrainingAPI("2018-10-08");
             requestTodayTrainingAPI(getTodayDate());
         } else {
-            sendMessage(MSG_CONTENT_VIEW_LOGIN);
+            sendCustomMessage(MSG_CONTENT_VIEW_LOGIN);
         }
     }
 
@@ -134,11 +129,11 @@ public class CourseActivity extends AppCompatActivity {
         Logs.showTrace("[API] http response id: " + nResponse_id);
     }
 
-    private void sendMessage(int msg) {
-        sendMessage(msg, null);
+    private void sendCustomMessage(int msg) {
+        sendCustomMessage(msg, null);
     }
 
-    private void sendMessage(int msg, Object obj) {
+    private void sendCustomMessage(int msg, Object obj) {
         Message message = new Message();
         message.what = msg;
         message.obj = obj;
@@ -209,9 +204,12 @@ public class CourseActivity extends AppCompatActivity {
             JSONObject jsonResp = new JSONObject(apiResponse);
             JSONObject dayView = jsonResp.getJSONObject("planDayView");
             JSONObject dayTraining = dayView.getJSONObject("dayTraining");
+            //取出訓練類型及第幾天
+            String dayInfo = dayTraining.getString("dayInfo");
+            updateActionBar(dayInfo);
             // 取出訓練課程內容
             JSONArray trainingContents = dayTraining.getJSONArray("contents");
-            for (int i=0;i<trainingContents.length();i+=1) {
+            for (int i=0; i<trainingContents.length(); i+=1) {
                 JSONObject content = trainingContents.getJSONObject(i);
                 // 取出title
                 String titleText = content.getString("title");
@@ -244,13 +242,10 @@ public class CourseActivity extends AppCompatActivity {
                     setMargins(video, 0, 10, 0, 10);
                 }
                 // 取出圖表
-                JSONObject chart = getChartInfo(content);
+                CourseChart chart = getChartInfo(content);
                 // 處理圖表呈現
                 if (chart != null) {
-                    BubbleChartView chartView = createBubbleChart();
-                    setViewLayout(contentLayout, chartView, ViewGroup.LayoutParams.MATCH_PARENT, 250);
-                    CourseChart info = extractChartInfo(chart);
-                    updateBubbleChart(chartView, info);
+                    AChartEngineUtils.drawChart(this, contentLayout, chart);
                 }
             }
         } catch (JSONException e) {
@@ -258,149 +253,8 @@ public class CourseActivity extends AppCompatActivity {
         }
     }
 
-    private class CourseChart {
-        private String xAxisTitle;
-        private String yAxisTitle;
-        public ArrayList<SquareBlock> data = new ArrayList<SquareBlock>();
-
-        public CourseChart(JSONObject chart) {
-            if (chart != null) {
-                // 取得x軸名稱
-                try {
-                    JSONObject xAxis = chart.getJSONObject("xAxis");
-                    this.xAxisTitle = xAxis.getString("text");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                // 取得y軸名稱
-                try {
-                    JSONObject xAxis = chart.getJSONObject("yAxis");
-                    this.yAxisTitle = xAxis.getString("text");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                // 取得data
-                try {
-                    JSONObject series = chart.getJSONObject("series");
-                    JSONArray chartData = series.getJSONArray("data");
-                    for (int i=0; i< chartData.length(); i+=1) {
-                        data.add(new SquareBlock(chartData.getJSONObject(i)));
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        public String getxAxisTitle() {
-            return xAxisTitle;
-        }
-
-        public String getyAxisTitle() {
-            return yAxisTitle;
-        }
-    }
-
-    private class SquareBlock {
-        private int xStart = 0;
-        private int xEnd = 0;
-        private int yStart = 0;
-        private int yEnd = 0;
-        private int x = 0;
-        private int y = 0;
-        private int z = 0;
-
-        public SquareBlock (JSONObject block) {
-            if (block != null) {
-                try {
-                    xStart = block.getInt("xStart");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    xEnd = block.getInt("xEnd");
-                    x = xStart + (xEnd - xStart )/2;
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    yStart = block.getInt("yStart");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    yEnd = block.getInt("yEnd");
-                    y = yStart + (yEnd - yStart )/2;
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    private CourseChart extractChartInfo (JSONObject chart) {
-        return new CourseChart(chart);
-    }
-
-    private void updateBubbleChart(BubbleChartView chart, CourseChart chartInfo){
-        int BUBBLES_NUM = chartInfo != null ? chartInfo.data.size() : 0;
-
-        BubbleChartData data;
-        boolean hasAxes = true;
-        boolean hasAxesNames = true;
-        ValueShape shape = ValueShape.SQUARE;
-        boolean hasLabels = false;
-        boolean hasLabelForSelected = false;
-
-
-        List<BubbleValue> values = new ArrayList<BubbleValue>();
-        //for (int i = 0; i < chartInfo.data.size(); ++i) {
-        for (SquareBlock sb : chartInfo.data) {
-            //BubbleValue value = new BubbleValue(i, (float) Math.random() * 100, (float) Math.random() * 1000);
-            BubbleValue value = new BubbleValue(sb.x, sb.y, 50);
-            value.setColor(ChartUtils.pickColor());
-            value.setShape(shape);
-            values.add(value);
-        }
-
-        data = new BubbleChartData(values);
-        data.setHasLabels(hasLabels);
-        data.setHasLabelsOnlyForSelected(hasLabelForSelected);
-
-        if (hasAxes) {
-            Axis axisX = new Axis();
-            Axis axisY = new Axis().setHasLines(true);
-            if (hasAxesNames) {
-                axisX.setName(chartInfo.getxAxisTitle());
-                axisY.setName(chartInfo.getyAxisTitle());
-            }
-            data.setAxisXBottom(axisX);
-            data.setAxisYLeft(axisY);
-        } else {
-            data.setAxisXBottom(null);
-            data.setAxisYLeft(null);
-        }
-
-        chart.setBubbleChartData(data);
-    }
-
-    private BubbleChartView createBubbleChart() {
-        BubbleChartView chart = new BubbleChartView(this);
-
-//        chart.setContainerScrollEnabled(true, ContainerScrollType.HORIZONTAL);
-//        chart.setScrollEnabled(true);
-        Viewport viewport = new Viewport(chart.getMaximumViewport());
-        viewport.top = 220;
-        viewport.bottom = 0;
-//        viewport.right = 10;
-        viewport.left = 0;
-        chart.setMaximumViewport(viewport);
-        chart.setCurrentViewport(viewport);
-
-        return chart;
-    }
-
-    private JSONObject getChartInfo (JSONObject trainingContent) {
+    private CourseChart getChartInfo (JSONObject trainingContent) {
+        CourseChart courseChart = null;
         JSONObject chart = null;
         if (trainingContent != null) {
             try {
@@ -415,8 +269,11 @@ public class CourseActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
+            if (chart != null) {
+                courseChart = extractChartInfo(chart);
+            }
         }
-        return chart;
+        return courseChart;
     }
 
     private TextView createTitle(String text) {
@@ -491,32 +348,11 @@ public class CourseActivity extends AppCompatActivity {
         return vid;
     }
 
-    private void setViewLayout(ViewGroup parent, View v, int widthDP, int heightDP) {
-        if (parent !=null && v != null) {
-            //
-            parent.addView(v);
-            v.getLayoutParams().width = convertDPtoPx(widthDP);
-            v.getLayoutParams().height = convertDPtoPx(heightDP);
+    private void updateActionBar(String title) {
+        ActionBar ab = getSupportActionBar();
+        if (ab != null && title != null) {
+            ab.setTitle(title);
         }
-    }
-
-    private void setMargins(View v, int left, int top, int right, int buttom) {
-        if (v instanceof ViewGroup) {
-            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
-            params.setMargins(
-                convertDPtoPx(left),
-                convertDPtoPx(top),
-                convertDPtoPx(right),
-                convertDPtoPx(buttom)
-            );
-            v.requestLayout();
-        }
-    }
-
-    private int convertDPtoPx(int dp) {
-        final float scale = getResources().getDisplayMetrics().density;
-        int px = (int) (dp * scale + 0.5f);  // replace 100 with your dimensions
-        return px;
     }
 
     private int getStyleResourceId(String name) {
@@ -550,7 +386,18 @@ public class CourseActivity extends AppCompatActivity {
                     strMsg = getResponseJSONString((JSONObject)msg.obj);
                     String trainingId = extractDayTrainingId(strMsg);
                     // 呼叫當日課程說明API
-                    requestCourseDayViewAPI(trainingId);
+                    if (trainingId != null) {
+                        requestCourseDayViewAPI(trainingId);
+                    } else {
+                        // 移除等待訊息框
+                        dialog.dismiss();
+                        // 今天無訓練課程，請至CoachBot服務產生今日課程
+                        Toast.makeText(
+                                getApplicationContext(),
+                                "今天無訓練課程，請至CoachBot服務產生今日訓練課程",
+                                Toast.LENGTH_LONG
+                        ).show();
+                    }
                     break;
                 case MSG_DAY_VIEW_API_RESPONSE:
                     strMsg = getResponseJSONString((JSONObject)msg.obj);
@@ -570,7 +417,7 @@ public class CourseActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (!isUserLoggedIn()) {
-            sendMessage(MSG_CONTENT_VIEW_LOGIN);
+            sendCustomMessage(MSG_CONTENT_VIEW_LOGIN);
         };
     }
 }

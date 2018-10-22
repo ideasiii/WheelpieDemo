@@ -48,12 +48,14 @@ public class CourseActivity extends AppCompatActivity {
     private static RestApiHeaderClient restApiHeaderClient = new RestApiHeaderClient();
     private static String courseAPIURL = "https://dsicoach.win/api/plan/my-course/plan/day-view";
     private static String trainingAPIURL = "https://dsicoach.win/api/plan/my-training/dayTraining";
-    private static String warmUpVideoURI = "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4";
+    //private static String warmUpVideoURI = "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4";
+    private static String warmUpVideoURI = "https://dsicoach.win/video/warm_up_YouTube_720.mp4";
     private final String PREF_USER_TOKEN_KEY = "userToken";
     private final int MSG_DAY_TRAINING_API_RESPONSE = 0;
     private final int MSG_DAY_VIEW_API_RESPONSE = 1;
     private final int MSG_CONTENT_VIEW_LOGIN = 2;
     private LinearLayout contentLayout;
+    private VideoPlayer videoPlayer = null;
     private String userToken;
     private ProgressDialog dialog;
     private long videoDuration;
@@ -235,11 +237,11 @@ public class CourseActivity extends AppCompatActivity {
 //                            ViewGroup.LayoutParams.MATCH_PARENT,
 //                            ViewGroup.LayoutParams.MATCH_PARENT
 //                    );
-                    VideoPlayer video = new VideoPlayer(this);
-                    video.showController(true);
-                    video.setVideo(Uri.parse(warmUpVideoURI));
-                    setViewLayout(contentLayout, video, ViewGroup.LayoutParams.MATCH_PARENT, 200);
-                    setMargins(video, 0, 10, 0, 10);
+                    videoPlayer = new VideoPlayer(this);
+                    videoPlayer.showController(true);
+                    videoPlayer.setVideo(Uri.parse(warmUpVideoURI));
+                    setViewLayout(contentLayout, videoPlayer, ViewGroup.LayoutParams.MATCH_PARENT, 200);
+                    setMargins(videoPlayer, 0, 10, 0, 10);
                 }
                 // 取出圖表
                 CourseChart chart = getChartInfo(content);
@@ -405,6 +407,10 @@ public class CourseActivity extends AppCompatActivity {
                     initViewByAPIResponse(strMsg);
                     // 移除等待訊息框
                     dialog.dismiss();
+                    // 播放影片
+                    if (videoPlayer != null) {
+                        videoPlayer.play();
+                    }
                     break;
                 case MSG_CONTENT_VIEW_LOGIN:
                     Intent it = new Intent(CourseActivity.this, LoginActivity.class);
@@ -419,5 +425,13 @@ public class CourseActivity extends AppCompatActivity {
         if (!isUserLoggedIn()) {
             sendCustomMessage(MSG_CONTENT_VIEW_LOGIN);
         };
+    }
+
+    @Override
+    protected void onStop() {
+        if (videoPlayer != null) {
+            videoPlayer.stop();
+        }
+        super.onStop();
     }
 }

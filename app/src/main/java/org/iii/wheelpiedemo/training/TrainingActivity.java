@@ -124,7 +124,7 @@ public class TrainingActivity extends Activity
         try
         {
             JSONObject resp = new JSONObject(jsonString);
-            JSONObject dayPlan = resp.getJSONObject("dayPlan");
+            JSONObject dayPlan = resp.getJSONObject("msg_reply");
             JSONObject dayTraining = dayPlan.getJSONObject("dayTraining");
             id = String.valueOf(dayTraining.getInt("id"));
         }

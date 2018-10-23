@@ -23,7 +23,7 @@ public class SpeechActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_speech);
 
-        findViewById(R.id.imageViewSpeechBtn).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.chat_imageViewSpeechBtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view)
             {
@@ -56,7 +56,7 @@ public class SpeechActivity extends Activity
             // 語音識別會有多個結果，第一個是最精確的
             String text = matches.get(0);
             Logs.showTrace("speech: " + text);
-            ((TextView)findViewById(R.id.textViewSpeech)).setText(text);
+            ((TextView)findViewById(R.id.chat_textViewSpeech)).setText(text);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

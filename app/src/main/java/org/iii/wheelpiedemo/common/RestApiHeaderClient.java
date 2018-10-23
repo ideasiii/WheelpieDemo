@@ -64,6 +64,7 @@ public class RestApiHeaderClient {
             this.mstrHttpsURL = httpsURL;
             this.mHttp_data_type = http_data_type;
             this.mParameters = parameters;
+            this.mResponse = response;
             this.mHeaders = headers;
         }
 

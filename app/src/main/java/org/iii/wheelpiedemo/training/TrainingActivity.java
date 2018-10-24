@@ -486,9 +486,9 @@ public class TrainingActivity extends Activity
                     startflag = true;
                 }
 
-//                Intent intent = null;
-//                intent = new Intent(TrainingActivity.this, SpeechActivity.class);
-//                startActivity(intent);
+                Intent intent = null;
+                intent = new Intent(TrainingActivity.this, SpeechActivity.class);
+                startActivity(intent);
             }
         });
 

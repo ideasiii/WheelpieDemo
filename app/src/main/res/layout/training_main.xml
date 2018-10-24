@@ -11,9 +11,9 @@
         android:layout_height="match_parent"
         android:gravity="center_horizontal"
         android:orientation="vertical"
+        tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp"
-        tools:ignore="MissingConstraints">
+        tools:layout_editor_absoluteY="0dp">
 
         <TableLayout
             android:layout_width="match_parent"
@@ -37,21 +37,23 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/ExerciseType"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
             </TableRow>
 
             <TableRow>
+
                 <TextView
                     android:id="@+id/exercise_mode_content"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="3dip"
                     android:text="@string/ExerciseModelContent"/>
+
                 <TextView
                     android:id="@+id/exercise_type_content"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/ExerciseContent" />
+                    android:text="@string/ExerciseContent"/>
             </TableRow>
         </TableLayout>
 
@@ -69,7 +71,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/ExerciseTime"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
             </TableRow>
 
             <TableRow>
@@ -78,10 +80,9 @@
                     android:id="@+id/timer_content"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/ExerciseTimeContent" />
+                    android:text="@string/ExerciseTimeContent"/>
             </TableRow>
         </TableLayout>
-
 
         <TableLayout
             android:layout_width="match_parent"
@@ -98,7 +99,7 @@
                     android:layout_height="wrap_content"
                     android:padding="3dip"
                     android:text="@string/HeartRate"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
 
                 <TextView
                     android:id="@+id/textView4"
@@ -106,7 +107,7 @@
                     android:layout_height="wrap_content"
                     android:padding="3dip"
                     android:text="@string/Distance"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
 
                 <TextView
                     android:id="@+id/textView5"
@@ -114,14 +115,14 @@
                     android:layout_height="wrap_content"
                     android:padding="3dip"
                     android:text="@string/Speed"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
 
                 <TextView
                     android:id="@+id/textView6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/Calories"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
 
             </TableRow>
 
@@ -132,27 +133,27 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="3dip"
-                    android:text="@string/HeartRateContent" />
+                    android:text="@string/HeartRateContent"/>
 
                 <TextView
                     android:id="@+id/textView9"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="3dip"
-                    android:text="@string/DistanceContent" />
+                    android:text="@string/DistanceContent"/>
 
                 <TextView
                     android:id="@+id/textView10"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="3dip"
-                    android:text="@string/SpeedContent" />
+                    android:text="@string/SpeedContent"/>
 
                 <TextView
                     android:id="@+id/textView11"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/CaloriesContent" />
+                    android:text="@string/CaloriesContent"/>
             </TableRow>
 
         </TableLayout>
@@ -180,7 +181,6 @@
                     android:text="@string/Distance"
                     android:textAppearance="@style/TextAppearance.AppCompat.Large"
                     android:visibility="gone"/>
-
 
                 <TextView
                     android:id="@+id/unused_3"
@@ -261,7 +261,6 @@
                     android:textAppearance="@style/TextAppearance.AppCompat.Large"
                     android:visibility="gone"/>
 
-
                 <TextView
                     android:id="@+id/unused_11"
                     android:layout_width="wrap_content"
@@ -340,7 +339,6 @@
                     android:text="@string/Distance"
                     android:textAppearance="@style/TextAppearance.AppCompat.Large"
                     android:visibility="gone"/>
-
 
                 <TextView
                     android:id="@+id/unused_19"
@@ -421,7 +419,6 @@
                     android:textAppearance="@style/TextAppearance.AppCompat.Large"
                     android:visibility="gone"/>
 
-
                 <TextView
                     android:id="@+id/unused_23"
                     android:layout_width="wrap_content"
@@ -477,18 +474,25 @@
 
         </TableLayout>
 
-
-        <!--<FrameLayout-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content">-->
         <ImageView
             android:id="@+id/imageView5"
             android:layout_width="250dp"
             android:layout_height="230dp"
             android:contentDescription="@string/monitoring"
             android:src="@drawable/training_monitoring"
-            />
-        <!--</FrameLayout>-->
+            android:visibility="gone"/>
+
+        <lecho.lib.hellocharts.view.LineChartView
+            android:id="@+id/chartLine"
+            android:layout_width="wrap_content"
+            android:layout_height="190dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="20dp"
+            android:background="@android:color/black"
+            android:scrollbarAlwaysDrawHorizontalTrack="true"
+            android:scrollbarAlwaysDrawVerticalTrack="true"
+            android:scrollbars="horizontal|vertical"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -504,7 +508,7 @@
                 android:scaleType="centerCrop"
                 android:visibility="gone"
                 app:srcCompat="@drawable/training_spotifybutton"
-                tools:visibility="gone" />
+                tools:visibility="gone"/>
 
             <ImageView
                 android:id="@+id/startbutton"
@@ -521,8 +525,7 @@
                 android:adjustViewBounds="false"
                 android:cropToPadding="false"
                 android:src="@drawable/training_stopbutton"
-                android:visibility="gone"
-                />
+                android:visibility="gone"/>
 
             <ImageButton
                 android:id="@+id/youtubebutton"
@@ -532,12 +535,9 @@
                 android:scaleType="centerCrop"
                 android:visibility="gone"
                 app:srcCompat="@drawable/training_youtubebutton"
-                tools:visibility="gone" />
+                tools:visibility="gone"/>
 
         </LinearLayout>
-
-
-
 
     </LinearLayout>
 

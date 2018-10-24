@@ -7,13 +7,13 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.annotation.SuppressLint;
-import android.os.SystemClock;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -32,29 +32,41 @@ import com.dsi.ant.plugins.antplus.pccbase.AntPlusCommonPcc;
 import com.dsi.ant.plugins.antplus.pccbase.AntPlusLegacyCommonPcc;
 import com.dsi.ant.plugins.antplus.pccbase.MultiDeviceSearch;
 import com.dsi.ant.plugins.antplus.pccbase.PccReleaseHandle;
-import com.dsi.ant.antplus.pluginsampler.datatransfer.WheelPiesClient;
 
 import org.iii.more.restapiclient.Config;
 import org.iii.more.restapiclient.Response;
 import org.iii.wheelpiedemo.R;
 import org.iii.wheelpiedemo.chat.SpeechActivity;
 import org.iii.wheelpiedemo.common.Logs;
+import org.iii.wheelpiedemo.common.RestApiHeaderClient;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
-import org.iii.wheelpiedemo.common.RestApiHeaderClient;
+import org.iii.wheelpiedemo.sample.LineChart;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import lecho.lib.hellocharts.gesture.ContainerScrollType;
+import lecho.lib.hellocharts.model.Axis;
+import lecho.lib.hellocharts.model.AxisValue;
+import lecho.lib.hellocharts.model.Line;
+import lecho.lib.hellocharts.model.LineChartData;
+import lecho.lib.hellocharts.model.PointValue;
+import lecho.lib.hellocharts.model.Viewport;
+import lecho.lib.hellocharts.view.LineChartView;
 
 @SuppressLint("Registered")
 public class TrainingActivity extends Activity
 {
-    
+
     /**
      * Layout
      */
@@ -85,7 +97,12 @@ public class TrainingActivity extends Activity
     private TextView tv_modelNumber;
     private TextView tv_dataStatus;
     private TextView tv_rrFlag;
-    
+    static int nXData = 0;
+    Boolean bRun = false;
+    LineChartView lineChartView;
+    String[] axisData = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
+    Timer timer02 = new Timer(true);
+
     /**
      * ANT+ Library
      */
@@ -94,7 +111,7 @@ public class TrainingActivity extends Activity
     protected PccReleaseHandle<AntPlusHeartRatePcc> releaseHandle = null;
     WheelPiesClient wheelPiesClient = null;
     String mstrUUID = "";
-    
+
     private String getResponseJSONString(JSONObject clientResp)
     {
         String jsonString = null;
@@ -111,7 +128,7 @@ public class TrainingActivity extends Activity
         }
         return jsonString;
     }
-    
+
     private String extractDayTrainingId(String jsonString)
     {
         String id = null;
@@ -119,7 +136,7 @@ public class TrainingActivity extends Activity
         {
             return null;
         }
-        
+
         try
         {
             JSONObject resp = new JSONObject(jsonString);
@@ -133,7 +150,7 @@ public class TrainingActivity extends Activity
         }
         return id;
     }
-    
+
     private RestApiHeaderClient.ResponseListener dayViewResponseListener = new RestApiHeaderClient
             .ResponseListener()
     {
@@ -147,7 +164,7 @@ public class TrainingActivity extends Activity
             handler.sendMessage(message);
         }
     };
-    
+
     private void requestCourseDayViewAPI(String dayTrainingId)
     {
         restApiHeaderClient.setResponseListener(dayViewResponseListener);
@@ -161,7 +178,7 @@ public class TrainingActivity extends Activity
                 param, response, headers);
 //        Logs.showTrace("[API] http response id: " + nResponse_id);
     }
-    
+
     //任何Task(如:TimerTask)無法直接改變元件因此要透過Handler來當橋樑
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler()
@@ -175,18 +192,18 @@ public class TrainingActivity extends Activity
                 case 1:
                     csec = tsec % 60;
                     cmin = tsec / 60;
-                    
+
                     if (cmin >= 60)
                     {
                         cmin = cmin % 60;
                     }
-                    
+
                     chr = tsec / 3600;
                     if (chr >= 24)
                     {
                         chr = chr % 24;
                     }
-                    
+
                     String s = "";
                     //定義進位時的顯示情況
                     if (chr < 10)
@@ -197,7 +214,7 @@ public class TrainingActivity extends Activity
                     {
                         s = "" + chr;
                     }
-                    
+
                     if (cmin < 10)
                     {
                         s = s + ":0" + cmin;
@@ -206,7 +223,7 @@ public class TrainingActivity extends Activity
                     {
                         s = s + ":" + cmin;
                     }
-                    
+
                     if (csec < 10)
                     {
                         s = s + ":0" + csec;
@@ -215,21 +232,21 @@ public class TrainingActivity extends Activity
                     {
                         s = s + ":" + csec;
                     }
-                    
+
                     //s字串為00:00:00格式
                     timer.setText(s);
                     break;
-                
+
                 case 3:
                     break;
-                
+
                 case MSG_DAY_TRAINING_API_RESPONSE:
                     JSONObject resp = (JSONObject) msg.obj;
                     try
                     {
                         //String resp_code = resp.getString("code");
                         //if ("-1".equals(resp_code)) //因為java屬於物件導向的程式語言,注意在string的比較中要用equals去比
-    
+
                         int resp_code = resp.getInt("code");
                         if (resp_code == -1)
                         {
@@ -248,10 +265,10 @@ public class TrainingActivity extends Activity
                             //Logs.showTrace("show me data" + excerciseMode);
                             TrainingMode.setText(excerciseMode);
                             TrainingType.setText(excerciseType);
-        
+
                             // 呼叫當日課程說明API
                             requestCourseDayViewAPI(trainingId);
-        
+
                         }
                     }
                     catch (JSONException e)
@@ -259,31 +276,30 @@ public class TrainingActivity extends Activity
                         e.printStackTrace();
                         break;
                     }
-                    
+
             }
         }
     };
-    
+
     private TimerTask task = new TimerTask()
     {
-        
+
         @Override
         public void run()
         {
             // TODO Auto-generated method stub
-            
+
             //一開始的時候message先丟3
 //            Message IniMessage = new Message();
 //            IniMessage.what = 3;
 //            handler.sendMessage(IniMessage);
-            
+
             if (startflag)
             {
                 //如果startflag是true則每秒tsec+1
-                
                 tsec++;
                 Message message = new Message();
-                
+
                 //傳送訊息1
                 message.what = 1;
                 handler.sendMessage(message);
@@ -293,20 +309,20 @@ public class TrainingActivity extends Activity
             {
                 //如果startflag是false則重製秒數
                 // (注意:畫面一開始停留的頁面即是flag==false的時候,所以這時候local value會被重製一次)
-                tsec = 0;
-                csec = 0;
-                cmin = 0;
-                chr = 0;
+//                tsec = 0;
+//                csec = 0;
+//                cmin = 0;
+//                chr = 0;
                 Message message = new Message();
-                
+
                 //傳送訊息1
                 message.what = 1;
                 handler.sendMessage(message);
             }
         }
-        
+
     };
-    
+
     private void requestTodayTrainingAPI(String dateString)
     {
         restApiHeaderClient.setResponseListener(todayTrainingResponseListener);
@@ -320,7 +336,7 @@ public class TrainingActivity extends Activity
                 param, response, headers);
 //        Logs.showTrace("[API] http response id: " + nResponse_id);
     }
-    
+
     private RestApiHeaderClient.ResponseListener todayTrainingResponseListener = new RestApiHeaderClient
             .ResponseListener()
     {
@@ -334,33 +350,37 @@ public class TrainingActivity extends Activity
             handler.sendMessage(message);
         }
     };
-    
-    
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.training_main);
-        
+
         //畫面切換
         LayoutInflater inflater = getLayoutInflater();
         final View view1 = inflater.inflate(R.layout.training_main, null);//找出第一個視窗
         final View view2 = inflater.inflate(R.layout.training_device_connection, null);//找出第二個視窗
         setContentView(view1); //顯示目前第一個視窗
-        
+
         final ImageView startbutton = (ImageView) view1.findViewById(R.id.startbutton);//找出第一個視窗中start的按鈕
         final ImageView stopbutton = (ImageView) view1.findViewById(R.id.stopbutton);//找出第一個視窗中stop的按鈕
-        startbutton.setTag(0);
 //        TextView backbutton = (TextView) view2.findViewById(R.id.textView14);//找出第二個視窗中的按鈕
+        startbutton.setTag(0);
+        stopbutton.setTag(0);
+
         TrainingMode = (TextView) view1.findViewById(R.id.exercise_mode_content);//找出第一個視窗中訓練類型的字串框格
         TrainingType = (TextView) view1.findViewById(R.id.exercise_type_content);//找出第一個視窗中訓練模式的字串框格
-        
+        lineChartView = view1.findViewById(R.id.chartLine); //找出第一個視窗中折線圖的image
+
         timer = (TextView) view1.findViewById(R.id.timer_content);
-    
+
         tv_status = (TextView) findViewById(R.id.textView_Status);
         tv_estTimestamp = (TextView) findViewById(R.id.textView_EstTimestamp);
         tv_rssi = (TextView) findViewById(R.id.textView_Rssi);
-        textView_ComputedHeartRate = (TextView) view1.findViewById(R.id.textView_ComputedHeartRate);//找出第一個視窗中心率的字串框格
+        textView_ComputedHeartRate = (TextView) view1.findViewById(R.id.textView_ComputedHeartRate);
+        //找出第一個視窗中心率的字串框格
         tv_heartBeatCounter = (TextView) findViewById(R.id.textView_HeartBeatCounter);
         tv_heartBeatEventTime = (TextView) findViewById(R.id.textView_HeartBeatEventTime);
         tv_manufacturerSpecificByte = (TextView) findViewById(R.id.textView_ManufacturerSpecificByte);
@@ -375,21 +395,22 @@ public class TrainingActivity extends Activity
         tv_dataStatus = (TextView) findViewById(R.id.textView_DataStatus);
         tv_rrFlag = (TextView) findViewById(R.id.textView_rRFlag);
 //        btn_Active = (Button) findViewById(R.id.button_active);
-        
+
         wheelPiesClient = new WheelPiesClient();
         mnState = 0;
         //Button監聽,第一種寫法,在上面先定義listener,function帶入即可
 //        startbutton.setOnClickListener(listener);
         //Button監聽,第二種寫法,(第一個畫面在做的事情)
-        
+        requestTodayTrainingAPI("2018-10-22");
+
         startbutton.setOnClickListener(new OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                Logs.showTrace("fuck here:" + v.getTag());
+                Logs.showTrace("startbutton onClick:" + v.getTag());
                 int nRun = (int) v.getTag();
-                
+
                 if (nRun == 1)
                 {
                     mnState = 2;
@@ -403,7 +424,7 @@ public class TrainingActivity extends Activity
                     mstrUUID = uuid.toString();
                     v.setTag(1);
                 }
-    
+
                 // TODO Auto-generated method stub
                 switch (v.getId())
                 {
@@ -413,12 +434,12 @@ public class TrainingActivity extends Activity
 //                        intent = new Intent(TrainingActivity.this, com.dsi.ant.antplus.pluginsampler
 //                                .heartrate.Activity_SearchUiHeartRateSampler.class);
 //                        startActivity(intent);
-                        
+
                         if (startflag)
                         {
                             startflag = false; //一開始的code,當點開始運動的時候flag會變成flase去啟動timer
 //                            startbutton.setImageResource(R.drawable.training_startbutton);
-                        
+
                         }
                         else
                         {
@@ -426,26 +447,74 @@ public class TrainingActivity extends Activity
 //                            startbutton.setImageResource(R.drawable.training_stopbutton);
                         }
                         break;
-                    
+
                 }
-                requestAccessToPcc();
+                requestAccessToPcc(); //啟動ant+ device detect
                 startbutton.setVisibility(View.GONE);
+                run(); //啟動畫圖機制
                 stopbutton.setVisibility(View.VISIBLE);
             }
         });
-        
+
         stopbutton.setOnClickListener(new OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                Intent intent = null;
-                intent = new Intent(TrainingActivity.this, SpeechActivity.class);
-                startActivity(intent);
+                int nRun = (int) v.getTag();
+
+                if (nRun == 1)
+                {
+                    mnState = 2;
+                    //mstrUUID = "";
+                    v.setTag(0);
+                }
+                else
+                {
+                    mnState = 1;
+                   UUID uuid = UUID.randomUUID();
+                    mstrUUID = uuid.toString();
+                    v.setTag(1);
+                }
+
+                if (startflag)
+                {
+                    startflag = false;
+                }
+                else
+                {
+                    startflag = true;
+                }
+
+//                Intent intent = null;
+//                intent = new Intent(TrainingActivity.this, SpeechActivity.class);
+//                startActivity(intent);
             }
         });
-        
-        
+
+        lineChartView.setContainerScrollEnabled(true, ContainerScrollType.HORIZONTAL);
+        lineChartView.setScrollEnabled(true);
+        Viewport viewport = new Viewport(lineChartView.getMaximumViewport());
+        viewport.top = 120;
+        viewport.bottom = 60;
+        viewport.right = 10;
+        viewport.left = 0;
+        lineChartView.setMaximumViewport(viewport);
+        lineChartView.setCurrentViewport(viewport);
+//        假如要透過點圖的方式啟動則開啟下列程式碼
+//        lineChartView.setOnClickListener(new View.OnClickListener()
+//        {
+//            @Override
+//            public void onClick(View v)
+//            {
+//                run();
+//            }
+//        });
+        Intent intent = getIntent();
+        String strName = intent.getStringExtra("NAME");
+        Logs.showTrace("my name " + strName);
+        updateChart();
+
 //        backbutton.setOnClickListener(new OnClickListener()
 //        {
 //            @Override
@@ -454,217 +523,195 @@ public class TrainingActivity extends Activity
 //                setContentView(view1);//按了之後跳到第1個視窗
 //            }
 //        });
-        
-        requestTodayTrainingAPI("2018-10-22");
-        
+
+
     }
-    
+
     private void requestAccessToPcc()
     {
         Intent intent = getIntent();
         if (intent.hasExtra(Activity_MultiDeviceSearchSampler.EXTRA_KEY_MULTIDEVICE_SEARCH_RESULT))
         {
             // device has already been selected through the multi-device search
-            MultiDeviceSearch.MultiDeviceSearchResult result = intent
-                    .getParcelableExtra(Activity_MultiDeviceSearchSampler
-                            .EXTRA_KEY_MULTIDEVICE_SEARCH_RESULT);
+            MultiDeviceSearch.MultiDeviceSearchResult result = intent.getParcelableExtra
+                    (Activity_MultiDeviceSearchSampler.EXTRA_KEY_MULTIDEVICE_SEARCH_RESULT);
             releaseHandle = AntPlusHeartRatePcc.requestAccess(this, result.getAntDeviceNumber(), 0,
-                    base_IPluginAccessResultReceiver,
-                    base_IDeviceStateChangeReceiver);
+                    base_IPluginAccessResultReceiver, base_IDeviceStateChangeReceiver);
         }
         else
         {
             // starts the plugins UI search
-            releaseHandle = AntPlusHeartRatePcc.requestAccess(this, this,
-                    base_IPluginAccessResultReceiver,
+            releaseHandle = AntPlusHeartRatePcc.requestAccess(this, this, base_IPluginAccessResultReceiver,
                     base_IDeviceStateChangeReceiver);
         }
     }
-    
+
     protected AntPluginPcc.IPluginAccessResultReceiver<AntPlusHeartRatePcc>
-            base_IPluginAccessResultReceiver =
-            new AntPluginPcc.IPluginAccessResultReceiver<AntPlusHeartRatePcc>()
+            base_IPluginAccessResultReceiver = new AntPluginPcc
+            .IPluginAccessResultReceiver<AntPlusHeartRatePcc>()
+    {
+        //Handle the result, connecting to events on success or reporting failure to user.
+        @Override
+        public void onResultReceived(AntPlusHeartRatePcc result, RequestAccessResult resultCode,
+                DeviceState initialDeviceState)
+        {
+            switch (resultCode)
             {
-                //Handle the result, connecting to events on success or reporting failure to user.
-                @Override
-                public void onResultReceived(
-                        AntPlusHeartRatePcc result, RequestAccessResult resultCode,
-                        DeviceState initialDeviceState
-                )
-                {
-                    switch (resultCode)
-                    {
-                        case SUCCESS:
-                            //宣告Timer
-                            Timer timer01 = new Timer();
-                            
-                            //設定Timer(task為執行內容，0代表立刻開始,間格1秒執行一次)
-                            timer01.schedule(task, 0, 1000);
-    
-                            startflag = true;//當裝置連結成功的時候去啟動timer
-                            
-                            hrPcc = result;
+                case SUCCESS:
+                    //宣告Timer
+                    Timer timer01 = new Timer();
+
+                    //設定Timer(task為執行內容，0代表立刻開始,間格1秒執行一次)
+                    timer01.schedule(task, 0, 1000);
+
+                    startflag = true;//當裝置連結成功的時候去啟動timer
+
+                    hrPcc = result;
 //                            tv_status.setText(result.getDeviceName() + ": " + initialDeviceState);
-                            subscribeToHrEvents();
+                    subscribeToHrEvents();
 //                            if (!result.supportsRssi())
 //                            {
 //                                tv_rssi.setText("N/A");
 //                            }
-                            break;
-                        case CHANNEL_NOT_AVAILABLE:
-                            Toast.makeText(TrainingActivity.this, "Channel Not Available",
-                                    Toast.LENGTH_SHORT).show();
-                            // tv_status.setText("Error. Do Menu->Reset.");
-                            break;
-                        case ADAPTER_NOT_DETECTED:
-                            Toast.makeText(TrainingActivity.this, "ANT Adapter Not " +
-                                    "Available" + ". Built-in ANT hardware or external adapter " +
-                                    "required"
-                                    + ".", Toast.LENGTH_SHORT).show();
-                            // tv_status.setText("Error. Do Menu->Reset.");
-                            break;
-                        case BAD_PARAMS:
-                            //Note: Since we compose all the params ourself, we should never see
-                            // this result
-                            Toast.makeText(TrainingActivity.this, "Bad request parameters.",
-                                    Toast.LENGTH_SHORT).show();
-                            // tv_status.setText("Error. Do Menu->Reset.");
-                            break;
-                        case OTHER_FAILURE:
-                            Toast.makeText(TrainingActivity.this, "RequestAccess failed. " +
-                                    "See" + " logcat for details.", Toast.LENGTH_SHORT).show();
-                            //      tv_status.setText("Error. Do Menu->Reset.");
-                            break;
-                        case DEPENDENCY_NOT_INSTALLED:
-                            //    tv_status.setText("Error. Do Menu->Reset.");
-                            AlertDialog.Builder adlgBldr = new AlertDialog.Builder
-                                    (TrainingActivity.this);
-                            adlgBldr.setTitle("Missing Dependency");
-                            adlgBldr.setMessage("The required service\n\"" + AntPlusHeartRatePcc
-                                    .getMissingDependencyName() + "\"\n was not found. You need " +
-                                    "to " +
-                                    "install the ANT+ Plugins service or you " +
-                                    "may need to update your " +
-                                    "existing version if you already have it." +
-                                    " Do you want to launch the "
-                                    + "Play Store to get it?");
-                            adlgBldr.setCancelable(true);
-                            adlgBldr.setPositiveButton("Go to Store", new DialogInterface
-                                    .OnClickListener()
-                            {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                    Intent startStore = null;
-                                    startStore = new Intent(Intent.ACTION_VIEW, Uri.parse
-                                            ("market://details?id=" + AntPlusHeartRatePcc
-                                                    .getMissingDependencyPackageName()));
-                                    startStore.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    
-                                    TrainingActivity.this.startActivity(startStore);
-                                }
-                            });
-                            adlgBldr.setNegativeButton("Cancel", new DialogInterface
-                                    .OnClickListener()
-                            {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                    dialog.dismiss();
-                                }
-                            });
-                            
-                            final AlertDialog waitDialog = adlgBldr.create();
-                            waitDialog.show();
-                            break;
-                        case USER_CANCELLED:
-                            //     tv_status.setText("Cancelled. Do Menu->Reset.");
-                            break;
-                        case UNRECOGNIZED:
-                            Toast.makeText(TrainingActivity.this, "Failed: UNRECOGNIZED. " +
-                                    "PluginLib Upgrade Required?", Toast.LENGTH_SHORT).show();
-                            //       tv_status.setText("Error. Do Menu->Reset.");
-                            break;
-                        default:
-                            Toast.makeText(TrainingActivity.this, "Unrecognized result: " +
-                                    resultCode, Toast.LENGTH_SHORT).show();
-                            //    tv_status.setText("Error. Do Menu->Reset.");
-                            break;
-                    }
-                }
-            };
-    
-    //Receives state changes and shows it on the status display line
-    protected AntPluginPcc.IDeviceStateChangeReceiver base_IDeviceStateChangeReceiver = new
-            AntPluginPcc.IDeviceStateChangeReceiver()
-            {
-                @Override
-                public void onDeviceStateChange(final DeviceState newDeviceState)
-                {
-                    runOnUiThread(new Runnable()
+                    break;
+                case CHANNEL_NOT_AVAILABLE:
+                    Toast.makeText(TrainingActivity.this, "Channel Not Available", Toast.LENGTH_SHORT).show();
+                    // tv_status.setText("Error. Do Menu->Reset.");
+                    break;
+                case ADAPTER_NOT_DETECTED:
+                    Toast.makeText(TrainingActivity.this, "ANT Adapter Not " + "Available" + ". Built-in "
+                            + "ANT hardware or external adapter " + "required" + ".", Toast.LENGTH_SHORT)
+                            .show();
+                    // tv_status.setText("Error. Do Menu->Reset.");
+                    break;
+                case BAD_PARAMS:
+                    //Note: Since we compose all the params ourself, we should never see
+                    // this result
+                    Toast.makeText(TrainingActivity.this, "Bad request parameters.", Toast.LENGTH_SHORT)
+                            .show();
+                    // tv_status.setText("Error. Do Menu->Reset.");
+                    break;
+                case OTHER_FAILURE:
+                    Toast.makeText(TrainingActivity.this, "RequestAccess failed. " + "See" + " logcat for "
+                            + "details.", Toast.LENGTH_SHORT).show();
+                    //      tv_status.setText("Error. Do Menu->Reset.");
+                    break;
+                case DEPENDENCY_NOT_INSTALLED:
+                    //    tv_status.setText("Error. Do Menu->Reset.");
+                    AlertDialog.Builder adlgBldr = new AlertDialog.Builder(TrainingActivity.this);
+                    adlgBldr.setTitle("Missing Dependency");
+                    adlgBldr.setMessage("The required service\n\"" + AntPlusHeartRatePcc
+                            .getMissingDependencyName() + "\"\n was not found. You need " + "to " +
+                            "install the ANT+ Plugins service or you " + "may need to update your " +
+                            "existing version if you already have it." + " Do you want to launch the " +
+                            "Play Store to get it?");
+                    adlgBldr.setCancelable(true);
+                    adlgBldr.setPositiveButton("Go to Store", new DialogInterface.OnClickListener()
                     {
                         @Override
-                        public void run()
+                        public void onClick(DialogInterface dialog, int which)
                         {
-                            // tv_status.setText(hrPcc.getDeviceName() + ": " +
-                            // newDeviceState);
+                            Intent startStore = null;
+                            startStore = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" +
+                                    AntPlusHeartRatePcc.getMissingDependencyPackageName()));
+                            startStore.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                            TrainingActivity.this.startActivity(startStore);
                         }
                     });
-                    
-                    
+                    adlgBldr.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            dialog.dismiss();
+                        }
+                    });
+
+                    final AlertDialog waitDialog = adlgBldr.create();
+                    waitDialog.show();
+                    break;
+                case USER_CANCELLED:
+                    //     tv_status.setText("Cancelled. Do Menu->Reset.");
+                    break;
+                case UNRECOGNIZED:
+                    Toast.makeText(TrainingActivity.this, "Failed: UNRECOGNIZED. " + "PluginLib Upgrade " +
+                            "Required?", Toast.LENGTH_SHORT).show();
+                    //       tv_status.setText("Error. Do Menu->Reset.");
+                    break;
+                default:
+                    Toast.makeText(TrainingActivity.this, "Unrecognized result: " + resultCode, Toast
+                            .LENGTH_SHORT).show();
+                    //    tv_status.setText("Error. Do Menu->Reset.");
+                    break;
+            }
+        }
+    };
+
+    //Receives state changes and shows it on the status display line
+    protected AntPluginPcc.IDeviceStateChangeReceiver base_IDeviceStateChangeReceiver = new AntPluginPcc
+            .IDeviceStateChangeReceiver()
+    {
+        @Override
+        public void onDeviceStateChange(final DeviceState newDeviceState)
+        {
+            runOnUiThread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    // tv_status.setText(hrPcc.getDeviceName() + ": " +
+                    // newDeviceState);
                 }
-            };
-    
+            });
+
+        }
+    };
+
     public void subscribeToHrEvents()
     {
         wheelPiesClient.start();
         hrPcc.subscribeHeartRateDataEvent(new AntPlusHeartRatePcc.IHeartRateDataReceiver()
         {
             @Override
-            public void onNewHeartRateData(
-                    final long estTimestamp, EnumSet<EventFlag>
-                    eventFlags, final int computedHeartRate, final long heartBeatCount, final BigDecimal heartBeatEventTime, final AntPlusHeartRatePcc.DataState dataState
-            )
+            public void onNewHeartRateData(final long estTimestamp, EnumSet<EventFlag> eventFlags, final
+            int computedHeartRate, final long heartBeatCount, final BigDecimal heartBeatEventTime, final
+            AntPlusHeartRatePcc.DataState dataState)
             {
                 // Mark heart rate with asterisk if zero detected
-                final String textHeartRate = String.valueOf(computedHeartRate) + (
-                        (AntPlusHeartRatePcc.DataState
-                                .ZERO_DETECTED.equals(dataState)) ? "*" : "");
-                
+                final String textHeartRate = String.valueOf(computedHeartRate) + ((AntPlusHeartRatePcc
+                        .DataState.ZERO_DETECTED.equals(dataState)) ? "*" : "");
+
                 // Mark heart beat count and heart beat event time with asterisk if initial value
-                final String textHeartBeatCount = String.valueOf(heartBeatCount) + (
-                        (AntPlusHeartRatePcc.DataState
-                                .INITIAL_VALUE.equals(dataState)) ? "*" : "");
+                final String textHeartBeatCount = String.valueOf(heartBeatCount) + ((AntPlusHeartRatePcc
+                        .DataState.INITIAL_VALUE.equals(dataState)) ? "*" : "");
                 final String textHeartBeatEventTime = String.valueOf(heartBeatEventTime) + (
                         (AntPlusHeartRatePcc.DataState.INITIAL_VALUE.equals(dataState)) ? "*" : "");
-                
+
                 runOnUiThread(new Runnable()
                 {
                     @Override
                     public void run()
                     {
                         // tv_estTimestamp.setText(String.valueOf(estTimestamp));
-                        
+
                         textView_ComputedHeartRate.setText(textHeartRate);
                         //  tv_heartBeatCounter.setText(textHeartBeatCount);
                         //  tv_heartBeatEventTime.setText(textHeartBeatEventTime);
-                        
+
                         //  tv_dataStatus.setText(dataState.toString());
-                        
+
                         sendData();
                     }
                 });
             }
         });
-        
+
         hrPcc.subscribePage4AddtDataEvent(new AntPlusHeartRatePcc.IPage4AddtDataReceiver()
         {
             @Override
-            public void onNewPage4AddtData(
-                    final long estTimestamp, final EnumSet<EventFlag>
-                    eventFlags, final int manufacturerSpecificByte, final BigDecimal
-                    previousHeartBeatEventTime
-            )
+            public void onNewPage4AddtData(final long estTimestamp, final EnumSet<EventFlag> eventFlags,
+                    final int manufacturerSpecificByte, final BigDecimal previousHeartBeatEventTime)
             {
                 runOnUiThread(new Runnable()
                 {
@@ -672,7 +719,7 @@ public class TrainingActivity extends Activity
                     public void run()
                     {
                         //       tv_estTimestamp.setText(String.valueOf(estTimestamp));
-                        
+
                         //       tv_manufacturerSpecificByte.setText(String.format("0x%02X",
                         //manufacturerSpecificByte));
                         //       tv_previousHeartBeatEventTime.setText(String.valueOf
@@ -681,15 +728,13 @@ public class TrainingActivity extends Activity
                 });
             }
         });
-        
+
         hrPcc.subscribeCumulativeOperatingTimeEvent(new AntPlusLegacyCommonPcc
                 .ICumulativeOperatingTimeReceiver()
         {
             @Override
-            public void onNewCumulativeOperatingTime(
-                    final long estTimestamp, final
-            EnumSet<EventFlag> eventFlags, final long cumulativeOperatingTime
-            )
+            public void onNewCumulativeOperatingTime(final long estTimestamp, final EnumSet<EventFlag>
+                    eventFlags, final long cumulativeOperatingTime)
             {
                 runOnUiThread(new Runnable()
                 {
@@ -697,22 +742,19 @@ public class TrainingActivity extends Activity
                     public void run()
                     {
                         //        tv_estTimestamp.setText(String.valueOf(estTimestamp));
-                        
+
                         //        tv_cumulativeOperatingTime.setText(String.valueOf
                         // (cumulativeOperatingTime));
                     }
                 });
             }
         });
-        
-        hrPcc.subscribeManufacturerAndSerialEvent(new AntPlusLegacyCommonPcc
-                .IManufacturerAndSerialReceiver()
+
+        hrPcc.subscribeManufacturerAndSerialEvent(new AntPlusLegacyCommonPcc.IManufacturerAndSerialReceiver()
         {
             @Override
-            public void onNewManufacturerAndSerial(
-                    final long estTimestamp, final
-            EnumSet<EventFlag> eventFlags, final int manufacturerID, final int serialNumber
-            )
+            public void onNewManufacturerAndSerial(final long estTimestamp, final EnumSet<EventFlag>
+                    eventFlags, final int manufacturerID, final int serialNumber)
             {
                 runOnUiThread(new Runnable()
                 {
@@ -720,22 +762,19 @@ public class TrainingActivity extends Activity
                     public void run()
                     {
                         //        tv_estTimestamp.setText(String.valueOf(estTimestamp));
-                        
+
                         //        tv_manufacturerID.setText(String.valueOf(manufacturerID));
                         //        tv_serialNumber.setText(String.valueOf(serialNumber));
                     }
                 });
             }
         });
-        
+
         hrPcc.subscribeVersionAndModelEvent(new AntPlusLegacyCommonPcc.IVersionAndModelReceiver()
         {
             @Override
-            public void onNewVersionAndModel(
-                    final long estTimestamp, final EnumSet<EventFlag>
-                    eventFlags, final int hardwareVersion, final int softwareVersion, final int
-                    modelNumber
-            )
+            public void onNewVersionAndModel(final long estTimestamp, final EnumSet<EventFlag> eventFlags,
+                    final int hardwareVersion, final int softwareVersion, final int modelNumber)
             {
                 runOnUiThread(new Runnable()
                 {
@@ -743,7 +782,7 @@ public class TrainingActivity extends Activity
                     public void run()
                     {
                         //       tv_estTimestamp.setText(String.valueOf(estTimestamp));
-                        
+
                         //       tv_hardwareVersion.setText(String.valueOf(hardwareVersion));
                         //       tv_softwareVersion.setText(String.valueOf(softwareVersion));
                         //       tv_modelNumber.setText(String.valueOf(modelNumber));
@@ -751,15 +790,12 @@ public class TrainingActivity extends Activity
                 });
             }
         });
-        
-        hrPcc.subscribeCalculatedRrIntervalEvent(new AntPlusHeartRatePcc
-                .ICalculatedRrIntervalReceiver()
+
+        hrPcc.subscribeCalculatedRrIntervalEvent(new AntPlusHeartRatePcc.ICalculatedRrIntervalReceiver()
         {
             @Override
-            public void onNewCalculatedRrInterval(
-                    final long estTimestamp, EnumSet<EventFlag>
-                    eventFlags, final BigDecimal rrInterval, final AntPlusHeartRatePcc.RrFlag flag
-            )
+            public void onNewCalculatedRrInterval(final long estTimestamp, EnumSet<EventFlag> eventFlags,
+                    final BigDecimal rrInterval, final AntPlusHeartRatePcc.RrFlag flag)
             {
                 runOnUiThread(new Runnable()
                 {
@@ -768,12 +804,11 @@ public class TrainingActivity extends Activity
                     {
                         //       tv_estTimestamp.setText(String.valueOf(estTimestamp));
                         //       tv_rrFlag.setText(flag.toString());
-                        
+
                         // Mark RR with asterisk if source is not cached or page 4
-                        if (flag.equals(AntPlusHeartRatePcc.RrFlag.DATA_SOURCE_CACHED) || flag
-                                .equals(AntPlusHeartRatePcc.RrFlag
-                                        .DATA_SOURCE_PAGE_4))
-                        
+                        if (flag.equals(AntPlusHeartRatePcc.RrFlag.DATA_SOURCE_CACHED) || flag.equals
+                                (AntPlusHeartRatePcc.RrFlag.DATA_SOURCE_PAGE_4))
+
                         {
                             //           tv_calculatedRrInterval.setText(String.valueOf
                             // (rrInterval));
@@ -787,14 +822,11 @@ public class TrainingActivity extends Activity
                 });
             }
         });
-        
+
         hrPcc.subscribeRssiEvent(new AntPlusCommonPcc.IRssiReceiver()
         {
             @Override
-            public void onRssiData(
-                    final long estTimestamp, final EnumSet<EventFlag> evtFlags,
-                    final int rssi
-            )
+            public void onRssiData(final long estTimestamp, final EnumSet<EventFlag> evtFlags, final int rssi)
             {
                 runOnUiThread(new Runnable()
                 {
@@ -808,16 +840,16 @@ public class TrainingActivity extends Activity
             }
         });
     }
-    
+
     private void sendData()
     {
         JSONObject jsonObject = new JSONObject();
-        
+
         try
         {
             jsonObject.put("activeId", mstrUUID);
             jsonObject.put("state", mnState);
-            if(2 == mnState) // 運動結束
+            if (2 == mnState) // 運動結束
             {
                 mstrUUID = "";
             }
@@ -830,12 +862,9 @@ public class TrainingActivity extends Activity
             jsonObject.put("heartBeatCounter", tv_heartBeatCounter.getText().toString());
             jsonObject.put("heartBeatEventTime", tv_heartBeatEventTime.getText().toString());
             jsonObject.put("dataStatus", tv_dataStatus.getText().toString());
-            jsonObject.put("manufacturerSpecificByte", tv_manufacturerSpecificByte.getText()
-                    .toString());
-            jsonObject.put("previousHeartBeatEventTime", tv_previousHeartBeatEventTime.getText()
-                    .toString());
-            jsonObject.put("cumulativeOperatingTime", tv_cumulativeOperatingTime.getText()
-                    .toString());
+            jsonObject.put("manufacturerSpecificByte", tv_manufacturerSpecificByte.getText().toString());
+            jsonObject.put("previousHeartBeatEventTime", tv_previousHeartBeatEventTime.getText().toString());
+            jsonObject.put("cumulativeOperatingTime", tv_cumulativeOperatingTime.getText().toString());
             jsonObject.put("manufacturerID", tv_manufacturerID.getText().toString());
             jsonObject.put("serialNumber", tv_serialNumber.getText().toString());
             jsonObject.put("hardwareVersion", tv_hardwareVersion.getText().toString());
@@ -848,9 +877,81 @@ public class TrainingActivity extends Activity
         }
         catch (Exception e)
         {
-            com.dsi.ant.antplus.pluginsampler.datatransfer.Logs.showError("JSONObject Exception: " + e.toString());
+            com.dsi.ant.antplus.pluginsampler.datatransfer.Logs.showError("JSONObject Exception: " + e
+                    .toString());
         }
-        
+
     }
-    
+
+    //處理即時圖形顯示的區塊
+    private void updateChart()
+    {
+        List yAxisValues = new ArrayList();
+        List axisValues = new ArrayList();
+
+        Line line = new Line(yAxisValues).setColor(Color.parseColor("#9C27B0"));
+
+        String strLabel;
+        if (10 < nXData)
+        {
+            nXData -= 10;
+        }
+
+        for (int i = 0; i < 11; i++)
+        {
+            strLabel = String.valueOf(nXData++);
+            axisValues.add(i, new AxisValue(i).setLabel(strLabel));
+        }
+
+        for (int i = 0; i < 11; ++i)
+        {
+            yAxisValues.add(new PointValue(i, ThreadLocalRandom.current().nextInt(65, 110)));
+        }
+
+        List lines = new ArrayList();
+        lines.add(line);
+
+        LineChartData data = new LineChartData();
+        data.setLines(lines);
+
+        Axis axis = new Axis();
+        axis.setName("秒");
+        axis.setValues(axisValues);
+        axis.setTextSize(9);
+        axis.setTextColor(Color.parseColor("#03A9F4"));
+        data.setAxisXBottom(axis);
+
+        Axis yAxis = new Axis();
+        yAxis.setName("心律");
+        yAxis.setTextColor(Color.parseColor("#03A9F4"));
+        yAxis.setTextSize(9);
+        data.setAxisYLeft(yAxis);
+
+        lineChartView.setLineChartData(data);
+    }
+
+    private void run()
+    {
+        if (bRun)
+        {
+            bRun = false;
+            timer02.cancel();
+        }
+        else
+        {
+            bRun = true;
+            timer02.schedule(new MyTimerTask(), 1000, 1000);
+        }
+
+    }
+
+    public class MyTimerTask extends TimerTask
+    {
+        public void run()
+        {
+            updateChart();
+        }
+    }
+
+
 }

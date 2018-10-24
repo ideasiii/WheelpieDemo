@@ -4,6 +4,8 @@ import android.content.Context;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import org.iii.wheelpiedemo.course.response.CourseChart;
+import org.iii.wheelpiedemo.course.response.SquareBlock;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

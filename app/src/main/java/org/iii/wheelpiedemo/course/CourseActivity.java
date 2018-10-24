@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
 import android.widget.TextView;
@@ -27,6 +28,9 @@ import org.iii.more.restapiclient.Response;
 import org.iii.wheelpiedemo.R;
 import org.iii.wheelpiedemo.common.Logs;
 import org.iii.wheelpiedemo.common.RestApiHeaderClient;
+import org.iii.wheelpiedemo.course.response.CourseChart;
+import org.iii.wheelpiedemo.course.response.DayTraining;
+import org.iii.wheelpiedemo.course.response.TrainingContent;
 import org.iii.wheelpiedemo.course.util.AChartEngineUtils;
 import org.iii.wheelpiedemo.course.util.HelloChartUtils;
 import org.iii.wheelpiedemo.login.LoginActivity;
@@ -56,6 +60,7 @@ public class CourseActivity extends AppCompatActivity {
     private final int MSG_CONTENT_VIEW_LOGIN = 2;
     private LinearLayout contentLayout;
     private VideoPlayer videoPlayer = null;
+    private Button btnTraining = null;
     private String userToken;
     private ProgressDialog dialog;
     private long videoDuration;
@@ -68,8 +73,7 @@ public class CourseActivity extends AppCompatActivity {
         setContentView(R.layout.activity_course);
 
         // 顯示等待訊息框
-        dialog = ProgressDialog.show(this, "",
-                "Loading. Please wait...", true);
+        displayLoadingDialog();
 
         if (isUserLoggedIn()) {
             // 設定開始訓練按鈕
@@ -78,8 +82,13 @@ public class CourseActivity extends AppCompatActivity {
             //requestTodayTrainingAPI("2018-10-08");
             requestTodayTrainingAPI(getTodayDate());
         } else {
-            sendCustomMessage(MSG_CONTENT_VIEW_LOGIN);
+            theHandler.sendEmptyMessage(MSG_CONTENT_VIEW_LOGIN);
         }
+    }
+
+    private void displayLoadingDialog() {
+        dialog = ProgressDialog.show(this, "",
+                "Loading. Please wait...", true);
     }
 
     private boolean isUserLoggedIn() {
@@ -131,33 +140,24 @@ public class CourseActivity extends AppCompatActivity {
         Logs.showTrace("[API] http response id: " + nResponse_id);
     }
 
-    private void sendCustomMessage(int msg) {
-        sendCustomMessage(msg, null);
-    }
-
-    private void sendCustomMessage(int msg, Object obj) {
-        Message message = new Message();
-        message.what = msg;
-        message.obj = obj;
-        theHandler.sendMessage(message);
-    }
-
     private RestApiHeaderClient.ResponseListener todayTrainingResponseListener = new RestApiHeaderClient.ResponseListener()
     {
         @Override
         public void onResponse(JSONObject jsonObject)
         {
             Logs.showTrace("[API] onResponse Data: " + jsonObject.toString());
-            Message message = new Message();
-            message.what = MSG_DAY_TRAINING_API_RESPONSE;
-            message.obj = jsonObject;
-            theHandler.sendMessage(message);
+            Message message = Message.obtain(
+                theHandler,
+                MSG_DAY_TRAINING_API_RESPONSE,
+                jsonObject
+            );
+            message.sendToTarget();
         }
     };
 
     private String getResponseJSONString(JSONObject clientResp) {
         String jsonString = null;
-        if (clientResp != null) {
+        if (clientResp instanceof JSONObject && clientResp.has("data")) {
             try {
                 jsonString = ((JSONObject)clientResp).getString("data");
             } catch (JSONException e) {
@@ -190,38 +190,44 @@ public class CourseActivity extends AppCompatActivity {
         public void onResponse(JSONObject jsonObject)
         {
             Logs.showTrace("[API] onResponse Data: " + jsonObject.toString());
-            Message message = new Message();
-            message.what = MSG_DAY_VIEW_API_RESPONSE;
-            message.obj = jsonObject;
-            theHandler.sendMessage(message);
+            Message message = Message.obtain(
+                theHandler,
+                MSG_DAY_VIEW_API_RESPONSE,
+                jsonObject
+            );
+            message.sendToTarget();
         }
     };
 
-    private void initViewByAPIResponse(String apiResponse) {
-        if (apiResponse == null || apiResponse.length() == 0) {
-            return;
+    private DayTraining parseResponse (String apiResponse) {
+        DayTraining dt = null;
+        if (apiResponse != null && apiResponse.length() != 0) {
+            try {
+                JSONObject jsonResp = new JSONObject(apiResponse);
+                JSONObject dayView = jsonResp.getJSONObject("planDayView");
+                JSONObject dayTraining = dayView.getJSONObject("dayTraining");
+                dt = new DayTraining(dayTraining);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
+        return dt;
+    }
+
+    private void initViewByAPIResponse(DayTraining dayTraining) {
         contentLayout = findViewById(R.id.content_layout);
-        try {
-            JSONObject jsonResp = new JSONObject(apiResponse);
-            JSONObject dayView = jsonResp.getJSONObject("planDayView");
-            JSONObject dayTraining = dayView.getJSONObject("dayTraining");
-            //取出訓練類型及第幾天
-            String dayInfo = dayTraining.getString("dayInfo");
-            updateActionBar(dayInfo);
+        if (dayTraining != null) {
+            //更新訓練類型及第幾天
+            updateActionBar(dayTraining.getDayInfo());
             // 取出訓練課程內容
-            JSONArray trainingContents = dayTraining.getJSONArray("contents");
-            for (int i=0; i<trainingContents.length(); i+=1) {
-                JSONObject content = trainingContents.getJSONObject(i);
-                // 取出title
-                String titleText = content.getString("title");
+            for (TrainingContent content : dayTraining.getContents()) {
+                String titleText = content.getTitle();
                 TextView title = createTitle(titleText);
                 contentLayout.addView(title);
                 // 取出steps
-                JSONArray steps = content.getJSONArray("steps");
-                for(int stepIdx=0; stepIdx<steps.length(); stepIdx+=1) {
-                    TextView step = createStep(steps.getString(stepIdx));
-                    contentLayout.addView(step);
+                for (String step : content.getSteps()) {
+                    TextView textviewStep = createStep(step);
+                    contentLayout.addView(textviewStep);
                 }
                 // Insert熱身影片
                 if (titleText instanceof String && titleText.endsWith("熱身")) {
@@ -244,38 +250,20 @@ public class CourseActivity extends AppCompatActivity {
                     setMargins(videoPlayer, 0, 10, 0, 10);
                 }
                 // 取出圖表
-                CourseChart chart = getChartInfo(content);
+                CourseChart chart = content.getHrrChartInfo() != null ?
+                    content.getHrrChartInfo() :
+                    content.getStrideChartInfo() != null ?
+                        content.getStrideChartInfo() : null;
+
                 // 處理圖表呈現
                 if (chart != null) {
                     AChartEngineUtils.drawChart(this, contentLayout, chart);
                 }
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
+            //是否可以訓練
+            btnTraining = findViewById(R.id.button_start_training);
+            btnTraining.setEnabled(dayTraining.isTrainable());
         }
-    }
-
-    private CourseChart getChartInfo (JSONObject trainingContent) {
-        CourseChart courseChart = null;
-        JSONObject chart = null;
-        if (trainingContent != null) {
-            try {
-                chart = trainingContent.getJSONObject("hrrChartInfo");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            if (chart == null) {
-                try {
-                    chart = trainingContent.getJSONObject("strideChartInfo");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (chart != null) {
-                courseChart = extractChartInfo(chart);
-            }
-        }
-        return courseChart;
     }
 
     private TextView createTitle(String text) {
@@ -395,16 +383,18 @@ public class CourseActivity extends AppCompatActivity {
                         dialog.dismiss();
                         // 今天無訓練課程，請至CoachBot服務產生今日課程
                         Toast.makeText(
-                                getApplicationContext(),
-                                "今天無訓練課程，請至CoachBot服務產生今日訓練課程",
-                                Toast.LENGTH_LONG
+                            getApplicationContext(),
+                            "今天無訓練課程，請至CoachBot服務產生今日訓練課程",
+                            Toast.LENGTH_LONG
                         ).show();
                     }
                     break;
                 case MSG_DAY_VIEW_API_RESPONSE:
                     strMsg = getResponseJSONString((JSONObject)msg.obj);
                     // 依當課程說明API，初始化畫面
-                    initViewByAPIResponse(strMsg);
+                    DayTraining dt = parseResponse(strMsg);
+                    //initViewByAPIResponse(strMsg);
+                    initViewByAPIResponse(dt);
                     // 移除等待訊息框
                     dialog.dismiss();
                     // 播放影片
@@ -423,7 +413,7 @@ public class CourseActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (!isUserLoggedIn()) {
-            sendCustomMessage(MSG_CONTENT_VIEW_LOGIN);
+            theHandler.sendEmptyMessage(MSG_CONTENT_VIEW_LOGIN);
         };
     }
 

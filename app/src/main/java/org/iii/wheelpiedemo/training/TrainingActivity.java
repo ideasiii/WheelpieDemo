@@ -37,6 +37,7 @@ import com.dsi.ant.antplus.pluginsampler.datatransfer.WheelPiesClient;
 import org.iii.more.restapiclient.Config;
 import org.iii.more.restapiclient.Response;
 import org.iii.wheelpiedemo.R;
+import org.iii.wheelpiedemo.chat.SpeechActivity;
 import org.iii.wheelpiedemo.common.Logs;
 
 import java.math.BigDecimal;
@@ -84,8 +85,6 @@ public class TrainingActivity extends Activity
     private TextView tv_modelNumber;
     private TextView tv_dataStatus;
     private TextView tv_rrFlag;
-    
-    
     
     /**
      * ANT+ Library
@@ -349,7 +348,8 @@ public class TrainingActivity extends Activity
         final View view2 = inflater.inflate(R.layout.training_device_connection, null);//找出第二個視窗
         setContentView(view1); //顯示目前第一個視窗
         
-        final ImageView startbutton = (ImageView) view1.findViewById(R.id.startbutton);//找出第一個視窗中的按鈕
+        final ImageView startbutton = (ImageView) view1.findViewById(R.id.startbutton);//找出第一個視窗中start的按鈕
+        final ImageView stopbutton = (ImageView) view1.findViewById(R.id.stopbutton);//找出第一個視窗中stop的按鈕
         startbutton.setTag(0);
 //        TextView backbutton = (TextView) view2.findViewById(R.id.textView14);//找出第二個視窗中的按鈕
         TrainingMode = (TextView) view1.findViewById(R.id.exercise_mode_content);//找出第一個視窗中訓練類型的字串框格
@@ -417,23 +417,33 @@ public class TrainingActivity extends Activity
                         if (startflag)
                         {
                             startflag = false; //一開始的code,當點開始運動的時候flag會變成flase去啟動timer
-                            startbutton.setImageResource(R.drawable.training_startbutton);
-                            
+//                            startbutton.setImageResource(R.drawable.training_startbutton);
+                        
                         }
                         else
                         {
                             startflag = true;
-                            startbutton.setImageResource(R.drawable.training_stopbutton);
+//                            startbutton.setImageResource(R.drawable.training_stopbutton);
                         }
                         break;
                     
                 }
                 requestAccessToPcc();
-                
-                
+                startbutton.setVisibility(View.GONE);
+                stopbutton.setVisibility(View.VISIBLE);
             }
         });
         
+        stopbutton.setOnClickListener(new OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Intent intent = null;
+                intent = new Intent(TrainingActivity.this, SpeechActivity.class);
+                startActivity(intent);
+            }
+        });
         
         
 //        backbutton.setOnClickListener(new OnClickListener()

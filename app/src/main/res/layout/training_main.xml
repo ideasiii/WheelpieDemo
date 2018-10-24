@@ -512,7 +512,16 @@
                 android:layout_height="wrap_content"
                 android:adjustViewBounds="false"
                 android:cropToPadding="false"
-                android:src="@drawable/training_startbutton"
+                android:src="@drawable/training_startbutton"/>
+
+            <ImageView
+                android:id="@+id/stopbutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="false"
+                android:cropToPadding="false"
+                android:src="@drawable/training_stopbutton"
+                android:visibility="gone"
                 />
 
             <ImageButton

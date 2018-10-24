@@ -13,6 +13,8 @@ import org.achartengine.model.RangeCategorySeries;
 import org.achartengine.model.XYMultipleSeriesDataset;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
+import org.iii.wheelpiedemo.course.response.CourseChart;
+import org.iii.wheelpiedemo.course.response.SquareBlock;
 import org.json.JSONObject;
 
 import java.util.ArrayList;

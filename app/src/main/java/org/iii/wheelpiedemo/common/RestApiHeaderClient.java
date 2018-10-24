@@ -48,7 +48,7 @@ public class RestApiHeaderClient {
 
     public int HttpGet(String httpsURL, Config.HTTP_DATA_TYPE http_data_type, HashMap<String, String> parameters, Response response, HashMap<String, String> headers) {
         response.Id = ++msnSerialNUm;
-        Thread thread = new Thread(new RestApiHeaderClient.HttpGetRunnable(httpsURL, http_data_type, parameters, response, headers=null));
+        Thread thread = new Thread(new RestApiHeaderClient.HttpGetRunnable(httpsURL, http_data_type, parameters, response, headers));
         thread.start();
         return response.Id;
     }

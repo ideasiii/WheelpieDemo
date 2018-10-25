@@ -31,7 +31,6 @@
             android:configChanges="orientation"
             android:label="Heart Rate Plugin Sampler"
             android:screenOrientation="portrait" />
-        <activity android:name=".sample.SpeechActivity" />
         <activity android:name=".sample.SnowActivity" />
         <activity android:name=".training.TrainingActivity" />
         <activity android:name=".chat.SpeechActivity" />

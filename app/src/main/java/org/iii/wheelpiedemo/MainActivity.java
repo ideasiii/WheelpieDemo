@@ -12,7 +12,7 @@ import org.iii.wheelpiedemo.login.LoginActivity;
 import org.iii.wheelpiedemo.sample.ApiActivity;
 import org.iii.wheelpiedemo.sample.LineChart;
 import org.iii.wheelpiedemo.sample.SnowActivity;
-import org.iii.wheelpiedemo.sample.SpeechActivity;
+import org.iii.wheelpiedemo.chat.SpeechActivity;
 import org.iii.wheelpiedemo.sample.TrainingSampleActivity;
 import org.iii.wheelpiedemo.sample.VideoActivity;
 import org.iii.wheelpiedemo.training.TrainingActivity;

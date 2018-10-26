@@ -15,16 +15,17 @@ import org.iii.wheelpiedemo.sample.SnowActivity;
 import org.iii.wheelpiedemo.chat.SpeechActivity;
 import org.iii.wheelpiedemo.sample.TrainingSampleActivity;
 import org.iii.wheelpiedemo.sample.VideoActivity;
-import org.iii.wheelpiedemo.training.TrainingActivity;
+
 
 import java.util.HashMap;
 
 import android.os.Handler;
 
+
 public class MainActivity extends Activity
 {
     private final int MSG_RUN_LOGIN = 0;
-
+    
     static final HashMap<Integer, Class<?>> mapActivity = new HashMap<Integer, Class<?>>()
     {{
         put(R.id.imageViewLineChart, LineChart.class);
@@ -36,32 +37,33 @@ public class MainActivity extends Activity
         put(R.id.imageViewSnow, SnowActivity.class);
         put(R.id.imageViewTrainging, TrainingSampleActivity.class);
     }};
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        
         setContentView(R.layout.activity_main);
-
+        
         for (int ImageViewId : mapActivity.keySet())
             findViewById(ImageViewId).setOnClickListener(viewOnClick);
     }
-
+    
     @Override
     protected void onStart()
     {
         super.onStart();
-        handler.sendEmptyMessageDelayed(MSG_RUN_LOGIN, 5000);
+        handler.sendEmptyMessageDelayed(MSG_RUN_LOGIN, 3000);
     }
-
+    
     @Override
     protected void onPause()
     {
         handler.removeMessages(MSG_RUN_LOGIN);
         super.onPause();
-
+        
     }
-
+    
     private View.OnClickListener viewOnClick = new View.OnClickListener()
     {
         @Override
@@ -73,7 +75,7 @@ public class MainActivity extends Activity
             startActivity(intent);
         }
     };
-
+    
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler()
     {

@@ -9,6 +9,7 @@ public class DayTraining {
     private String dayInfo = "";
     private boolean trainable = false;
     private ArrayList<TrainingContent> contents = new ArrayList<TrainingContent>();
+    private ClassInfo classInfo;
 
     public DayTraining(JSONObject response) {
         if (response != null) {
@@ -26,6 +27,11 @@ public class DayTraining {
             }
             // 取出是否可訓練
             this.trainable = response.optBoolean("trainable");
+            // 取出課程相關資訊
+            JSONObject info = response.optJSONObject("classInfo");
+            if (info != null) {
+                classInfo = new ClassInfo(info);
+            }
         }
     }
 
@@ -39,6 +45,10 @@ public class DayTraining {
 
     public boolean isTrainable() {
         return trainable;
+    }
+
+    public ClassInfo getClassInfo() {
+        return classInfo;
     }
 }
 

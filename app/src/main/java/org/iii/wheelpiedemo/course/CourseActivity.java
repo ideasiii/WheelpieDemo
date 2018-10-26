@@ -28,6 +28,7 @@ import org.iii.more.restapiclient.Response;
 import org.iii.wheelpiedemo.R;
 import org.iii.wheelpiedemo.common.Logs;
 import org.iii.wheelpiedemo.common.RestApiHeaderClient;
+import org.iii.wheelpiedemo.course.response.ClassContent;
 import org.iii.wheelpiedemo.course.response.CourseChart;
 import org.iii.wheelpiedemo.course.response.DayTraining;
 import org.iii.wheelpiedemo.course.response.TrainingContent;
@@ -41,6 +42,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TimeZone;
 
@@ -53,7 +55,8 @@ public class CourseActivity extends AppCompatActivity {
     private static String courseAPIURL = "https://dsicoach.win/api/plan/my-course/plan/day-view";
     private static String trainingAPIURL = "https://dsicoach.win/api/plan/my-training/dayTraining";
     //private static String warmUpVideoURI = "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4";
-    private static String warmUpVideoURI = "https://dsicoach.win/video/warm_up_YouTube_720.mp4";
+    //private static String warmUpVideoURI = "https://dsicoach.win/video/warm_up_YouTube_720.mp4";
+    private static String warmUpVideoURI = "https://dsicoach.win/video/warm_up_360_high_profile.mp4";
     private final String PREF_USER_TOKEN_KEY = "userToken";
     private final int MSG_DAY_TRAINING_API_RESPONSE = 0;
     private final int MSG_DAY_VIEW_API_RESPONSE = 1;
@@ -71,7 +74,6 @@ public class CourseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         // 啟動課程說明頁
         setContentView(R.layout.activity_course);
-
         // 顯示等待訊息框
         displayLoadingDialog();
 
@@ -219,6 +221,15 @@ public class CourseActivity extends AppCompatActivity {
         if (dayTraining != null) {
             //更新訓練類型及第幾天
             updateActionBar(dayTraining.getDayInfo());
+            //取出相關課程說明的第一個url
+            ArrayList<ClassContent> classContents = dayTraining.getClassInfo().getContents();
+            for(ClassContent classContent : classContents) {
+                if (classContent.isURLType()) {
+                    //warmUpVideoURI = classContent.getUrl();
+                    warmUpVideoURI = "https://dsicoach.win/video/warm_up_360_high_profile.mp4";
+                    break;
+                }
+            }
             // 取出訓練課程內容
             for (TrainingContent content : dayTraining.getContents()) {
                 String titleText = content.getTitle();
@@ -393,7 +404,6 @@ public class CourseActivity extends AppCompatActivity {
                     strMsg = getResponseJSONString((JSONObject)msg.obj);
                     // 依當課程說明API，初始化畫面
                     DayTraining dt = parseResponse(strMsg);
-                    //initViewByAPIResponse(strMsg);
                     initViewByAPIResponse(dt);
                     // 移除等待訊息框
                     dialog.dismiss();

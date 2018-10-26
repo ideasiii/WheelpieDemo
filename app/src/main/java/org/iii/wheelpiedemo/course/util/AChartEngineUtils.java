@@ -96,14 +96,14 @@ public class AChartEngineUtils {
 
         if (info!=null &&info.data.size()>0) {
             for(SquareBlock sb : info.data) {
-                // x起始是否從可被10整除
                 int xStart = sb.getxStart();
-                int xStartRemainder = xStart % 10;
-                if (xStartRemainder != 0) {
-                    // 如果不是，把x切齊前的資料當一筆加入
-                    xStart += xStartRemainder;
-                    data.add(new RangeChartData(sb.getxStart(), xStart, sb.getyStart(), sb.getyEnd()));
-                }
+                // x起始是否從可被10整除
+//                int xStartRemainder = xStart % 10;
+//                if (xStartRemainder != 0) {
+//                    // 如果不是，把x切齊前的資料當一筆加入
+//                    xStart += xStartRemainder;
+//                    data.add(new RangeChartData(sb.getxStart(), xStart, sb.getyStart(), sb.getyEnd()));
+//                }
                 // 從切齊的x開始，到結束的x範圍
                 int xDiff = sb.getxEnd() - xStart;
                 // 計算為10的n倍

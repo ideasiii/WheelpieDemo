@@ -529,8 +529,7 @@ public class TrainingActivity extends Activity
 //                setContentView(view1);//按了之後跳到第1個視窗
 //            }
 //        });
-
-
+    
     }
 
     private void requestAccessToPcc()

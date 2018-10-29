@@ -64,6 +64,8 @@ import lecho.lib.hellocharts.model.LineChartData;
 import lecho.lib.hellocharts.model.PointValue;
 import lecho.lib.hellocharts.model.Viewport;
 import lecho.lib.hellocharts.view.LineChartView;
+import org.iii.wheelpiedemo.training.ObservableHeartRate;
+import org.iii.wheelpiedemo.training.ObserverHeartRateChanged;
 
 @SuppressLint("Registered")
 public class TrainingActivity extends Activity
@@ -104,6 +106,12 @@ public class TrainingActivity extends Activity
     LineChartView lineChartView;
     String[] axisData = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
     Timer timer02 = new Timer(true);
+
+    /**
+     * Initialization for HeartRate Supervision
+     */
+    private ObservableHeartRate hrObservable = new ObservableHeartRate();
+    private ObserverHeartRateChanged hrObserver = new ObserverHeartRateChanged();
 
     /**
      * ANT+ Library
@@ -359,6 +367,11 @@ public class TrainingActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.training_main);
+
+        /**
+         * Make observer subscribes to observable(HeartRate) for HeartRate Supervision
+         */
+        hrObservable.addObserver(hrObserver.HeartRateChanged);
 
         //畫面切換
         LayoutInflater inflater = getLayoutInflater();
@@ -683,6 +696,11 @@ public class TrainingActivity extends Activity
             int computedHeartRate, final long heartBeatCount, final BigDecimal heartBeatEventTime, final
             AntPlusHeartRatePcc.DataState dataState)
             {
+                /**
+                 * Update HeartRate Observable when New HeartRateData is received
+                 */
+                hrObservable.setValue(computedHeartRate);
+
                 // Mark heart rate with asterisk if zero detected
                 final String textHeartRate = String.valueOf(computedHeartRate) + ((AntPlusHeartRatePcc
                         .DataState.ZERO_DETECTED.equals(dataState)) ? "*" : "");

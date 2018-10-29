@@ -31,7 +31,7 @@ public class SpeechActivity extends Activity
     
     private int voiceRecognitionRequestCode = 777;
 //    private static RestApiClient restApiClient = new RestApiClient();
-    private static String chatingAPIURL = "http://13.230.154.2:8000/appd";
+    private static String chatingAPIURL = "http://13.230.154.2:8000/appd4re";
     private TextView textToAPIResp = null;
     private ImageView testButton = null;
     private ImageView textToDashboard = null;
@@ -147,7 +147,7 @@ public class SpeechActivity extends Activity
     private void startVoiceRecognitionActivity()
     {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "QQ請說出您現在的狀況");
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "請說說您現在的狀況");
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
         startActivityForResult(intent, voiceRecognitionRequestCode);

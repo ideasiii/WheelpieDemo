@@ -13,6 +13,7 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -55,6 +56,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import lecho.lib.hellocharts.gesture.ContainerScrollType;
+import lecho.lib.hellocharts.gesture.ZoomType;
 import lecho.lib.hellocharts.model.Axis;
 import lecho.lib.hellocharts.model.AxisValue;
 import lecho.lib.hellocharts.model.Line;
@@ -491,16 +493,20 @@ public class TrainingActivity extends Activity
                 startActivity(intent);
             }
         });
-
+    
+        lineChartView.setInteractive(true);
         lineChartView.setContainerScrollEnabled(true, ContainerScrollType.HORIZONTAL);
         lineChartView.setScrollEnabled(true);
+        
         Viewport viewport = new Viewport(lineChartView.getMaximumViewport());
-        viewport.top = 120;
-        viewport.bottom = 60;
+        viewport.top = 200;
+        viewport.bottom = 20;
         viewport.right = 10;
         viewport.left = 0;
+        lineChartView.setViewportCalculationEnabled(false); //這行一定要加否則頁面在顯示的時候不會按照上面所設定的top/botton來跑
         lineChartView.setMaximumViewport(viewport);
         lineChartView.setCurrentViewport(viewport);
+        
 //        假如要透過點圖的方式啟動則開啟下列程式碼
 //        lineChartView.setOnClickListener(new View.OnClickListener()
 //        {
@@ -888,6 +894,7 @@ public class TrainingActivity extends Activity
     {
         List yAxisValues = new ArrayList();
         List axisValues = new ArrayList();
+        String[] testlist = {"120", "130", "140", "150", "160", "170"};
 
         Line line = new Line(yAxisValues).setColor(Color.parseColor("#9C27B0"));
 
@@ -901,11 +908,17 @@ public class TrainingActivity extends Activity
         {
             strLabel = String.valueOf(nXData++);
             axisValues.add(i, new AxisValue(i).setLabel(strLabel));
+//            yAxisValues.add(new AxisValue(i).setValue(i).setLabel(
+//                    i +""));// 添加y轴显示的刻度值
+    
         }
-
+        
+        float DevHrData = Float.parseFloat(textView_ComputedHeartRate.getText().toString());
+        
         for (int i = 0; i < 11; ++i)
         {
-            yAxisValues.add(new PointValue(i, ThreadLocalRandom.current().nextInt(65, 110)));
+//            yAxisValues.add(new PointValue(i, ThreadLocalRandom.current().nextInt(65, 110)));//自動random出幾筆數據來畫圖
+            yAxisValues.add(new PointValue(i, DevHrData));//取出設備心率數值來畫圖
         }
 
         List lines = new ArrayList();
@@ -914,17 +927,23 @@ public class TrainingActivity extends Activity
         LineChartData data = new LineChartData();
         data.setLines(lines);
 
+        //設定x座標軸
         Axis axis = new Axis();
-        axis.setName("秒");
+        axis.setName("Seconds");
+
         axis.setValues(axisValues);
-        axis.setTextSize(9);
+//        axis.setHasLines(true);
+//        axis.setTextSize(9);
         axis.setTextColor(Color.parseColor("#03A9F4"));
         data.setAxisXBottom(axis);
 
+        //設定y座標軸
         Axis yAxis = new Axis();
-        yAxis.setName("心律");
+        yAxis.setName("HeartRate");
         yAxis.setTextColor(Color.parseColor("#03A9F4"));
-        yAxis.setTextSize(9);
+        
+//        yAxis.setTextSize(9);
+//        yAxis.setValues(testlist);
         data.setAxisYLeft(yAxis);
 
         lineChartView.setLineChartData(data);

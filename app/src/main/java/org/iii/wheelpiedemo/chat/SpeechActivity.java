@@ -7,11 +7,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.speech.RecognizerIntent;
+import android.speech.tts.TextToSpeech;
 import android.util.JsonReader;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.iii.more.restapiclient.Config;
 import org.iii.more.restapiclient.Response;
@@ -25,8 +27,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 
-public class SpeechActivity extends Activity
+public class SpeechActivity extends Activity implements TextToSpeech.OnInitListener
 {
     
     private int voiceRecognitionRequestCode = 777;
@@ -41,6 +44,8 @@ public class SpeechActivity extends Activity
     private String ABC_REPLY = null;
     private final int _SpeechTextOut_ = 5;
     Response response = null;
+    TextToSpeech mTTS = null;
+    private final int ACT_CHECK_TTS_DATA = 1000;
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler()
     {
@@ -57,6 +62,8 @@ public class SpeechActivity extends Activity
                     Logs.showTrace("<case eat> MsgAskResponse: " + ABC123);
                     textToAPIResp.setText("ANS:" + ABC123);
                     Logs.showTrace("PRINT OK");
+                    saySomething(ABC123.toString().trim(), 1);
+//                    Logs.showTrace("SOUND OK");
                     break;
                 case _SpeechTextOut_:
                     String text_handle = (String) msg.obj;
@@ -121,6 +128,10 @@ public class SpeechActivity extends Activity
                 startVoiceRecognitionActivity();
             }
         });
+        // Check to see if we have TTS voice data
+        Intent ttsIntent = new Intent();
+        ttsIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+        startActivityForResult(ttsIntent, ACT_CHECK_TTS_DATA);
 
     }
     
@@ -169,6 +180,18 @@ public class SpeechActivity extends Activity
             message.obj = MSG_INPUT_API;
             handler.sendMessage(message);
         }
+        if (requestCode == ACT_CHECK_TTS_DATA) {
+            if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
+                // Data exists, so we instantiate the TTS engine
+                mTTS = new TextToSpeech(this, this);
+            } else {
+                // Data is missing, so we start the TTS
+                // installation process
+                Intent installIntent = new Intent();
+                installIntent.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+                startActivity(installIntent);
+            }
+        }
         super.onActivityResult(requestCode, resultCode, data);
     }
     
@@ -195,9 +218,6 @@ public class SpeechActivity extends Activity
 //            Log.d("OBVIOUS", String.valueOf(response.Data));
 //        }
 //        Log.d("response",String.valueOf(nResponse_id));
-    
-
-
     
     }
     private RestApiHeaderClient.ResponseListener requestMsgAskResponseListener = new RestApiHeaderClient
@@ -230,23 +250,37 @@ public class SpeechActivity extends Activity
             
         }
     };
-    private String extractMsgReply(String jsonString)
-    {
-        String msgReply = null;
-        if (jsonString == null || jsonString.length() == 0)
-        {
-            return null;
-        }
-        
-        try
-        {
-            JSONObject resp = new JSONObject(jsonString);
-            msgReply = String.valueOf(resp.getInt("msg_reply"));
-        }
-        catch (JSONException e)
-        {
-            e.printStackTrace();
-        }
-        return msgReply;
+    
+    private void saySomething(String text, int qmode) {
+        if (qmode == 1)
+            mTTS.speak(text, TextToSpeech.QUEUE_ADD, null);
+        else
+            mTTS.speak(text, TextToSpeech.QUEUE_FLUSH, null);
     }
+    public void onInit(int status) {
+        if (status == TextToSpeech.SUCCESS) {
+            if (mTTS != null) {
+                int result = mTTS.setLanguage(Locale.TAIWAN);
+                if (result == TextToSpeech.LANG_MISSING_DATA ||
+                        result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                    Toast.makeText(this, "TTS language is not supported", Toast.LENGTH_LONG).show();
+                } else {
+                    saySomething("來吧，告訴我你喜歡什麼", 0);
+                }
+            }
+        } else {
+            Toast.makeText(this, "TTS initialization failed",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+    
+    @Override
+    protected void onDestroy() {
+        if (mTTS != null) {
+            mTTS.stop();
+            mTTS.shutdown();
+        }
+        super.onDestroy();
+    }
+
 }

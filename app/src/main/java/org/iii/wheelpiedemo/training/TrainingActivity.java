@@ -111,7 +111,7 @@ public class TrainingActivity extends Activity
      * Initialization for HeartRate Supervision
      */
     private ObservableHeartRate hrObservable = new ObservableHeartRate();
-    private ObserverHeartRateChanged hrObserver = new ObserverHeartRateChanged();
+    private ObserverHeartRateChanged hrObserver = new ObserverHeartRateChanged("E10+M20+E5");
 
     /**
      * ANT+ Library

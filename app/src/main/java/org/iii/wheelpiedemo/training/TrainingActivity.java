@@ -476,6 +476,11 @@ public class TrainingActivity extends Activity
             @Override
             public void onClick(View v)
             {
+                /**
+                 * Stop HeartRate Supervision when the stop button is clicked
+                 */
+                hrObservable.deleteObserver(hrObserver.HeartRateChanged);
+
                 int nRun = (int) v.getTag();
 
                 if (nRun == 1)

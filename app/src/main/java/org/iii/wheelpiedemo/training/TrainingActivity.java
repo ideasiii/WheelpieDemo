@@ -13,6 +13,7 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -46,6 +47,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -64,8 +66,6 @@ import lecho.lib.hellocharts.model.LineChartData;
 import lecho.lib.hellocharts.model.PointValue;
 import lecho.lib.hellocharts.model.Viewport;
 import lecho.lib.hellocharts.view.LineChartView;
-import org.iii.wheelpiedemo.training.ObservableHeartRate;
-import org.iii.wheelpiedemo.training.ObserverHeartRateChanged;
 
 @SuppressLint("Registered")
 public class TrainingActivity extends Activity
@@ -110,8 +110,11 @@ public class TrainingActivity extends Activity
     /**
      * Initialization for HeartRate Supervision
      */
-    private ObservableHeartRate hrObservable = new ObservableHeartRate();
-    private ObserverHeartRateChanged hrObserver = new ObserverHeartRateChanged("E10+M20+E5");
+    private ObservableHeartRate hrObservable;
+    private ObserverHeartRateChanged hrObserver;
+    private ObservableSpeech speechContentObservable;
+    private ObserverSpeechChanged speechContentObserver;
+    private TextToSpeech tts;
 
     /**
      * ANT+ Library
@@ -368,11 +371,6 @@ public class TrainingActivity extends Activity
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.training_main);
 
-        /**
-         * Make observer subscribes to observable(HeartRate) for HeartRate Supervision
-         */
-        hrObservable.addObserver(hrObserver.HeartRateChanged);
-
         //畫面切換
         LayoutInflater inflater = getLayoutInflater();
         final View view1 = inflater.inflate(R.layout.training_main, null);//找出第一個視窗
@@ -384,6 +382,46 @@ public class TrainingActivity extends Activity
 //        TextView backbutton = (TextView) view2.findViewById(R.id.textView14);//找出第二個視窗中的按鈕
         startbutton.setTag(0);
         stopbutton.setTag(0);
+
+
+        /**
+         * Instantiate TTS
+         */
+        tts = new TextToSpeech(TrainingActivity.this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                // TODO Auto-generated method stub
+                if(status == TextToSpeech.SUCCESS){
+                    int result=tts.setLanguage(Locale.US);
+//                    if(result==TextToSpeech.LANG_MISSING_DATA ||
+//                            result==TextToSpeech.LANG_NOT_SUPPORTED){
+//                        Log.e("error", "This Language is not supported");
+//                    }
+//                    else{
+//                        Log.e("error", "convertTextToSpeech");
+//                    }
+                    Log.e("success", "Initilization success with result code: "+result);
+                }
+                else
+                    Log.e("error", "Initilization Failed!");
+            }
+        });
+
+        /**
+         * Initialization for TTS, make observer subscribes to observable(speech content).
+         * Therefore, when speech content changes, observer speaks.
+         */
+        speechContentObservable = new ObservableSpeech();
+        speechContentObserver = new ObserverSpeechChanged(tts);
+        speechContentObservable.addObserver(speechContentObserver.SpeechChanged);
+
+        /**
+         * Initialization for HeartRate Supervision, Make observer subscribes to observable(HeartRate).
+         * Therefore, when HeartRate changes, observer checks correctness.
+         */
+        hrObservable = new ObservableHeartRate();
+        hrObserver = new ObserverHeartRateChanged("E10+M20+E5", speechContentObservable);
+        hrObservable.addObserver(hrObserver.HeartRateChanged);
 
         TrainingMode = (TextView) view1.findViewById(R.id.exercise_mode_content);//找出第一個視窗中訓練類型的字串框格
         TrainingType = (TextView) view1.findViewById(R.id.exercise_type_content);//找出第一個視窗中訓練模式的字串框格
@@ -477,9 +515,10 @@ public class TrainingActivity extends Activity
             public void onClick(View v)
             {
                 /**
-                 * Stop HeartRate Supervision when the stop button is clicked
+                 * Stop HeartRate Supervision & TTS when the stop button is clicked
                  */
                 hrObservable.deleteObserver(hrObserver.HeartRateChanged);
+                speechContentObservable.deleteObserver(speechContentObserver.SpeechChanged);
 
                 int nRun = (int) v.getTag();
 

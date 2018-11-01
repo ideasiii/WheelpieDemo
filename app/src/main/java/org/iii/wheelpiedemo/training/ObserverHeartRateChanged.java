@@ -1,16 +1,15 @@
 package org.iii.wheelpiedemo.training;
+
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Calendar;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.lang.IndexOutOfBoundsException;
+
 
 public class ObserverHeartRateChanged {
     // private getHeartRateRecord; (from api call)
@@ -20,9 +19,12 @@ public class ObserverHeartRateChanged {
     private HashMap<String, HashMap<String, Integer>> hrZoneRange;
     private Integer currRuleIdx = 0;
 
-    public ObserverHeartRateChanged(String courseType) {
-        rules = getRules(courseType);
-        hrZoneRange = getHeartRateZoneRange(123,456);
+    private ObservableSpeech speechContentObservable;
+
+    public ObserverHeartRateChanged(String courseType, ObservableSpeech speechContentObservable) {
+        this.rules = getRules(courseType);
+        this.hrZoneRange = getHeartRateZoneRange(123,456);
+        this.speechContentObservable = speechContentObservable;
     }
 
     // Get HeartRate Zone
@@ -71,6 +73,12 @@ public class ObserverHeartRateChanged {
     public Observer HeartRateChanged = new Observer() {
         @Override
         public void update(Observable o, Object newValue) {
+//                /**
+//             * Test tts
+//                */
+//            observableSpeech.setValue("hehe");
+////            tts.speak("HELLO", TextToSpeech.QUEUE_FLUSH, null, null);
+
             // Get current time
             Long currentTime = Calendar.getInstance().getTime().getTime();
             if(startTime == null){
@@ -89,8 +97,10 @@ public class ObserverHeartRateChanged {
                     Integer rangeMax = range.get("max");
                     Log.d("HeartRateSupervisor", "HeartRate is: "+ newValue + " at time(millis) : " + diff + " should be in range : " + rangeMin + " ~ " + rangeMax);
                     if((int)newValue < rangeMin){
+                        speechContentObservable.setValue("Run");
                         Log.d("HeartRateSupervisor", "跑快一點");
                     }else if((int)newValue > rangeMax){
+                        speechContentObservable.setValue("Stop");
                         Log.d("HeartRateSupervisor", "跑慢一點");
                     }
                 }else{

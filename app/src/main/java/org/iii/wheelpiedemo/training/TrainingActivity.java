@@ -109,8 +109,6 @@ public class TrainingActivity extends Activity
     static int nXData = 0;
     Boolean bRun = false;
     LineChartView lineChartView;
-    String[] axisData = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
-    Timer timer02 = new Timer(true);
     
     /**
      * ANT+ Library
@@ -198,7 +196,8 @@ public class TrainingActivity extends Activity
         param.put("id", dayTrainingId);
         HashMap<String, String> headers = new HashMap<String, String>();
 //        headers.put("Authorization", "Bearer " +
-//                "2h39l3nV4iiYucuXax7Mw6PEQMh4cjkFX7AeW3yVcaiLyIhAHRdAPLixkgS5Mvpv0FcWJMnXUyO9ssEkeb60VyBWm4yEVoPZ1jXIAcnO3ZM9qIgcRXiTKdEYkOTcZWFryyo2hFTgQwMVpprXDpGyBlHJUru8g9QOeOYNYET9jsRUz0IX6e6bPuw3K3FNsBfHmUbukwYgEnDBLP6VYOAul9njlS4DKVda3yD6WGFXcjkbKeRtPb8dY98dJkpXsWUg");
+//
+// "2h39l3nV4iiYucuXax7Mw6PEQMh4cjkFX7AeW3yVcaiLyIhAHRdAPLixkgS5Mvpv0FcWJMnXUyO9ssEkeb60VyBWm4yEVoPZ1jXIAcnO3ZM9qIgcRXiTKdEYkOTcZWFryyo2hFTgQwMVpprXDpGyBlHJUru8g9QOeOYNYET9jsRUz0IX6e6bPuw3K3FNsBfHmUbukwYgEnDBLP6VYOAul9njlS4DKVda3yD6WGFXcjkbKeRtPb8dY98dJkpXsWUg");
         headers.put("Authorization", String.format("Bearer %s", userToken));
         Response response = new Response();
         int nResponse_id = restApiHeaderClient.HttpsGet(courseAPIURL, Config.HTTP_DATA_TYPE.X_WWW_FORM,
@@ -323,8 +322,19 @@ public class TrainingActivity extends Activity
             
             if (startflag)
             {
-                //如果startflag是true則每秒tsec+1
+                //如果startflag是true則每秒tsec+1以及更新即時數據圖形
+                updateChart();
+//                try
+//                {
+//                    updateChart();
+//                }
+//                catch (Exception e)
+//                {
+//                    Logs.showTrace(String.valueOf(e));
+//                }
+                
                 tsec++;
+                
                 Message message = new Message();
                 
                 //傳送訊息1
@@ -491,7 +501,7 @@ public class TrainingActivity extends Activity
                 }
                 requestAccessToPcc(); //啟動ant+ device detect
                 startbutton.setVisibility(View.GONE);
-                run(); //啟動畫圖機制
+//                run(); //啟動畫圖機制
                 stopbutton.setVisibility(View.VISIBLE);
             }
         });
@@ -596,7 +606,6 @@ public class TrainingActivity extends Activity
         else
         {
             // starts the plugins UI search
-            // todo 與手錶連上線之後若沒戴上手,只要手表一沒偵測到訊號就會crash掉
             releaseHandle = AntPlusHeartRatePcc.requestAccess(this, this, base_IPluginAccessResultReceiver,
                     base_IDeviceStateChangeReceiver);
         }
@@ -614,12 +623,10 @@ public class TrainingActivity extends Activity
             switch (resultCode)
             {
                 case SUCCESS:
-                    //宣告Timer
-                    Timer timer01 = new Timer();
-                    
-                    //設定Timer(task為執行內容，0代表立刻開始,間格1秒執行一次)
-                    timer01.schedule(task, 0, 1000);
-                    
+
+//                    run(); //啟動畫圖機制
+                    Timer timer01 = new Timer(true);//宣告Timer
+                    timer01.schedule(task, 0, 1000);//設定Timer(task為執行內容，0代表立刻開始,間格1秒執行一次)
                     startflag = true;//當裝置連結成功的時候去啟動timer
                     
                     hrPcc = result;
@@ -750,13 +757,10 @@ public class TrainingActivity extends Activity
                     public void run()
                     {
                         // tv_estTimestamp.setText(String.valueOf(estTimestamp));
-                        
                         textView_ComputedHeartRate.setText(textHeartRate);
                         //  tv_heartBeatCounter.setText(textHeartBeatCount);
                         //  tv_heartBeatEventTime.setText(textHeartBeatEventTime);
-                        
                         //  tv_dataStatus.setText(dataState.toString());
-                        
                         sendData();
                     }
                 });
@@ -774,11 +778,10 @@ public class TrainingActivity extends Activity
                     @Override
                     public void run()
                     {
-                        //       tv_estTimestamp.setText(String.valueOf(estTimestamp));
-                        
-                        //       tv_manufacturerSpecificByte.setText(String.format("0x%02X",
+                        //tv_estTimestamp.setText(String.valueOf(estTimestamp));
+                        //tv_manufacturerSpecificByte.setText(String.format("0x%02X",
                         //manufacturerSpecificByte));
-                        //       tv_previousHeartBeatEventTime.setText(String.valueOf
+                        //tv_previousHeartBeatEventTime.setText(String.valueOf
                         //(previousHeartBeatEventTime));
                     }
                 });
@@ -797,10 +800,9 @@ public class TrainingActivity extends Activity
                     @Override
                     public void run()
                     {
-                        //        tv_estTimestamp.setText(String.valueOf(estTimestamp));
-                        
-                        //        tv_cumulativeOperatingTime.setText(String.valueOf
-                        // (cumulativeOperatingTime));
+                        //tv_estTimestamp.setText(String.valueOf(estTimestamp));
+                        //tv_cumulativeOperatingTime.setText(String.valueOf
+                        //(cumulativeOperatingTime));
                     }
                 });
             }
@@ -817,10 +819,9 @@ public class TrainingActivity extends Activity
                     @Override
                     public void run()
                     {
-                        //        tv_estTimestamp.setText(String.valueOf(estTimestamp));
-                        
-                        //        tv_manufacturerID.setText(String.valueOf(manufacturerID));
-                        //        tv_serialNumber.setText(String.valueOf(serialNumber));
+                        //tv_estTimestamp.setText(String.valueOf(estTimestamp));
+                        //tv_manufacturerID.setText(String.valueOf(manufacturerID));
+                        //tv_serialNumber.setText(String.valueOf(serialNumber));
                     }
                 });
             }
@@ -837,11 +838,10 @@ public class TrainingActivity extends Activity
                     @Override
                     public void run()
                     {
-                        //       tv_estTimestamp.setText(String.valueOf(estTimestamp));
-                        
-                        //       tv_hardwareVersion.setText(String.valueOf(hardwareVersion));
-                        //       tv_softwareVersion.setText(String.valueOf(softwareVersion));
-                        //       tv_modelNumber.setText(String.valueOf(modelNumber));
+                        //tv_estTimestamp.setText(String.valueOf(estTimestamp));
+                        //tv_hardwareVersion.setText(String.valueOf(hardwareVersion));
+                        //tv_softwareVersion.setText(String.valueOf(softwareVersion));
+                        //tv_modelNumber.setText(String.valueOf(modelNumber));
                     }
                 });
             }
@@ -858,20 +858,18 @@ public class TrainingActivity extends Activity
                     @Override
                     public void run()
                     {
-                        //       tv_estTimestamp.setText(String.valueOf(estTimestamp));
-                        //       tv_rrFlag.setText(flag.toString());
-                        
-                        // Mark RR with asterisk if source is not cached or page 4
+                        //tv_estTimestamp.setText(String.valueOf(estTimestamp));
+                        //tv_rrFlag.setText(flag.toString());
+                        //Mark RR with asterisk if source is not cached or page 4
                         if (flag.equals(AntPlusHeartRatePcc.RrFlag.DATA_SOURCE_CACHED) || flag.equals
                                 (AntPlusHeartRatePcc.RrFlag.DATA_SOURCE_PAGE_4))
-                        
                         {
-                            //           tv_calculatedRrInterval.setText(String.valueOf
+                            // tv_calculatedRrInterval.setText(String.valueOf
                             // (rrInterval));
                         }
                         else
                         {
-                            //           tv_calculatedRrInterval.setText(String.valueOf
+                            // tv_calculatedRrInterval.setText(String.valueOf
                             // (rrInterval) + "*");
                         }
                     }
@@ -889,8 +887,8 @@ public class TrainingActivity extends Activity
                     @Override
                     public void run()
                     {
-                        //       tv_estTimestamp.setText(String.valueOf(estTimestamp));
-                        //       tv_rssi.setText(String.valueOf(rssi) + " dBm");
+                        // tv_estTimestamp.setText(String.valueOf(estTimestamp));
+                        // tv_rssi.setText(String.valueOf(rssi) + " dBm");
                     }
                 });
             }
@@ -942,9 +940,19 @@ public class TrainingActivity extends Activity
     //處理即時圖形顯示的區塊
     private void updateChart()
     {
+        Logs.showTrace("fuckkkkkkkkkkhere" + textView_ComputedHeartRate.getText().toString());
+        
+        String HR_value = textView_ComputedHeartRate.getText().toString();
+        float DevHrData;
+        if ("0*".equals(HR_value))
+        {
+            DevHrData = (float) 0.0;
+        }
+        else {
+            DevHrData = Float.parseFloat(textView_ComputedHeartRate.getText().toString());
+        }
         List yAxisValues = new ArrayList();
         List axisValues = new ArrayList();
-        String[] testlist = {"120", "130", "140", "150", "160", "170"};
         
         Line line = new Line(yAxisValues).setColor(Color.parseColor("#9C27B0"));
         
@@ -954,23 +962,23 @@ public class TrainingActivity extends Activity
             nXData -= 10;
         }
         
-        for (int i = 0; i < 11; i++)
+        if (startflag)
         {
-            strLabel = String.valueOf(nXData++);
-            axisValues.add(i, new AxisValue(i).setLabel(strLabel));
-//            yAxisValues.add(new AxisValue(i).setValue(i).setLabel(
-//                    i +""));// 添加y轴显示的刻度值
-        
+            for (int i = 0; i < 11; i++)
+            {
+                strLabel = String.valueOf(nXData++);
+                axisValues.add(i, new AxisValue(i).setLabel(strLabel));
+            }
+            
+            for (int i = 0; i < 11; ++i)
+            {
+                yAxisValues.add(new PointValue(i, DevHrData));//取出設備心率數值來畫圖
+//                yAxisValues.add(new PointValue(i, ThreadLocalRandom.current().nextInt(65, 110)));
+                //自動random出幾筆數據來畫圖
+            }
+            
         }
         
-        float DevHrData = Float.parseFloat(textView_ComputedHeartRate.getText().toString());
-        
-        for (int i = 0; i < 11; ++i)
-        {
-//            yAxisValues.add(new PointValue(i, ThreadLocalRandom.current().nextInt(65, 110)));
-// 自動random出幾筆數據來畫圖
-            yAxisValues.add(new PointValue(i, DevHrData));//取出設備心率數值來畫圖
-        }
         
         List lines = new ArrayList();
         lines.add(line);
@@ -1002,6 +1010,8 @@ public class TrainingActivity extends Activity
     
     private void run()
     {
+        Timer timer02 = new Timer(true);
+        
         if (bRun)
         {
             bRun = false;
@@ -1010,7 +1020,7 @@ public class TrainingActivity extends Activity
         else
         {
             bRun = true;
-            timer02.schedule(new MyTimerTask(), 1000, 1000);
+            timer02.schedule(new MyTimerTask(), 0, 1000);
         }
         
     }
@@ -1031,8 +1041,15 @@ public class TrainingActivity extends Activity
         {
             handler.sendEmptyMessage(MSG_CONTENT_VIEW_LOGIN);
         }
-        ;
     }
-    
-    
+
+//    @Override
+//    protected void onDestroy() {
+//        if ( != null) {
+//            .stop();
+//            .shutdown();
+//        }
+//        super.onDestroy();
+//    }
+
 }

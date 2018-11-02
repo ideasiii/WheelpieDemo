@@ -116,6 +116,55 @@ abstract class Http {
         Logs.showTrace("[Http] POST Response: " + jsonResponse.toString());
     }
 
+    static void PUT(String httpsURL, HTTP_DATA_TYPE http_data_type, HashMap<String, String> parameters, Response response, HashMap<String, String> headers) {
+        JSONObject jsonResponse = new JSONObject();
+
+        try {
+            jsonResponse.put("id", response.Id);
+            jsonResponse.put("code", -1);
+            String strParameter = http_data_type == HTTP_DATA_TYPE.JSON ?
+                getJSONDataString(parameters):
+                getPostDataString(parameters);
+            Logs.showTrace("[Http] PUT : URL=" + httpsURL + " Data Type=" + http_data_type.toString() + " Parameter:" + strParameter);
+            URL url = new URL(httpsURL);
+            HttpURLConnection con = (HttpURLConnection)url.openConnection();
+            con.setRequestMethod("PUT");
+            con.setConnectTimeout(15000);
+            con.setReadTimeout(15000);
+            con.setRequestProperty("Content-length", String.valueOf(strParameter.length()));
+            con.setRequestProperty("Content-Type", http_data_type.toString());
+            con.setRequestProperty("Cache-Control", "no-cache");
+            setHeaders(con, headers);
+            con.setDoOutput(true);
+            con.setDoInput(true);
+            DataOutputStream output = new DataOutputStream(con.getOutputStream());
+            output.writeBytes(strParameter);
+            output.close();
+            response.Code = con.getResponseCode();
+            if (response.Code == 200) {
+                response.Data = "";
+
+                String line;
+                for(BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream())); (line = br.readLine()) != null; response.Data = response.Data + line) {
+                    ;
+                }
+            } else {
+                Logs.showTrace("[Http] ERROR HTTP Response Code:" + response.Code);
+            }
+
+            jsonResponse.put("code", response.Code);
+            jsonResponse.put("data", response.Data);
+        } catch (Exception var11) {
+            Logs.showError("[Http] PUT Exception: " + var11.getMessage());
+        }
+
+        if (null != eventListener) {
+            eventListener.onEvent(jsonResponse);
+        }
+
+        Logs.showTrace("[Http] POST Response: " + jsonResponse.toString());
+    }
+
     private static void setHeaders(HttpURLConnection con, HashMap<String, String> headers) {
         if (con == null || headers == null || headers.size() == 0) {
             return;
@@ -137,6 +186,15 @@ abstract class Http {
             result.append(queryString);
         }
 
+        return result.toString();
+    }
+
+    private static String getJSONDataString(HashMap<String, String> params) throws UnsupportedEncodingException {
+        StringBuilder result = new StringBuilder();
+
+        if (params != null && params.containsKey("body")) {
+            result.append((String)params.get("body"));
+        }
         return result.toString();
     }
 

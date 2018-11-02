@@ -61,6 +61,7 @@
         <activity
             android:name=".sample.TrainingSampleActivity">
         </activity>
+        <activity android:name=".setting.SettingActivity" />
     </application>
 
 </manifest>

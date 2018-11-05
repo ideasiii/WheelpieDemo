@@ -73,12 +73,6 @@ public class ObserverHeartRateChanged {
     public Observer HeartRateChanged = new Observer() {
         @Override
         public void update(Observable o, Object newValue) {
-//                /**
-//             * Test tts
-//                */
-//            observableSpeech.setValue("hehe");
-////            tts.speak("HELLO", TextToSpeech.QUEUE_FLUSH, null, null);
-
             // Get current time
             Long currentTime = Calendar.getInstance().getTime().getTime();
             if(startTime == null){
@@ -97,10 +91,10 @@ public class ObserverHeartRateChanged {
                     Integer rangeMax = range.get("max");
                     Log.d("HeartRateSupervisor", "HeartRate is: "+ newValue + " at time(millis) : " + diff + " should be in range : " + rangeMin + " ~ " + rangeMax);
                     if((int)newValue < rangeMin){
-                        speechContentObservable.setValue("Run");
+                        speechContentObservable.setValue("跑快一點");
                         Log.d("HeartRateSupervisor", "跑快一點");
                     }else if((int)newValue > rangeMax){
-                        speechContentObservable.setValue("Stop");
+                        speechContentObservable.setValue("跑慢一點");
                         Log.d("HeartRateSupervisor", "跑慢一點");
                     }
                 }else{

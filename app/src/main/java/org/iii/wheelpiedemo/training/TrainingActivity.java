@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -392,7 +393,7 @@ public class TrainingActivity extends Activity
             public void onInit(int status) {
                 // TODO Auto-generated method stub
                 if(status == TextToSpeech.SUCCESS){
-                    int result=tts.setLanguage(Locale.US);
+                    int result=tts.setLanguage(Locale.TAIWAN);
 //                    if(result==TextToSpeech.LANG_MISSING_DATA ||
 //                            result==TextToSpeech.LANG_NOT_SUPPORTED){
 //                        Log.e("error", "This Language is not supported");
@@ -406,6 +407,24 @@ public class TrainingActivity extends Activity
                     Log.e("error", "Initilization Failed!");
             }
         });
+        tts.setOnUtteranceProgressListener(new UtteranceProgressListener(){
+            @Override
+            public void onStart(String utteranceId) {
+                // Speaking started.
+                speechContentObserver.setSpeakingStatus(true);
+            }
+
+            @Override
+            public void onDone(String utteranceId) {
+                // Speaking stopped.
+                speechContentObserver.setSpeakingStatus(false);
+            }
+
+            @Override
+            public void onError(String utteranceId) {
+                // There was an error.
+            }
+        });
 
         /**
          * Initialization for TTS, make observer subscribes to observable(speech content).
@@ -413,6 +432,7 @@ public class TrainingActivity extends Activity
          */
         speechContentObservable = new ObservableSpeech();
         speechContentObserver = new ObserverSpeechChanged(tts);
+        speechContentObserver.setRestingInterval(3000);
         speechContentObservable.addObserver(speechContentObserver.SpeechChanged);
 
         /**

@@ -55,12 +55,10 @@ import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.iii.wheelpiedemo.sample.LineChart;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import lecho.lib.hellocharts.gesture.ContainerScrollType;
-import lecho.lib.hellocharts.gesture.ZoomType;
 import lecho.lib.hellocharts.model.Axis;
 import lecho.lib.hellocharts.model.AxisValue;
 import lecho.lib.hellocharts.model.Line;
@@ -72,7 +70,7 @@ import lecho.lib.hellocharts.view.LineChartView;
 @SuppressLint("Registered")
 public class TrainingActivity extends Activity
 {
-    
+
     /**
      * Layout
      */
@@ -106,10 +104,10 @@ public class TrainingActivity extends Activity
     private TextView tv_modelNumber;
     private TextView tv_dataStatus;
     private TextView tv_rrFlag;
-    static int nXData = 0;
+    static int nXData = 2;
     Boolean bRun = false;
     LineChartView lineChartView;
-    
+
     /**
      * ANT+ Library
      */
@@ -118,24 +116,24 @@ public class TrainingActivity extends Activity
     protected PccReleaseHandle<AntPlusHeartRatePcc> releaseHandle = null;
     WheelPiesClient wheelPiesClient = null;
     String mstrUUID = "";
-    
+
     private boolean isUserLoggedIn()
     {
         boolean isLoggedIn = false;
-        
+
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key),
                 Context.MODE_PRIVATE);
         userToken = sharedPref.getString(PREF_USER_TOKEN_KEY, null);
-        
+
         if (userToken != null)
         {
             isLoggedIn = true;
         }
-        
+
         return isLoggedIn;
     }
-    
-    
+
+
     private String getResponseJSONString(JSONObject clientResp)
     {
         String jsonString = null;
@@ -152,7 +150,7 @@ public class TrainingActivity extends Activity
         }
         return jsonString;
     }
-    
+
     private String extractDayTrainingId(String jsonString)
     {
         String id = null;
@@ -160,7 +158,7 @@ public class TrainingActivity extends Activity
         {
             return null;
         }
-        
+
         try
         {
             JSONObject resp = new JSONObject(jsonString);
@@ -174,7 +172,7 @@ public class TrainingActivity extends Activity
         }
         return id;
     }
-    
+
     private RestApiHeaderClient.ResponseListener dayViewResponseListener = new RestApiHeaderClient
             .ResponseListener()
     {
@@ -188,7 +186,7 @@ public class TrainingActivity extends Activity
             handler.sendMessage(message);
         }
     };
-    
+
     private void requestCourseDayViewAPI(String dayTrainingId)
     {
         restApiHeaderClient.setResponseListener(dayViewResponseListener);
@@ -204,7 +202,7 @@ public class TrainingActivity extends Activity
                 param, response, headers);
         Logs.showTrace("[API] http response id: " + nResponse_id);
     }
-    
+
     //任何Task(如:TimerTask)無法直接改變元件因此要透過Handler來當橋樑
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler()
@@ -218,18 +216,18 @@ public class TrainingActivity extends Activity
                 case 1:
                     csec = tsec % 60;
                     cmin = tsec / 60;
-                    
+
                     if (cmin >= 60)
                     {
                         cmin = cmin % 60;
                     }
-                    
+
                     chr = tsec / 3600;
                     if (chr >= 24)
                     {
                         chr = chr % 24;
                     }
-                    
+
                     String s = "";
                     //定義進位時的顯示情況
                     if (chr < 10)
@@ -240,7 +238,7 @@ public class TrainingActivity extends Activity
                     {
                         s = "" + chr;
                     }
-                    
+
                     if (cmin < 10)
                     {
                         s = s + ":0" + cmin;
@@ -249,7 +247,7 @@ public class TrainingActivity extends Activity
                     {
                         s = s + ":" + cmin;
                     }
-                    
+
                     if (csec < 10)
                     {
                         s = s + ":0" + csec;
@@ -258,21 +256,21 @@ public class TrainingActivity extends Activity
                     {
                         s = s + ":" + csec;
                     }
-                    
+
                     //s字串為00:00:00格式
                     timer.setText(s);
                     break;
-                
+
                 case 3:
                     break;
-                
+
                 case MSG_DAY_TRAINING_API_RESPONSE:
                     JSONObject resp = (JSONObject) msg.obj;
                     try
                     {
                         //String resp_code = resp.getString("code");
                         //if ("-1".equals(resp_code)) //因為java屬於物件導向的程式語言,注意在string的比較中要用equals去比
-                        
+
                         int resp_code = resp.getInt("code");
                         if (resp_code == -1)
                         {
@@ -291,10 +289,10 @@ public class TrainingActivity extends Activity
                             //Logs.showTrace("show me data" + excerciseMode);
                             TrainingMode.setText(excerciseMode);
                             TrainingType.setText(excerciseType);
-                            
+
                             // 呼叫當日課程說明API
                             requestCourseDayViewAPI(trainingId);
-                            
+
                         }
                     }
                     catch (JSONException e)
@@ -302,41 +300,32 @@ public class TrainingActivity extends Activity
                         e.printStackTrace();
                         break;
                     }
-                
+
             }
         }
     };
-    
+
     private TimerTask task = new TimerTask()
     {
-        
+
         @Override
         public void run()
         {
             // TODO Auto-generated method stub
-            
+
             //一開始的時候message先丟3
 //            Message IniMessage = new Message();
 //            IniMessage.what = 3;
 //            handler.sendMessage(IniMessage);
-            
+
             if (startflag)
             {
                 //如果startflag是true則每秒tsec+1以及更新即時數據圖形
                 updateChart();
-//                try
-//                {
-//                    updateChart();
-//                }
-//                catch (Exception e)
-//                {
-//                    Logs.showTrace(String.valueOf(e));
-//                }
-                
                 tsec++;
-                
+
                 Message message = new Message();
-                
+
                 //傳送訊息1
                 message.what = 1;
                 handler.sendMessage(message);
@@ -351,15 +340,15 @@ public class TrainingActivity extends Activity
 //                cmin = 0;
 //                chr = 0;
                 Message message = new Message();
-                
+
                 //傳送訊息1
                 message.what = 1;
                 handler.sendMessage(message);
             }
         }
-        
+
     };
-    
+
     private void requestTodayTrainingAPI(String dateString)
     {
         restApiHeaderClient.setResponseListener(todayTrainingResponseListener);
@@ -375,7 +364,7 @@ public class TrainingActivity extends Activity
                 param, response, headers);
         Logs.showTrace("[API] http response id: " + nResponse_id);
     }
-    
+
     private RestApiHeaderClient.ResponseListener todayTrainingResponseListener = new RestApiHeaderClient
             .ResponseListener()
     {
@@ -389,32 +378,32 @@ public class TrainingActivity extends Activity
             handler.sendMessage(message);
         }
     };
-    
-    
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.training_main);
-        
+
         //畫面切換
         LayoutInflater inflater = getLayoutInflater();
         final View view1 = inflater.inflate(R.layout.training_main, null);//找出第一個視窗
         final View view2 = inflater.inflate(R.layout.training_device_connection, null);//找出第二個視窗
         setContentView(view1); //顯示目前第一個視窗
-        
+
         final ImageView startbutton = (ImageView) view1.findViewById(R.id.startbutton);//找出第一個視窗中start的按鈕
         final ImageView stopbutton = (ImageView) view1.findViewById(R.id.stopbutton);//找出第一個視窗中stop的按鈕
 //        TextView backbutton = (TextView) view2.findViewById(R.id.textView14);//找出第二個視窗中的按鈕
         startbutton.setTag(0);
         stopbutton.setTag(0);
-        
+
         TrainingMode = (TextView) view1.findViewById(R.id.exercise_mode_content);//找出第一個視窗中訓練類型的字串框格
         TrainingType = (TextView) view1.findViewById(R.id.exercise_type_content);//找出第一個視窗中訓練模式的字串框格
         lineChartView = view1.findViewById(R.id.chartLine); //找出第一個視窗中折線圖的image
-        
+
         timer = (TextView) view1.findViewById(R.id.timer_content);
-        
+
         tv_status = (TextView) findViewById(R.id.textView_Status);
         tv_estTimestamp = (TextView) findViewById(R.id.textView_EstTimestamp);
         tv_rssi = (TextView) findViewById(R.id.textView_Rssi);
@@ -434,13 +423,13 @@ public class TrainingActivity extends Activity
         tv_dataStatus = (TextView) findViewById(R.id.textView_DataStatus);
         tv_rrFlag = (TextView) findViewById(R.id.textView_rRFlag);
 //        btn_Active = (Button) findViewById(R.id.button_active);
-        
+
         wheelPiesClient = new WheelPiesClient();
         mnState = 0;
         //Button監聽,第一種寫法,在上面先定義listener,function帶入即可
 //        startbutton.setOnClickListener(listener);
         //Button監聽,第二種寫法,(第一個畫面在做的事情)
-        
+
         if (isUserLoggedIn())
         {
             // 呼叫當日課程訓練API
@@ -451,8 +440,8 @@ public class TrainingActivity extends Activity
         {
             handler.sendEmptyMessage(MSG_CONTENT_VIEW_LOGIN);
         }
-        
-        
+
+
         startbutton.setOnClickListener(new OnClickListener()
         {
             @Override
@@ -460,7 +449,7 @@ public class TrainingActivity extends Activity
             {
                 Logs.showTrace("startbutton onClick:" + v.getTag());
                 int nRun = (int) v.getTag();
-                
+
                 if (nRun == 1)
                 {
                     mnState = 2;
@@ -474,7 +463,7 @@ public class TrainingActivity extends Activity
                     mstrUUID = uuid.toString();
                     v.setTag(1);
                 }
-                
+
                 // TODO Auto-generated method stub
                 switch (v.getId())
                 {
@@ -484,12 +473,12 @@ public class TrainingActivity extends Activity
 //                        intent = new Intent(TrainingActivity.this, com.dsi.ant.antplus.pluginsampler
 //                                .heartrate.Activity_SearchUiHeartRateSampler.class);
 //                        startActivity(intent);
-                        
+
                         if (startflag)
                         {
                             startflag = false; //一開始的code,當點開始運動的時候flag會變成flase去啟動timer
 //                            startbutton.setImageResource(R.drawable.training_startbutton);
-                        
+
                         }
                         else
                         {
@@ -497,22 +486,21 @@ public class TrainingActivity extends Activity
 //                            startbutton.setImageResource(R.drawable.training_stopbutton);
                         }
                         break;
-                    
+
                 }
                 requestAccessToPcc(); //啟動ant+ device detect
                 startbutton.setVisibility(View.GONE);
-//                run(); //啟動畫圖機制
                 stopbutton.setVisibility(View.VISIBLE);
             }
         });
-        
+
         stopbutton.setOnClickListener(new OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
                 int nRun = (int) v.getTag();
-                
+
                 if (nRun == 1)
                 {
                     mnState = 2;
@@ -526,7 +514,7 @@ public class TrainingActivity extends Activity
                     mstrUUID = uuid.toString();
                     v.setTag(1);
                 }
-                
+
                 if (startflag)
                 {
                     startflag = false;
@@ -535,20 +523,21 @@ public class TrainingActivity extends Activity
                 {
                     startflag = true;
                 }
-                
+
                 Intent intent = null;
                 intent = new Intent(TrainingActivity.this, SpeechActivity.class);
                 startActivity(intent);
             }
         });
-        
+
         lineChartView.setInteractive(true);
         lineChartView.setContainerScrollEnabled(true, ContainerScrollType.HORIZONTAL);
         lineChartView.setScrollEnabled(true);
-        
+
         Viewport viewport = new Viewport(lineChartView.getMaximumViewport());
+        //調整xy軸range
         viewport.top = 200;
-        viewport.bottom = 20;
+        viewport.bottom = 45;
         viewport.right = 10;
         viewport.left = 0;
         lineChartView.setViewportCalculationEnabled(false); //這行一定要加否則頁面在顯示的時候不會按照上面所設定的top/botton來跑
@@ -564,6 +553,7 @@ public class TrainingActivity extends Activity
 //                run();
 //            }
 //        });
+
         Intent intent = getIntent();
         String strName = intent.getStringExtra("NAME");
         Logs.showTrace("my name " + strName);
@@ -577,21 +567,21 @@ public class TrainingActivity extends Activity
 //                setContentView(view1);//按了之後跳到第1個視窗
 //            }
 //        });
-    
+
     }
-    
+
     private String getTodayDate()
     {
         return getTodayDate("UTC");
     }
-    
+
     private String getTodayDate(String timezone)
     {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         sdf.setTimeZone(TimeZone.getTimeZone(timezone));
         return sdf.format(java.util.Calendar.getInstance().getTime());
     }
-    
+
     private void requestAccessToPcc()
     {
         Intent intent = getIntent();
@@ -610,7 +600,7 @@ public class TrainingActivity extends Activity
                     base_IDeviceStateChangeReceiver);
         }
     }
-    
+
     protected AntPluginPcc.IPluginAccessResultReceiver<AntPlusHeartRatePcc>
             base_IPluginAccessResultReceiver = new AntPluginPcc
             .IPluginAccessResultReceiver<AntPlusHeartRatePcc>()
@@ -624,11 +614,10 @@ public class TrainingActivity extends Activity
             {
                 case SUCCESS:
 
-//                    run(); //啟動畫圖機制
                     Timer timer01 = new Timer(true);//宣告Timer
                     timer01.schedule(task, 0, 1000);//設定Timer(task為執行內容，0代表立刻開始,間格1秒執行一次)
                     startflag = true;//當裝置連結成功的時候去啟動timer
-                    
+
                     hrPcc = result;
 //                            tv_status.setText(result.getDeviceName() + ": " + initialDeviceState);
                     subscribeToHrEvents();
@@ -678,7 +667,7 @@ public class TrainingActivity extends Activity
                             startStore = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" +
                                     AntPlusHeartRatePcc.getMissingDependencyPackageName()));
                             startStore.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            
+
                             TrainingActivity.this.startActivity(startStore);
                         }
                     });
@@ -690,7 +679,7 @@ public class TrainingActivity extends Activity
                             dialog.dismiss();
                         }
                     });
-                    
+
                     final AlertDialog waitDialog = adlgBldr.create();
                     waitDialog.show();
                     break;
@@ -710,7 +699,7 @@ public class TrainingActivity extends Activity
             }
         }
     };
-    
+
     //Receives state changes and shows it on the status display line
     protected AntPluginPcc.IDeviceStateChangeReceiver base_IDeviceStateChangeReceiver = new AntPluginPcc
             .IDeviceStateChangeReceiver()
@@ -727,10 +716,10 @@ public class TrainingActivity extends Activity
                     // newDeviceState);
                 }
             });
-            
+
         }
     };
-    
+
     public void subscribeToHrEvents()
     {
         wheelPiesClient.start();
@@ -744,13 +733,13 @@ public class TrainingActivity extends Activity
                 // Mark heart rate with asterisk if zero detected
                 final String textHeartRate = String.valueOf(computedHeartRate) + ((AntPlusHeartRatePcc
                         .DataState.ZERO_DETECTED.equals(dataState)) ? "*" : "");
-                
+
                 // Mark heart beat count and heart beat event time with asterisk if initial value
                 final String textHeartBeatCount = String.valueOf(heartBeatCount) + ((AntPlusHeartRatePcc
                         .DataState.INITIAL_VALUE.equals(dataState)) ? "*" : "");
                 final String textHeartBeatEventTime = String.valueOf(heartBeatEventTime) + (
                         (AntPlusHeartRatePcc.DataState.INITIAL_VALUE.equals(dataState)) ? "*" : "");
-                
+
                 runOnUiThread(new Runnable()
                 {
                     @Override
@@ -766,7 +755,7 @@ public class TrainingActivity extends Activity
                 });
             }
         });
-        
+
         hrPcc.subscribePage4AddtDataEvent(new AntPlusHeartRatePcc.IPage4AddtDataReceiver()
         {
             @Override
@@ -787,7 +776,7 @@ public class TrainingActivity extends Activity
                 });
             }
         });
-        
+
         hrPcc.subscribeCumulativeOperatingTimeEvent(new AntPlusLegacyCommonPcc
                 .ICumulativeOperatingTimeReceiver()
         {
@@ -807,7 +796,7 @@ public class TrainingActivity extends Activity
                 });
             }
         });
-        
+
         hrPcc.subscribeManufacturerAndSerialEvent(new AntPlusLegacyCommonPcc.IManufacturerAndSerialReceiver()
         {
             @Override
@@ -826,7 +815,7 @@ public class TrainingActivity extends Activity
                 });
             }
         });
-        
+
         hrPcc.subscribeVersionAndModelEvent(new AntPlusLegacyCommonPcc.IVersionAndModelReceiver()
         {
             @Override
@@ -846,7 +835,7 @@ public class TrainingActivity extends Activity
                 });
             }
         });
-        
+
         hrPcc.subscribeCalculatedRrIntervalEvent(new AntPlusHeartRatePcc.ICalculatedRrIntervalReceiver()
         {
             @Override
@@ -876,7 +865,7 @@ public class TrainingActivity extends Activity
                 });
             }
         });
-        
+
         hrPcc.subscribeRssiEvent(new AntPlusCommonPcc.IRssiReceiver()
         {
             @Override
@@ -894,11 +883,11 @@ public class TrainingActivity extends Activity
             }
         });
     }
-    
+
     private void sendData()
     {
         JSONObject jsonObject = new JSONObject();
-        
+
         try
         {
             jsonObject.put("activeId", mstrUUID);
@@ -934,114 +923,131 @@ public class TrainingActivity extends Activity
             com.dsi.ant.antplus.pluginsampler.datatransfer.Logs.showError("JSONObject Exception: " + e
                     .toString());
         }
-        
+
     }
-    
+
     //處理即時圖形顯示的區塊
     private void updateChart()
     {
-        Logs.showTrace("fuckkkkkkkkkkhere" + textView_ComputedHeartRate.getText().toString());
-        
         String HR_value = textView_ComputedHeartRate.getText().toString();
         float DevHrData;
         if ("0*".equals(HR_value))
         {
             DevHrData = (float) 0.0;
         }
-        else {
+        else
+        {
             DevHrData = Float.parseFloat(textView_ComputedHeartRate.getText().toString());
         }
         List yAxisValues = new ArrayList();
         List axisValues = new ArrayList();
-        
+
         Line line = new Line(yAxisValues).setColor(Color.parseColor("#9C27B0"));
-        
-        String strLabel;
-        if (10 < nXData)
-        {
-            nXData -= 10;
-        }
-        
+
         if (startflag)
         {
-            for (int i = 0; i < 11; i++)
+            int tsec_condition = (int) tsec;
+            if (tsec_condition > 10)
             {
-                strLabel = String.valueOf(nXData++);
-                axisValues.add(i, new AxisValue(i).setLabel(strLabel));
+                tsec_condition = 11;
             }
-            
-            for (int i = 0; i < 11; ++i)
+
+            String strLabel;
+            if (10 < nXData)
+            {
+                nXData -= 10;
+            }
+//            Logs.showTrace("nXData現在到底幾秒" + String.valueOf(nXData));
+
+            if (tsec <= 10)
+            {
+                for (int i = 0; i < 11; i++)
+                {
+//                    Logs.showTrace("X軸現在到底幾秒" + i);
+                    axisValues.add(i, new AxisValue(i).setLabel(String.valueOf(i + 2)));
+                }
+            }
+            else
+            {
+                for (int i = 0; i < 11; i++)
+                {
+                    strLabel = String.valueOf(nXData++);
+//                    Logs.showTrace("X軸現在到底幾秒" + strLabel);
+                    axisValues.add(i, new AxisValue(i).setLabel(strLabel));
+                }
+            }
+//            Logs.showTrace("現在到底幾秒" + String.valueOf(tsec));
+
+            for (int i = 0; i < tsec_condition; ++i)
             {
                 yAxisValues.add(new PointValue(i, DevHrData));//取出設備心率數值來畫圖
+//                Logs.showTrace("心率的數值" + String.valueOf(new PointValue(i, DevHrData)));
 //                yAxisValues.add(new PointValue(i, ThreadLocalRandom.current().nextInt(65, 110)));
                 //自動random出幾筆數據來畫圖
             }
-            
+
         }
-        
-        
+
         List lines = new ArrayList();
         lines.add(line);
-        
+
         LineChartData data = new LineChartData();
         data.setLines(lines);
-        
+
         //設定x座標軸
         Axis axis = new Axis();
         axis.setName("Seconds");
-        
+
         axis.setValues(axisValues);
 //        axis.setHasLines(true);
 //        axis.setTextSize(9);
         axis.setTextColor(Color.parseColor("#03A9F4"));
         data.setAxisXBottom(axis);
-        
+
         //設定y座標軸
         Axis yAxis = new Axis();
         yAxis.setName("HeartRate");
         yAxis.setTextColor(Color.parseColor("#03A9F4"));
-
 //        yAxis.setTextSize(9);
-//        yAxis.setValues(testlist);
         data.setAxisYLeft(yAxis);
-        
+
         lineChartView.setLineChartData(data);
     }
-    
-    private void run()
-    {
-        Timer timer02 = new Timer(true);
-        
-        if (bRun)
-        {
-            bRun = false;
-            timer02.cancel();
-        }
-        else
-        {
-            bRun = true;
-            timer02.schedule(new MyTimerTask(), 0, 1000);
-        }
-        
-    }
-    
-    public class MyTimerTask extends TimerTask
-    {
-        public void run()
-        {
-            updateChart();
-        }
-    }
-    
-    @Override
-    protected void onResume()
-    {
-        super.onResume();
-        if (!isUserLoggedIn())
-        {
-            handler.sendEmptyMessage(MSG_CONTENT_VIEW_LOGIN);
-        }
-    }
+
+//    private void run()
+//    {
+//        Timer timer02 = new Timer(true);
+//
+//        if (bRun)
+//        {
+//            bRun = false;
+//            timer02.cancel();
+//        }
+//        else
+//        {
+//            bRun = true;
+//            timer02.schedule(new MyTimerTask(), 0, 1000);
+//        }
+//
+//    }
+//
+//    public class MyTimerTask extends TimerTask
+//    {
+//        public void run()
+//        {
+//            updateChart();
+//        }
+//    }
+//
+//    @Override
+//    protected void onResume()
+//    {
+//        super.onResume();
+//        if (!isUserLoggedIn())
+//        {
+//            handler.sendEmptyMessage(MSG_CONTENT_VIEW_LOGIN);
+//        }
+//    }
 
 //    @Override
 //    protected void onDestroy() {

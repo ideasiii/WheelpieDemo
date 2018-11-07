@@ -1,5 +1,6 @@
 package org.iii.wheelpiedemo.setting.response;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class PhysicalInfo {
@@ -19,5 +20,24 @@ public class PhysicalInfo {
 
     public int getRestHeartRate() {
         return restHeartRate;
+    }
+
+    static public PhysicalInfo parseResponse (String apiResponse) {
+        PhysicalInfo pi = null;
+        if (apiResponse != null && apiResponse.length() != 0) {
+            try {
+                JSONObject jsonResp = new JSONObject(apiResponse);
+                if (jsonResp.optBoolean("result")) {
+                    JSONObject user = jsonResp.getJSONObject("user");
+                    JSONObject physicalInfo = user.getJSONObject("physicalInfo");
+                    if (physicalInfo != null) {
+                        pi = new PhysicalInfo(physicalInfo);
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return pi;
     }
 }

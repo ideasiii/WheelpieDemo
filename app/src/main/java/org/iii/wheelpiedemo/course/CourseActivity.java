@@ -20,7 +20,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.VideoView;
 
 import org.iii.more.restapiclient.Config;
@@ -34,6 +33,8 @@ import org.iii.wheelpiedemo.course.response.DayTraining;
 import org.iii.wheelpiedemo.course.response.TrainingContent;
 import org.iii.wheelpiedemo.course.util.AChartEngineUtils;
 import org.iii.wheelpiedemo.course.util.HelloChartUtils;
+import org.iii.wheelpiedemo.course.util.JSONUtils;
+import org.iii.wheelpiedemo.course.util.ViewUtils;
 import org.iii.wheelpiedemo.login.LoginActivity;
 import org.iii.wheelpiedemo.sample.VideoPlayer;
 import org.iii.wheelpiedemo.training.TrainingActivity;
@@ -157,18 +158,6 @@ public class CourseActivity extends AppCompatActivity {
         }
     };
 
-    private String getResponseJSONString(JSONObject clientResp) {
-        String jsonString = null;
-        if (clientResp instanceof JSONObject && clientResp.has("data")) {
-            try {
-                jsonString = ((JSONObject)clientResp).getString("data");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        return jsonString;
-    }
-
     private String extractDayTrainingId(String jsonString) {
         String id = null;
         if (jsonString == null || jsonString.length() == 0) {
@@ -200,21 +189,6 @@ public class CourseActivity extends AppCompatActivity {
             message.sendToTarget();
         }
     };
-
-    private DayTraining parseResponse (String apiResponse) {
-        DayTraining dt = null;
-        if (apiResponse != null && apiResponse.length() != 0) {
-            try {
-                JSONObject jsonResp = new JSONObject(apiResponse);
-                JSONObject dayView = jsonResp.getJSONObject("planDayView");
-                JSONObject dayTraining = dayView.getJSONObject("dayTraining");
-                dt = new DayTraining(dayTraining);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        return dt;
-    }
 
     private void initViewByAPIResponse(DayTraining dayTraining) {
         contentLayout = findViewById(R.id.content_layout);
@@ -332,7 +306,10 @@ public class CourseActivity extends AppCompatActivity {
                     //vid.stopPlayback(); //不可呼叫，不然會無法再法再度播放
                     //vid.seekTo(0);
                     //vid.setVideoURI(u); //爛方法，不設定的話，touch event的restart不會work
-                    Toast.makeText(getApplicationContext(), "影片播放完畢...", Toast.LENGTH_LONG).show();
+                    ViewUtils.showFloatingMessage(
+                        getApplicationContext(),
+                        "影片播放完畢..."
+                    );
                 }
             });
 
@@ -384,7 +361,7 @@ public class CourseActivity extends AppCompatActivity {
             switch (msg.what)
             {
                 case MSG_DAY_TRAINING_API_RESPONSE:
-                    strMsg = getResponseJSONString((JSONObject)msg.obj);
+                    strMsg = JSONUtils.getResponseJSONString((JSONObject)msg.obj);
                     String trainingId = extractDayTrainingId(strMsg);
                     // 呼叫當日課程說明API
                     if (trainingId != null) {
@@ -393,17 +370,16 @@ public class CourseActivity extends AppCompatActivity {
                         // 移除等待訊息框
                         dialog.dismiss();
                         // 今天無訓練課程，請至CoachBot服務產生今日課程
-                        Toast.makeText(
+                        ViewUtils.showFloatingMessage(
                             getApplicationContext(),
-                            "今天無訓練課程，請至CoachBot服務產生今日訓練課程",
-                            Toast.LENGTH_LONG
-                        ).show();
+                            "今天無訓練課程，請至CoachBot服務產生今日訓練課程"
+                        );
                     }
                     break;
                 case MSG_DAY_VIEW_API_RESPONSE:
-                    strMsg = getResponseJSONString((JSONObject)msg.obj);
+                    strMsg = JSONUtils.getResponseJSONString((JSONObject)msg.obj);
                     // 依當課程說明API，初始化畫面
-                    DayTraining dt = parseResponse(strMsg);
+                    DayTraining dt = DayTraining.parseResponse(strMsg);
                     initViewByAPIResponse(dt);
                     // 移除等待訊息框
                     dialog.dismiss();

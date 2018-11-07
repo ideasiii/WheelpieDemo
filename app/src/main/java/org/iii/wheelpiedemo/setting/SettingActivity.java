@@ -19,6 +19,7 @@ import org.iii.more.restapiclient.Response;
 import org.iii.wheelpiedemo.R;
 import org.iii.wheelpiedemo.common.Logs;
 import org.iii.wheelpiedemo.common.RestApiHeaderClient;
+import org.iii.wheelpiedemo.course.util.ViewUtils;
 import org.iii.wheelpiedemo.login.LoginActivity;
 import org.iii.wheelpiedemo.setting.response.PhysicalInfo;
 import org.json.JSONException;
@@ -60,7 +61,7 @@ public class SettingActivity extends AppCompatActivity {
                 }
             });
             // 呼叫個人設定API
-            requestAPI(URL_USER_PHYSICAL_INFO, null, null, userPhysicalInfoResponseListener);
+            requestAPI(URL_USER_PHYSICAL_INFO, "GET", null, userPhysicalInfoResponseListener);
         } else {
             theHandler.sendEmptyMessage(MSG_CONTENT_VIEW_LOGIN);
         }
@@ -124,25 +125,6 @@ public class SettingActivity extends AppCompatActivity {
             }
         }
         return result;
-    }
-
-    private PhysicalInfo parseResponse (String apiResponse) {
-        PhysicalInfo pi = null;
-        if (apiResponse != null && apiResponse.length() != 0) {
-            try {
-                JSONObject jsonResp = new JSONObject(apiResponse);
-                if (jsonResp.optBoolean("result")) {
-                    JSONObject user = jsonResp.getJSONObject("user");
-                    JSONObject physicalInfo = user.getJSONObject("physicalInfo");
-                    if (physicalInfo != null) {
-                        pi = new PhysicalInfo(physicalInfo);
-                    }
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        return pi;
     }
 
     private void initViewByAPIResponse(PhysicalInfo physicalInfo) {
@@ -267,7 +249,7 @@ public class SettingActivity extends AppCompatActivity {
                     strMsg = getResponseJSONString((JSONObject)msg.obj);
                     // 處理個人設定API結果
                     if (strMsg != null) {
-                        PhysicalInfo pi = parseResponse(strMsg);
+                        PhysicalInfo pi = PhysicalInfo.parseResponse(strMsg);
                         initViewByAPIResponse(pi);
                         // 移除等待訊息框
                         dialog.dismiss();
@@ -275,11 +257,10 @@ public class SettingActivity extends AppCompatActivity {
                         // 移除等待訊息框
                         dialog.dismiss();
                         // 無個人設定資料，請輸入個人資訊
-                        Toast.makeText(
-                                getApplicationContext(),
-                                "無個人設定資料，請輸入個人資訊",
-                                Toast.LENGTH_LONG
-                        ).show();
+                        ViewUtils.showFloatingMessage(
+                            getApplicationContext(),
+                            "無個人設定資料，請輸入個人資訊"
+                        );
                     }
                     break;
                 case MSG_API_RESPONSE_PUT_USER_PHYSICAL_INFO:
@@ -291,30 +272,27 @@ public class SettingActivity extends AppCompatActivity {
                             // 移除等待訊息框
                             dialog.dismiss();
                             // 成功 -> Toast 成功
-                            Toast.makeText(
-                                    getApplicationContext(),
-                                    "儲存成功",
-                                    Toast.LENGTH_LONG
-                            ).show();
+                            ViewUtils.showFloatingMessage(
+                                getApplicationContext(),
+                                "儲存成功"
+                            );
                         } else {
                             // 移除等待訊息框
                             dialog.dismiss();
                             // 失敗 -> Toast 失敗
-                            Toast.makeText(
-                                    getApplicationContext(),
-                                    "儲存失敗",
-                                    Toast.LENGTH_LONG
-                            ).show();
+                            ViewUtils.showFloatingMessage(
+                                getApplicationContext(),
+                                "儲存失敗"
+                            );
                         }
                     } else {
                         // 移除等待訊息框
                         dialog.dismiss();
-                        // 今天無訓練課程，請至CoachBot服務產生今日課程
-                        Toast.makeText(
-                                getApplicationContext(),
-                                "目前網路有問題，儲存請稍後再試",
-                                Toast.LENGTH_LONG
-                        ).show();
+                        // 目前網路有問題，儲存請稍後再試
+                        ViewUtils.showFloatingMessage(
+                            getApplicationContext(),
+                            "目前網路有問題，儲存請稍後再試"
+                        );
                     }
                     break;
                 case MSG_CONTENT_VIEW_LOGIN:

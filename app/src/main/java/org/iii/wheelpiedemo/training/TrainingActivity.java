@@ -15,6 +15,7 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.content.res.TypedArrayUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -46,6 +47,7 @@ import org.iii.wheelpiedemo.common.RestApiHeaderClient;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -82,6 +84,7 @@ public class TrainingActivity extends Activity
     private static RestApiHeaderClient restApiHeaderClient = new RestApiHeaderClient();
     private static String trainingAPIURL = "https://dsicoach.win/api/plan/my-training/dayTraining";
     private static String courseAPIURL = "https://dsicoach.win/api/plan/my-course/plan/day-view";
+    private static ArrayList<Float> tmpHR_value = new ArrayList<Float>();
     private final int MSG_DAY_TRAINING_API_RESPONSE = 0;
     private final int MSG_DAY_VIEW_API_RESPONSE = 1;
     private final int MSG_CONTENT_VIEW_LOGIN = 9;
@@ -931,6 +934,7 @@ public class TrainingActivity extends Activity
     {
         String HR_value = textView_ComputedHeartRate.getText().toString();
         float DevHrData;
+        
         if ("0*".equals(HR_value))
         {
             DevHrData = (float) 0.0;
@@ -943,9 +947,17 @@ public class TrainingActivity extends Activity
         List axisValues = new ArrayList();
 
         Line line = new Line(yAxisValues).setColor(Color.parseColor("#9C27B0"));
-
+        
         if (startflag)
         {
+    
+            tmpHR_value.add(DevHrData);
+//            Logs.showTrace("value:" + tmpHR_value + ";size:" + tmpHR_value.size());
+            if (tmpHR_value.size() >= 12){
+                tmpHR_value.remove(0);
+            }
+//            Logs.showTrace("value:" + tmpHR_value + ";size:" + tmpHR_value.size());
+            
             int tsec_condition = (int) tsec;
             if (tsec_condition > 10)
             {
@@ -963,7 +975,7 @@ public class TrainingActivity extends Activity
             {
                 for (int i = 0; i < 11; i++)
                 {
-//                    Logs.showTrace("X軸現在到底幾秒" + i);
+                    Logs.showTrace("X軸現在到底幾秒" + i);
                     axisValues.add(i, new AxisValue(i).setLabel(String.valueOf(i + 2)));
                 }
             }
@@ -972,16 +984,17 @@ public class TrainingActivity extends Activity
                 for (int i = 0; i < 11; i++)
                 {
                     strLabel = String.valueOf(nXData++);
-//                    Logs.showTrace("X軸現在到底幾秒" + strLabel);
+                    Logs.showTrace("X軸現在到底幾秒" + strLabel);
                     axisValues.add(i, new AxisValue(i).setLabel(strLabel));
                 }
             }
-//            Logs.showTrace("現在到底幾秒" + String.valueOf(tsec));
+            Logs.showTrace("現在到底幾秒" + String.valueOf(tsec));
 
             for (int i = 0; i < tsec_condition; ++i)
             {
-                yAxisValues.add(new PointValue(i, DevHrData));//取出設備心率數值來畫圖
-//                Logs.showTrace("心率的數值" + String.valueOf(new PointValue(i, DevHrData)));
+                yAxisValues.add(new PointValue(i, tmpHR_value.get(i)));//取出設備心率數值來畫圖
+                Logs.showTrace("心率的數值" + String.valueOf(new PointValue(i, tmpHR_value.get(i))));
+//                yAxisValues.add(new PointValue(i, DevHrData));//取出設備心率數值來畫圖
 //                yAxisValues.add(new PointValue(i, ThreadLocalRandom.current().nextInt(65, 110)));
                 //自動random出幾筆數據來畫圖
             }

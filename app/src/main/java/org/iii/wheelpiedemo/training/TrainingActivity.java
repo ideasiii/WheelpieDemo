@@ -479,7 +479,6 @@ public class TrainingActivity extends Activity
                     v.setTag(1);
                 }
                 
-                // TODO Auto-generated method stub
                 switch (v.getId())
                 {
                     case R.id.startbutton:
@@ -514,6 +513,7 @@ public class TrainingActivity extends Activity
             @Override
             public void onClick(View v)
             {
+                v.setTag(1);
                 int nRun = (int) v.getTag();
                 
                 if (nRun == 1)
@@ -542,6 +542,7 @@ public class TrainingActivity extends Activity
                 Intent intent = null;
                 intent = new Intent(TrainingActivity.this, SpeechActivity.class);
                 startActivity(intent);
+                
             }
         });
         
@@ -937,23 +938,40 @@ public class TrainingActivity extends Activity
                 mnState = 0;
             }
             /// TODO: 2018/11/9 修正其他數據必須要匯進資料庫
-            /// TODO: 2018/11/9 當按下停止鍵的時候資料不會停止傳送(且沒有state=2)
-            jsonObject.put("estTimestamp", tv_estTimestamp.getText().toString());
+            
+//            jsonObject.put("estTimestamp", tv_estTimestamp.getText().toString());
             jsonObject.put("computedHeartRate", textView_ComputedHeartRate.getText().toString());
-            jsonObject.put("heartBeatCounter", tv_heartBeatCounter.getText().toString());
-            jsonObject.put("heartBeatEventTime", tv_heartBeatEventTime.getText().toString());
-            jsonObject.put("dataStatus", tv_dataStatus.getText().toString());
-            jsonObject.put("manufacturerSpecificByte", tv_manufacturerSpecificByte.getText().toString());
-            jsonObject.put("previousHeartBeatEventTime", tv_previousHeartBeatEventTime.getText().toString());
-            jsonObject.put("cumulativeOperatingTime", tv_cumulativeOperatingTime.getText().toString());
-            jsonObject.put("manufacturerID", tv_manufacturerID.getText().toString());
-            jsonObject.put("serialNumber", tv_serialNumber.getText().toString());
-            jsonObject.put("hardwareVersion", tv_hardwareVersion.getText().toString());
-            jsonObject.put("softwareVersion", tv_softwareVersion.getText().toString());
-            jsonObject.put("modelNumber", tv_modelNumber.getText().toString());
-            jsonObject.put("rrFlag", tv_rrFlag.getText().toString());
-            jsonObject.put("calculatedRrInterval", tv_calculatedRrInterval.getText().toString());
-            jsonObject.put("rssi", tv_rssi.getText().toString());
+//            jsonObject.put("heartBeatCounter", tv_heartBeatCounter.getText().toString());
+//            jsonObject.put("heartBeatEventTime", tv_heartBeatEventTime.getText().toString());
+//            jsonObject.put("dataStatus", tv_dataStatus.getText().toString());
+//            jsonObject.put("manufacturerSpecificByte", tv_manufacturerSpecificByte.getText().toString());
+//            jsonObject.put("previousHeartBeatEventTime", tv_previousHeartBeatEventTime.getText().toString());
+//            jsonObject.put("cumulativeOperatingTime", tv_cumulativeOperatingTime.getText().toString());
+//            jsonObject.put("manufacturerID", tv_manufacturerID.getText().toString());
+//            jsonObject.put("serialNumber", tv_serialNumber.getText().toString());
+//            jsonObject.put("hardwareVersion", tv_hardwareVersion.getText().toString());
+//            jsonObject.put("softwareVersion", tv_softwareVersion.getText().toString());
+//            jsonObject.put("modelNumber", tv_modelNumber.getText().toString());
+//            jsonObject.put("rrFlag", tv_rrFlag.getText().toString());
+//            jsonObject.put("calculatedRrInterval", tv_calculatedRrInterval.getText().toString());
+//            jsonObject.put("rssi", tv_rssi.getText().toString());
+    
+            jsonObject.put("estTimestamp", tv_estTimestamp);
+            jsonObject.put("heartBeatCounter", tv_heartBeatCounter);
+            jsonObject.put("heartBeatEventTime", tv_heartBeatEventTime);
+            jsonObject.put("dataStatus", tv_dataStatus);
+            jsonObject.put("manufacturerSpecificByte", tv_manufacturerSpecificByte);
+            jsonObject.put("previousHeartBeatEventTime", tv_previousHeartBeatEventTime);
+            jsonObject.put("cumulativeOperatingTime", tv_cumulativeOperatingTime);
+            jsonObject.put("manufacturerID", tv_manufacturerID);
+            jsonObject.put("serialNumber", tv_serialNumber);
+            jsonObject.put("hardwareVersion", tv_hardwareVersion);
+            jsonObject.put("softwareVersion", tv_softwareVersion);
+            jsonObject.put("modelNumber", tv_modelNumber);
+            jsonObject.put("rrFlag", tv_rrFlag);
+            jsonObject.put("calculatedRrInterval", tv_calculatedRrInterval);
+            jsonObject.put("rssi", tv_rssi);
+
             /*
             以下先塞測試用的假資料
              */

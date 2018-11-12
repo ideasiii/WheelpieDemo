@@ -131,6 +131,7 @@ public class TrainingActivity extends Activity
     private ObservableSpeech speechContentObservable;
     private ObserverSpeechChanged speechContentObserver;
     private TextToSpeech tts;
+    public Context mContext;
 
     /**
      * ANT+ Library
@@ -423,6 +424,11 @@ public class TrainingActivity extends Activity
         stopbutton.setTag(0);
 
         /**
+         * For ObserverHeartRateChanged to access sharedPreference.
+         */
+        mContext = this;
+
+        /**
          * Instantiate TTS
          */
         tts = new TextToSpeech(TrainingActivity.this, new TextToSpeech.OnInitListener() {
@@ -477,7 +483,7 @@ public class TrainingActivity extends Activity
          * Therefore, when HeartRate changes, observer checks correctness.
          */
         hrObservable = new ObservableHeartRate();
-        hrObserver = new ObserverHeartRateChanged("E10+M20+E5", speechContentObservable);
+        hrObserver = new ObserverHeartRateChanged(61,162,"E1+M1+A1", speechContentObservable);
         hrObservable.addObserver(hrObserver.HeartRateChanged);
 
         TrainingMode = (TextView) view1.findViewById(R.id.exercise_mode_content);//找出第一個視窗中訓練類型的字串框格

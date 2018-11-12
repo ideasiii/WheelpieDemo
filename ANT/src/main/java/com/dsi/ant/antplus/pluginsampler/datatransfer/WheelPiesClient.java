@@ -21,20 +21,28 @@ public class WheelPiesClient
     private final int nConnectTimeOut = 5000; // Socket Connect Timeout
     private final int nReceiveTimeOut = 5000; // Socket Read IO Timeout
     private final int SOCKET_CONNECT_SUCCESS = 0;
-    
+    static public Handler ParentHandler = null;
     private Socket socket = null;
     
     public WheelPiesClient()
     {
     }
     
-    public void start()
+    public void start(Handler phandler)
     {
+        if (null == phandler)
+        {
+            ParentHandler = phandler;
+        }
+        else
+        {
+            ParentHandler = handler;
+        }
         stop();
         socket = new Socket();
         
         Logs.showTrace("[WheelPiesClient] start Socket Created");
-        Thread thread = new Thread(new SocketConnect(socket, handler));
+        Thread thread = new Thread(new SocketConnect(socket, ParentHandler));
         thread.start();
         
     }
@@ -58,9 +66,14 @@ public class WheelPiesClient
     
     public void send(JSONObject jsonObject)
     {
+        send(jsonObject, handler);
+    }
+    
+    public void send(JSONObject jsonObject, Handler sendHandler)
+    {
         if (Controller.validSocket(socket))
         {
-            Thread thread = new Thread(new SocketSend(socket, handler, jsonObject.toString()));
+            Thread thread = new Thread(new SocketSend(socket, sendHandler, jsonObject.toString()));
             thread.start();
         }
     }
@@ -81,8 +94,7 @@ public class WheelPiesClient
         {
             try
             {
-                theSocket.connect(new InetSocketAddress(WHEELPIES_IP, WHEELPIES_PORT),
-                        nConnectTimeOut);
+                theSocket.connect(new InetSocketAddress(WHEELPIES_IP, WHEELPIES_PORT), nConnectTimeOut);
                 theSocket.setSoTimeout(nReceiveTimeOut);
                 theHandler.sendEmptyMessage(SOCKET_CONNECT_SUCCESS);
                 Logs.showTrace("[WheelPiesClient] SocketConnect : " + theSocket.isConnected());
@@ -116,8 +128,17 @@ public class WheelPiesClient
                 if (theSocket.isConnected())
                 {
                     Controller.CMP_PACKET respPacket = new Controller.CMP_PACKET();
-                    nRespon = Controller.cmpRequest(Controller.wheelpies_request, theData,
-                            respPacket, theSocket);
+                    nRespon = Controller.cmpRequest(Controller.wheelpies_request, theData, respPacket,
+                            theSocket);
+                    if (null != theHandler)
+                    {
+                        theHandler.sendEmptyMessage(999);
+                    }
+                    else
+                    {
+                        Logs.showTrace("[WheelPiesClient] SocketSend invalid handler");
+                    }
+                    
                     Logs.showTrace("[WheelPiesClient] SocketSend Response Code: " + nRespon);
                 }
                 else

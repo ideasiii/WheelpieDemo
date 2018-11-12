@@ -15,9 +15,7 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.content.res.TypedArrayUtils;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -48,7 +46,6 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -123,7 +120,7 @@ public class TrainingActivity extends Activity
     /**
      * ANT+ Library
      */
-    int mnState;
+    volatile int mnState;
     private AntPlusHeartRatePcc hrPcc = null;
     protected PccReleaseHandle<AntPlusHeartRatePcc> releaseHandle = null;
     WheelPiesClient wheelPiesClient = null;
@@ -273,9 +270,6 @@ public class TrainingActivity extends Activity
                     timer.setText(s);
                     break;
                 
-                case 3:
-                    break;
-                
                 case MSG_DAY_TRAINING_API_RESPONSE:
                     JSONObject resp = (JSONObject) msg.obj;
                     try
@@ -313,6 +307,15 @@ public class TrainingActivity extends Activity
                         break;
                     }
                 
+                case 999:
+                    Logs.showTrace("socket send response: 999");
+                    if (mnState == 2)
+                    {
+                        Logs.showTrace("mnstate = 2, It's time to stop socket pipline");
+//                        wheelPiesClient.stop();
+                    }
+                    
+                    break;
             }
         }
     };
@@ -323,12 +326,6 @@ public class TrainingActivity extends Activity
         @Override
         public void run()
         {
-            // TODO Auto-generated method stub
-            
-            //一開始的時候message先丟3
-//            Message IniMessage = new Message();
-//            IniMessage.what = 3;
-//            handler.sendMessage(IniMessage);
             
             if (startflag)
             {
@@ -408,7 +405,7 @@ public class TrainingActivity extends Activity
         final ImageView stopbutton = (ImageView) view1.findViewById(R.id.stopbutton);//找出第一個視窗中stop的按鈕
 //        TextView backbutton = (TextView) view2.findViewById(R.id.textView14);//找出第二個視窗中的按鈕
         startbutton.setTag(0);
-        stopbutton.setTag(0);
+        stopbutton.setTag(1);
         
         TrainingMode = (TextView) view1.findViewById(R.id.exercise_mode_content);//找出第一個視窗中訓練類型的字串框格
         TrainingType = (TextView) view1.findViewById(R.id.exercise_type_content);//找出第一個視窗中訓練模式的字串框格
@@ -456,13 +453,12 @@ public class TrainingActivity extends Activity
             handler.sendEmptyMessage(MSG_CONTENT_VIEW_LOGIN);
         }
         
-        
         startbutton.setOnClickListener(new OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                Logs.showTrace("startbutton onClick:" + v.getTag());
+//                Logs.showTrace("startbutton onClick:" + v.getTag());
                 int nRun = (int) v.getTag();
                 
                 if (nRun == 1)
@@ -482,11 +478,6 @@ public class TrainingActivity extends Activity
                 switch (v.getId())
                 {
                     case R.id.startbutton:
-//                        setContentView(view2);//按了之後跳到第2個視窗
-//                        Intent intent = null;
-//                        intent = new Intent(TrainingActivity.this, com.dsi.ant.antplus.pluginsampler
-//                                .heartrate.Activity_SearchUiHeartRateSampler.class);
-//                        startActivity(intent);
                         
                         if (startflag)
                         {
@@ -513,7 +504,7 @@ public class TrainingActivity extends Activity
             @Override
             public void onClick(View v)
             {
-                v.setTag(1);
+                
                 int nRun = (int) v.getTag();
                 
                 if (nRun == 1)
@@ -539,6 +530,7 @@ public class TrainingActivity extends Activity
                     startflag = true;
                 }
                 
+                //切換到speech的頁面
                 Intent intent = null;
                 intent = new Intent(TrainingActivity.this, SpeechActivity.class);
                 startActivity(intent);
@@ -551,6 +543,7 @@ public class TrainingActivity extends Activity
         lineChartView.setScrollEnabled(true);
         
         Viewport viewport = new Viewport(lineChartView.getMaximumViewport());
+        
         //調整xy軸range
         viewport.top = 200;
         viewport.bottom = 45;
@@ -572,18 +565,8 @@ public class TrainingActivity extends Activity
         
         Intent intent = getIntent();
         String strName = intent.getStringExtra("NAME");
-        Logs.showTrace("my name " + strName);
         updateChart();
-
-//        backbutton.setOnClickListener(new OnClickListener()
-//        {
-//            @Override
-//            public void onClick(View v)
-//            {
-//                setContentView(view1);//按了之後跳到第1個視窗
-//            }
-//        });
-    
+        
     }
     
     private String getTodayDate()
@@ -635,35 +618,40 @@ public class TrainingActivity extends Activity
                     startflag = true;//當裝置連結成功的時候去啟動timer
                     
                     hrPcc = result;
-//                            tv_status.setText(result.getDeviceName() + ": " + initialDeviceState);
+                    tv_status.setText(result.getDeviceName() + ": " + initialDeviceState);
                     subscribeToHrEvents();
-//                            if (!result.supportsRssi())
-//                            {
-//                                tv_rssi.setText("N/A");
-//                            }
+                    if (!result.supportsRssi())
+                    {
+                        tv_rssi.setText("N/A");
+                    }
                     break;
+                
                 case CHANNEL_NOT_AVAILABLE:
                     Toast.makeText(TrainingActivity.this, "Channel Not Available", Toast.LENGTH_SHORT).show();
-                    // tv_status.setText("Error. Do Menu->Reset.");
+                    tv_status.setText("Error. Do Menu->Reset.");
                     break;
+                
                 case ADAPTER_NOT_DETECTED:
                     Toast.makeText(TrainingActivity.this, "ANT Adapter Not " + "Available" + ". Built-in "
                             + "ANT hardware or external adapter " + "required" + ".", Toast.LENGTH_SHORT)
                             .show();
-                    // tv_status.setText("Error. Do Menu->Reset.");
+                    tv_status.setText("Error. Do Menu->Reset.");
                     break;
+                
                 case BAD_PARAMS:
                     //Note: Since we compose all the params ourself, we should never see
                     // this result
                     Toast.makeText(TrainingActivity.this, "Bad request parameters.", Toast.LENGTH_SHORT)
                             .show();
-                    // tv_status.setText("Error. Do Menu->Reset.");
+                    tv_status.setText("Error. Do Menu->Reset.");
                     break;
+                
                 case OTHER_FAILURE:
                     Toast.makeText(TrainingActivity.this, "RequestAccess failed. " + "See" + " logcat for "
                             + "details.", Toast.LENGTH_SHORT).show();
-                    //      tv_status.setText("Error. Do Menu->Reset.");
+                    tv_status.setText("Error. Do Menu->Reset.");
                     break;
+                
                 case DEPENDENCY_NOT_INSTALLED:
                     //    tv_status.setText("Error. Do Menu->Reset.");
                     AlertDialog.Builder adlgBldr = new AlertDialog.Builder(TrainingActivity.this);
@@ -699,14 +687,17 @@ public class TrainingActivity extends Activity
                     final AlertDialog waitDialog = adlgBldr.create();
                     waitDialog.show();
                     break;
+                
                 case USER_CANCELLED:
                     //     tv_status.setText("Cancelled. Do Menu->Reset.");
                     break;
+                
                 case UNRECOGNIZED:
                     Toast.makeText(TrainingActivity.this, "Failed: UNRECOGNIZED. " + "PluginLib Upgrade " +
                             "Required?", Toast.LENGTH_SHORT).show();
                     //       tv_status.setText("Error. Do Menu->Reset.");
                     break;
+                
                 default:
                     Toast.makeText(TrainingActivity.this, "Unrecognized result: " + resultCode, Toast
                             .LENGTH_SHORT).show();
@@ -728,8 +719,7 @@ public class TrainingActivity extends Activity
                 @Override
                 public void run()
                 {
-                    // tv_status.setText(hrPcc.getDeviceName() + ": " +
-                    // newDeviceState);
+                    tv_status.setText(hrPcc.getDeviceName() + ": " + newDeviceState);
                 }
             });
             
@@ -738,7 +728,7 @@ public class TrainingActivity extends Activity
     
     public void subscribeToHrEvents()
     {
-        wheelPiesClient.start();
+        wheelPiesClient.start(handler);
         hrPcc.subscribeHeartRateDataEvent(new AntPlusHeartRatePcc.IHeartRateDataReceiver()
         {
             @Override
@@ -755,7 +745,7 @@ public class TrainingActivity extends Activity
                         .DataState.INITIAL_VALUE.equals(dataState)) ? "*" : "");
                 final String textHeartBeatEventTime = String.valueOf(heartBeatEventTime) + (
                         (AntPlusHeartRatePcc.DataState.INITIAL_VALUE.equals(dataState)) ? "*" : "");
-                
+
                 /*
                 以下暫時處理fake data
                 */
@@ -784,7 +774,7 @@ public class TrainingActivity extends Activity
                         tv_heartBeatCounter.setText(textHeartBeatCount);
                         tv_heartBeatEventTime.setText(textHeartBeatEventTime);
                         tv_dataStatus.setText(dataState.toString());
-                        
+
                         /*
                         以下暫時顯示假資料的數值
                          */
@@ -810,7 +800,8 @@ public class TrainingActivity extends Activity
                     public void run()
                     {
                         tv_estTimestamp.setText(String.valueOf(estTimestamp));
-                        tv_manufacturerSpecificByte.setText(String.format("0x%02X", manufacturerSpecificByte));
+                        tv_manufacturerSpecificByte.setText(String.format("0x%02X",
+                                manufacturerSpecificByte));
                         tv_previousHeartBeatEventTime.setText(String.valueOf(previousHeartBeatEventTime));
                     }
                 });
@@ -892,11 +883,11 @@ public class TrainingActivity extends Activity
                         if (flag.equals(AntPlusHeartRatePcc.RrFlag.DATA_SOURCE_CACHED) || flag.equals
                                 (AntPlusHeartRatePcc.RrFlag.DATA_SOURCE_PAGE_4))
                         {
-                             tv_calculatedRrInterval.setText(String.valueOf(rrInterval));
+                            tv_calculatedRrInterval.setText(String.valueOf(rrInterval));
                         }
                         else
                         {
-                             tv_calculatedRrInterval.setText(String.valueOf(rrInterval) + "*");
+                            tv_calculatedRrInterval.setText(String.valueOf(rrInterval) + "*");
                         }
                     }
                 });
@@ -913,8 +904,8 @@ public class TrainingActivity extends Activity
                     @Override
                     public void run()
                     {
-                         tv_estTimestamp.setText(String.valueOf(estTimestamp));
-                         tv_rssi.setText(String.valueOf(rssi) + " dBm");
+                        tv_estTimestamp.setText(String.valueOf(estTimestamp));
+                        tv_rssi.setText(String.valueOf(rssi) + " dBm");
                     }
                 });
             }
@@ -939,39 +930,23 @@ public class TrainingActivity extends Activity
             }
             /// TODO: 2018/11/9 修正其他數據必須要匯進資料庫
             
-//            jsonObject.put("estTimestamp", tv_estTimestamp.getText().toString());
+            jsonObject.put("estTimestamp", tv_estTimestamp.getText().toString());
             jsonObject.put("computedHeartRate", textView_ComputedHeartRate.getText().toString());
-//            jsonObject.put("heartBeatCounter", tv_heartBeatCounter.getText().toString());
-//            jsonObject.put("heartBeatEventTime", tv_heartBeatEventTime.getText().toString());
-//            jsonObject.put("dataStatus", tv_dataStatus.getText().toString());
-//            jsonObject.put("manufacturerSpecificByte", tv_manufacturerSpecificByte.getText().toString());
-//            jsonObject.put("previousHeartBeatEventTime", tv_previousHeartBeatEventTime.getText().toString());
-//            jsonObject.put("cumulativeOperatingTime", tv_cumulativeOperatingTime.getText().toString());
-//            jsonObject.put("manufacturerID", tv_manufacturerID.getText().toString());
-//            jsonObject.put("serialNumber", tv_serialNumber.getText().toString());
-//            jsonObject.put("hardwareVersion", tv_hardwareVersion.getText().toString());
-//            jsonObject.put("softwareVersion", tv_softwareVersion.getText().toString());
-//            jsonObject.put("modelNumber", tv_modelNumber.getText().toString());
-//            jsonObject.put("rrFlag", tv_rrFlag.getText().toString());
-//            jsonObject.put("calculatedRrInterval", tv_calculatedRrInterval.getText().toString());
-//            jsonObject.put("rssi", tv_rssi.getText().toString());
-    
-            jsonObject.put("estTimestamp", tv_estTimestamp);
-            jsonObject.put("heartBeatCounter", tv_heartBeatCounter);
-            jsonObject.put("heartBeatEventTime", tv_heartBeatEventTime);
-            jsonObject.put("dataStatus", tv_dataStatus);
-            jsonObject.put("manufacturerSpecificByte", tv_manufacturerSpecificByte);
-            jsonObject.put("previousHeartBeatEventTime", tv_previousHeartBeatEventTime);
-            jsonObject.put("cumulativeOperatingTime", tv_cumulativeOperatingTime);
-            jsonObject.put("manufacturerID", tv_manufacturerID);
-            jsonObject.put("serialNumber", tv_serialNumber);
-            jsonObject.put("hardwareVersion", tv_hardwareVersion);
-            jsonObject.put("softwareVersion", tv_softwareVersion);
-            jsonObject.put("modelNumber", tv_modelNumber);
-            jsonObject.put("rrFlag", tv_rrFlag);
-            jsonObject.put("calculatedRrInterval", tv_calculatedRrInterval);
-            jsonObject.put("rssi", tv_rssi);
-
+            jsonObject.put("heartBeatCounter", tv_heartBeatCounter.getText().toString());
+            jsonObject.put("heartBeatEventTime", tv_heartBeatEventTime.getText().toString());
+            jsonObject.put("dataStatus", tv_dataStatus.getText().toString());
+            jsonObject.put("manufacturerSpecificByte", tv_manufacturerSpecificByte.getText().toString());
+            jsonObject.put("previousHeartBeatEventTime", tv_previousHeartBeatEventTime.getText().toString());
+            jsonObject.put("cumulativeOperatingTime", tv_cumulativeOperatingTime.getText().toString());
+            jsonObject.put("manufacturerID", tv_manufacturerID.getText().toString());
+            jsonObject.put("serialNumber", tv_serialNumber.getText().toString());
+            jsonObject.put("hardwareVersion", tv_hardwareVersion.getText().toString());
+            jsonObject.put("softwareVersion", tv_softwareVersion.getText().toString());
+            jsonObject.put("modelNumber", tv_modelNumber.getText().toString());
+            jsonObject.put("rrFlag", tv_rrFlag.getText().toString());
+            jsonObject.put("calculatedRrInterval", tv_calculatedRrInterval.getText().toString());
+            jsonObject.put("rssi", tv_rssi.getText().toString());
+            
             /*
             以下先塞測試用的假資料
              */
@@ -979,7 +954,7 @@ public class TrainingActivity extends Activity
             jsonObject.put("speed", fake_speed_value);
             jsonObject.put("altitude", fake_altitude_value);
             
-            wheelPiesClient.send(jsonObject);
+            wheelPiesClient.send(jsonObject, handler);
         }
         catch (Exception e)
         {
@@ -1037,7 +1012,7 @@ public class TrainingActivity extends Activity
                 for (int i = 0; i < 11; i++)
                 {
 //                    Logs.showTrace("X軸現在到底幾秒" + i);
-                    axisValues.add(i, new AxisValue(i).setLabel(String.valueOf(i + 2)));
+                    axisValues.add(i, new AxisValue(i).setLabel(String.valueOf(i)));
                 }
             }
             else
@@ -1121,15 +1096,6 @@ public class TrainingActivity extends Activity
 //        {
 //            handler.sendEmptyMessage(MSG_CONTENT_VIEW_LOGIN);
 //        }
-//    }
-
-//    @Override
-//    protected void onDestroy() {
-//        if ( != null) {
-//            .stop();
-//            .shutdown();
-//        }
-//        super.onDestroy();
 //    }
 
 }

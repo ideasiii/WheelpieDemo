@@ -24,6 +24,7 @@ import android.widget.VideoView;
 
 import org.iii.more.restapiclient.Config;
 import org.iii.more.restapiclient.Response;
+import org.iii.wheelpiedemo.NavigationActivity;
 import org.iii.wheelpiedemo.R;
 import org.iii.wheelpiedemo.common.Logs;
 import org.iii.wheelpiedemo.common.RestApiHeaderClient;
@@ -49,7 +50,7 @@ import java.util.TimeZone;
 
 import static org.iii.wheelpiedemo.course.util.ViewUtils.*;
 
-public class CourseActivity extends AppCompatActivity {
+public class CourseActivity extends NavigationActivity {
 
 
     private static RestApiHeaderClient restApiHeaderClient = new RestApiHeaderClient();
@@ -74,7 +75,11 @@ public class CourseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // 啟動課程說明頁
-        setContentView(R.layout.activity_course);
+        setContentView(R.layout.nav_course);
+
+        // 初始共用menu
+        initCommonNavigationView();
+
         // 顯示等待訊息框
         displayLoadingDialog();
 
@@ -87,6 +92,11 @@ public class CourseActivity extends AppCompatActivity {
         } else {
             theHandler.sendEmptyMessage(MSG_CONTENT_VIEW_LOGIN);
         }
+    }
+
+    @Override
+    public int getBottomNavigationViewId() {
+        return R.id.course_nav;
     }
 
     private void displayLoadingDialog() {

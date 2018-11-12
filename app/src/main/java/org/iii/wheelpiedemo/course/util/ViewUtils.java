@@ -1,8 +1,10 @@
 package org.iii.wheelpiedemo.course.util;
 
 import android.content.Context;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import org.iii.wheelpiedemo.course.response.CourseChart;
 import org.json.JSONArray;
@@ -39,6 +41,16 @@ public class ViewUtils {
             );
             v.requestLayout();
         }
+    }
+
+    public static void showFloatingMessage(Context context, String message) {
+        Toast toast = Toast.makeText(
+            context,
+            message,
+            Toast.LENGTH_LONG
+        );
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
     }
 
     public static CourseChart extractChartInfo (JSONObject chart) {

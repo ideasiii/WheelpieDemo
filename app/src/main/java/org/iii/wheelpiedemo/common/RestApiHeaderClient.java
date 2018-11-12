@@ -110,9 +110,23 @@ public class RestApiHeaderClient {
         return response.Id;
     }
 
+    public int HttpsPut(String httpsURL, Config.HTTP_DATA_TYPE http_data_type, HashMap<String, String> parameters, Response response, HashMap<String, String> headers) {
+        response.Id = ++msnSerialNUm;
+        Thread thread = new Thread(new RestApiHeaderClient.HttpsPutRunnable(httpsURL, http_data_type, parameters, response, headers));
+        thread.start();
+        return response.Id;
+    }
+
     public int HttpPost(String httpsURL, Config.HTTP_DATA_TYPE http_data_type, HashMap<String, String> parameters, Response response, HashMap<String, String> headers) {
         response.Id = ++msnSerialNUm;
         Thread thread = new Thread(new RestApiHeaderClient.HttpPostRunnable(httpsURL, http_data_type, parameters, response, headers));
+        thread.start();
+        return response.Id;
+    }
+
+    public int HttpPut(String httpsURL, Config.HTTP_DATA_TYPE http_data_type, HashMap<String, String> parameters, Response response, HashMap<String, String> headers) {
+        response.Id = ++msnSerialNUm;
+        Thread thread = new Thread(new RestApiHeaderClient.HttpPutRunnable(httpsURL, http_data_type, parameters, response, headers));
         thread.start();
         return response.Id;
     }
@@ -138,6 +152,27 @@ public class RestApiHeaderClient {
         }
     }
 
+    private class HttpPutRunnable implements Runnable {
+        private String mstrHttpsURL;
+        private Config.HTTP_DATA_TYPE mHttp_data_type;
+        private HashMap<String, String> mParameters;
+        private Response mResponse;
+        private HashMap<String, String> mHeaders;
+
+        HttpPutRunnable(String httpsURL, Config.HTTP_DATA_TYPE http_data_type, HashMap<String, String> parameters, Response response, HashMap<String, String> headers) {
+            this.mstrHttpsURL = httpsURL;
+            this.mHttp_data_type = http_data_type;
+            this.mParameters = parameters;
+            this.mResponse = response;
+            this.mHeaders = headers;
+        }
+
+        public void run() {
+            Http.setResponseListener(RestApiHeaderClient.this.callback);
+            Http.PUT(this.mstrHttpsURL, this.mHttp_data_type, this.mParameters, this.mResponse, this.mHeaders);
+        }
+    }
+
     private class HttpsPostRunnable implements Runnable {
         private String mstrHttpsURL;
         private Config.HTTP_DATA_TYPE mHttp_data_type;
@@ -158,6 +193,28 @@ public class RestApiHeaderClient {
             Https.POST(this.mstrHttpsURL, this.mHttp_data_type, this.mParameters, this.mResponse, this.mHeaders);
         }
     }
+
+    private class HttpsPutRunnable implements Runnable {
+        private String mstrHttpsURL;
+        private Config.HTTP_DATA_TYPE mHttp_data_type;
+        private HashMap<String, String> mParameters;
+        private Response mResponse;
+        private HashMap<String, String> mHeaders;
+
+        HttpsPutRunnable(String httpsURL, Config.HTTP_DATA_TYPE http_data_type, HashMap<String, String> parameters, Response response, HashMap<String, String> headers) {
+            this.mstrHttpsURL = httpsURL;
+            this.mHttp_data_type = http_data_type;
+            this.mParameters = parameters;
+            this.mResponse = response;
+            this.mHeaders = headers;
+        }
+
+        public void run() {
+            Https.setResponseListener(RestApiHeaderClient.this.callback);
+            Https.PUT(this.mstrHttpsURL, this.mHttp_data_type, this.mParameters, this.mResponse, this.mHeaders);
+        }
+    }
+
 
     public interface ResponseListener {
         void onResponse(JSONObject var1);

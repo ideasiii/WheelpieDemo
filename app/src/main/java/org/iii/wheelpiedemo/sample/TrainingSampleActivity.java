@@ -54,8 +54,8 @@ public class TrainingSampleActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.training_main);
         textView_ComputedHeartRate = findViewById(R.id.textView_ComputedHeartRate);
-        textView9 = findViewById(R.id.textView9);
-        textView10 = findViewById(R.id.textView10);
+        textView9 = findViewById(R.id.textView_ComputedDistance);
+        textView10 = findViewById(R.id.textView_ComputedSpeed);
         findViewById(R.id.startbutton).setOnClickListener(new View.OnClickListener()
         {
             @Override

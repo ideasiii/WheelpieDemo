@@ -1,6 +1,7 @@
 package org.iii.wheelpiedemo.course.response;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -49,6 +50,21 @@ public class DayTraining {
 
     public ClassInfo getClassInfo() {
         return classInfo;
+    }
+
+    static public DayTraining parseResponse (String apiResponse) {
+        DayTraining dt = null;
+        if (apiResponse != null && apiResponse.length() != 0) {
+            try {
+                JSONObject jsonResp = new JSONObject(apiResponse);
+                JSONObject dayView = jsonResp.getJSONObject("planDayView");
+                JSONObject dayTraining = dayView.getJSONObject("dayTraining");
+                dt = new DayTraining(dayTraining);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return dt;
     }
 }
 

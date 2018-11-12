@@ -1,4 +1,4 @@
-package org.iii.wheelpiedemo;
+package org.iii.wheelpiedemo.menu;
 
 import android.app.Fragment;
 import android.content.Intent;
@@ -9,8 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.design.widget.BottomNavigationView;
 import android.view.MenuItem;
 
-import org.iii.wheelpiedemo.menu.viewpager.MenuItemObject;
-import org.iii.wheelpiedemo.other.OtherDialogFragment;
+import org.iii.wheelpiedemo.R;
 
 public abstract class NavigationActivity extends AppCompatActivity
         implements BottomNavigationView.OnNavigationItemSelectedListener,

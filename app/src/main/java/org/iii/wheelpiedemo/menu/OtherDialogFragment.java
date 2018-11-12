@@ -1,4 +1,4 @@
-package org.iii.wheelpiedemo.other;
+package org.iii.wheelpiedemo.menu;
 
 
 import android.app.Activity;

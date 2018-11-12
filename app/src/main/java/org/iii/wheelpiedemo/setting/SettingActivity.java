@@ -14,7 +14,7 @@ import android.widget.EditText;
 
 import org.iii.more.restapiclient.Config;
 import org.iii.more.restapiclient.Response;
-import org.iii.wheelpiedemo.NavigationActivity;
+import org.iii.wheelpiedemo.menu.NavigationActivity;
 import org.iii.wheelpiedemo.R;
 import org.iii.wheelpiedemo.common.Logs;
 import org.iii.wheelpiedemo.common.RestApiHeaderClient;

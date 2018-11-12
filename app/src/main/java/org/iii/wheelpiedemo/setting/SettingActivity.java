@@ -6,16 +6,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Message;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import org.iii.more.restapiclient.Config;
 import org.iii.more.restapiclient.Response;
+import org.iii.wheelpiedemo.NavigationActivity;
 import org.iii.wheelpiedemo.R;
 import org.iii.wheelpiedemo.common.Logs;
 import org.iii.wheelpiedemo.common.RestApiHeaderClient;
@@ -27,7 +26,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 
-public class SettingActivity extends AppCompatActivity {
+public class SettingActivity extends NavigationActivity {
 
     private static RestApiHeaderClient restApiHeaderClient = new RestApiHeaderClient();
     private static String URL_USER_PHYSICAL_INFO = "https://dsicoach.win/api/user/physicalInfo";
@@ -44,7 +43,11 @@ public class SettingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_setting);
+        setContentView(R.layout.nav_setting);
+
+        // 初始共用menu
+        initCommonNavigationView();
+
         editTextMaxHeartRate = findViewById(R.id.edittext_max_heart_rate);
         editTextRestHeartRate = findViewById(R.id.edittext_rest_heart_rate);
         // 顯示等待訊息框
@@ -65,6 +68,11 @@ public class SettingActivity extends AppCompatActivity {
         } else {
             theHandler.sendEmptyMessage(MSG_CONTENT_VIEW_LOGIN);
         }
+    }
+
+    @Override
+    public int getBottomNavigationViewId() {
+        return R.id.setting_nav;
     }
 
     private View.OnClickListener btnSaveSettingOnClick = new View.OnClickListener() {

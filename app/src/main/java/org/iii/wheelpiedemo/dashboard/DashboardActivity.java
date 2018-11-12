@@ -13,10 +13,11 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
 import org.iii.wheelpiedemo.R;
+import org.iii.wheelpiedemo.menu.NavigationActivity;
 import android.content.SharedPreferences;
 import android.content.Context;
 
-public class DashboardActivity extends AppCompatActivity{
+public class DashboardActivity extends NavigationActivity{
 
     private WebView webview;
     private ProgressBar spinner;
@@ -28,7 +29,10 @@ public class DashboardActivity extends AppCompatActivity{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.dashboard);
+        setContentView(R.layout.nav_dashboard);
+
+        // 初始共用menu
+        initCommonNavigationView();
 
         // Retrieve userToken from shared preference.
         SharedPreferences sharedPref = getSharedPreferences(
@@ -48,6 +52,11 @@ public class DashboardActivity extends AppCompatActivity{
         webview.setOverScrollMode(WebView.OVER_SCROLL_NEVER);
         webview.loadUrl("https://coachbot.win/app/dashboard/");
 //        webview.loadUrl("https://32946ea8.ngrok.io/app/");
+    }
+
+    @Override
+    public int getBottomNavigationViewId() {
+        return R.id.dashboard_nav;
     }
 
     private class CustomWebChromeClient extends WebChromeClient {

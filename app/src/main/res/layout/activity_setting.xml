@@ -145,20 +145,15 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:orientation="horizontal"
+            android:gravity="center_horizontal"
+            android:weightSum="1.0"
             android:layout_alignParentBottom="true">
-
-            <Button
-                android:id="@+id/button_cancel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="取消" />
 
             <Button
                 android:id="@+id/button_setting_save"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_weight=".5"
                 android:text="儲存" />
         </LinearLayout>
     </RelativeLayout>

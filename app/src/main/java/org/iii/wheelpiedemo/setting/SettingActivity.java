@@ -39,6 +39,7 @@ public class SettingActivity extends NavigationActivity {
     private ProgressDialog dialog;
     private EditText editTextMaxHeartRate;
     private EditText editTextRestHeartRate;
+    private EditText editTextWeight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,19 +51,13 @@ public class SettingActivity extends NavigationActivity {
 
         editTextMaxHeartRate = findViewById(R.id.edittext_max_heart_rate);
         editTextRestHeartRate = findViewById(R.id.edittext_rest_heart_rate);
+        editTextWeight = findViewById(R.id.edittext_weight);
         // 顯示等待訊息框
         displayLoadingDialog();
 
         if (isUserLoggedIn()) {
             // 設定儲存按鈕
             findViewById(R.id.button_setting_save).setOnClickListener(btnSaveSettingOnClick);
-            // 設定取消按鈕
-            findViewById(R.id.button_cancel).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    finish();
-                }
-            });
             // 呼叫個人設定API
             requestAPI(URL_USER_PHYSICAL_INFO, "GET", null, userPhysicalInfoResponseListener);
         } else {
@@ -83,6 +78,7 @@ public class SettingActivity extends NavigationActivity {
             // 取消focus
             editTextMaxHeartRate.setFocusable(false);
             editTextRestHeartRate.setFocusable(false);
+            editTextWeight.setFocusable(false);
             // 取得從UI設定值
             HashMap<String, String> params = new HashMap<String, String>();
             params.put("body", getPutUserPhysicalJSONBody());
@@ -97,14 +93,17 @@ public class SettingActivity extends NavigationActivity {
             // 從UI取得數值
             String maxText = editTextMaxHeartRate.getText().toString();
             String restText = editTextRestHeartRate.getText().toString();
+            String weightText = editTextWeight.getText().toString();
             int max = Integer.parseInt(maxText, 10);
             int rest = Integer.parseInt(restText, 10);
+            int weight = Integer.parseInt(weightText, 10);
             // 封裝數值為JSON物件
             JSONObject physicalInfo = new JSONObject();
             physicalInfo.put("maxHeartRate", max);
             physicalInfo.put("restHeartRate", rest);
+            physicalInfo.put("weight", weight);
             info.put("physicalInfo", physicalInfo);
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return info.toString();
@@ -136,16 +135,20 @@ public class SettingActivity extends NavigationActivity {
     }
 
     private void initViewByAPIResponse(PhysicalInfo physicalInfo) {
-        editTextMaxHeartRate = (EditText) findViewById(R.id.edittext_max_heart_rate);
-        editTextRestHeartRate = (EditText) findViewById(R.id.edittext_rest_heart_rate);
         if (physicalInfo != null) {
             //更新最大心率
-            editTextMaxHeartRate.setText(String.valueOf(physicalInfo.getMaxHeartRate()));
+            int max = physicalInfo.getMaxHeartRate();
+            int rest = physicalInfo.getRestHeartRate();
+            int weight = physicalInfo.getWeight();
+            editTextMaxHeartRate.setText(max > 0 ? String.valueOf(max) : "");
             //更新安靜心率
-            editTextRestHeartRate.setText(String.valueOf(physicalInfo.getRestHeartRate()));
+            editTextRestHeartRate.setText(rest > 0 ? String.valueOf(rest) : "");
+            //更新體重
+            editTextWeight.setText(weight > 0 ? String.valueOf(weight) : "");
             //設定點擊後，取得focus
             editTextMaxHeartRate.setOnTouchListener(touchForEditableListener);
             editTextRestHeartRate.setOnTouchListener(touchForEditableListener);
+            editTextWeight.setOnTouchListener(touchForEditableListener);
         }
     }
 

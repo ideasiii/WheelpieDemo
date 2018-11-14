@@ -56,4 +56,18 @@ public class ViewUtils {
     public static CourseChart extractChartInfo (JSONObject chart) {
         return new CourseChart(chart);
     }
+
+    public static boolean isNumeric(String str)
+    {
+        return str.matches("-?\\d+(.\\d+)?");
+    }
+
+    /**
+     * 從字串中取得整數，如果不是數字則回傳0
+     * @param str
+     * @return
+     */
+    public static int optInteger(String str) {
+        return isNumeric(str) ? Integer.parseInt(str, 10) : 0;
+    }
 }

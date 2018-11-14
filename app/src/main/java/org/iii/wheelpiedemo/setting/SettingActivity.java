@@ -94,9 +94,9 @@ public class SettingActivity extends NavigationActivity {
             String maxText = editTextMaxHeartRate.getText().toString();
             String restText = editTextRestHeartRate.getText().toString();
             String weightText = editTextWeight.getText().toString();
-            int max = Integer.parseInt(maxText, 10);
-            int rest = Integer.parseInt(restText, 10);
-            int weight = Integer.parseInt(weightText, 10);
+            int max = ViewUtils.optInteger(maxText);
+            int rest = ViewUtils.optInteger(restText);
+            int weight = ViewUtils.optInteger(weightText);
             // 封裝數值為JSON物件
             JSONObject physicalInfo = new JSONObject();
             physicalInfo.put("maxHeartRate", max);

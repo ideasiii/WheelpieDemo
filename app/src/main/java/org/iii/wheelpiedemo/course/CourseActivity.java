@@ -23,6 +23,7 @@ import android.widget.VideoView;
 
 import org.iii.more.restapiclient.Config;
 import org.iii.more.restapiclient.Response;
+import org.iii.wheelpiedemo.menu.MenuItemObject;
 import org.iii.wheelpiedemo.menu.NavigationActivity;
 import org.iii.wheelpiedemo.R;
 import org.iii.wheelpiedemo.common.Logs;
@@ -120,9 +121,7 @@ public class CourseActivity extends NavigationActivity {
         @Override
         public void onClick(View v)
         {
-            Intent intent = null;
-            intent = new Intent(CourseActivity.this, TrainingActivity.class);
-            startActivity(intent);
+            toView(MenuItemObject.TRAINING);
         }
     };
 

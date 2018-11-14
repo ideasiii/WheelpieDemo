@@ -15,10 +15,10 @@ public abstract class NavigationActivity extends AppCompatActivity
         implements BottomNavigationView.OnNavigationItemSelectedListener,
         OtherDialogFragment.OnDialogItemClickedListener {
 
-    private Bundle bundle;
-    private static String KEY_TRAINING_MODE = "TRAINING_MODE";
-    private static String TRAINING_MODE_FREE = "FREE";
-    private static String TRAINING_MODE_SMART = "SMART";
+    protected Bundle bundle;
+    protected final static String KEY_TRAINING_MODE = "TRAINING_MODE";
+    protected final static String TRAINING_MODE_FREE = "FREE";
+    protected final static String TRAINING_MODE_SMART = "SMART";
     private BottomNavigationView bottomNavigationView;
     private OtherDialogFragment otherDialogFragment;
 
@@ -106,7 +106,7 @@ public abstract class NavigationActivity extends AppCompatActivity
         toView(MenuItemObject.lookupByMenuIndex(moreMenuBaseIndex + menuId));
     }
 
-    private void toView(MenuItemObject view) {
+    protected void toView(MenuItemObject view) {
         Bundle bundle = null;
         if (view.equals(MenuItemObject.FREE)) {
             bundle = new Bundle ();
@@ -119,11 +119,11 @@ public abstract class NavigationActivity extends AppCompatActivity
         toView(view.getActivityClass(), bundle);
     }
 
-    private void toView(Class<?> cls) {
+    protected void toView(Class<?> cls) {
         toView(cls, null);
     }
 
-    private void toView(Class<?> cls, Bundle bundle) {
+    protected void toView(Class<?> cls, Bundle bundle) {
         Intent it = new Intent(this, cls);
         if (bundle != null) {
             it.putExtras(bundle);
@@ -131,9 +131,29 @@ public abstract class NavigationActivity extends AppCompatActivity
         startActivity(it);
     }
 
-    private void showOtherMenuDialog() {
+    protected void showOtherMenuDialog() {
         // Create an instance of the dialog fragment and show it
         otherDialogFragment = new OtherDialogFragment();
         otherDialogFragment.show(this.getFragmentManager(), "OtherDialogFragment");
+    }
+
+    protected boolean isSmartTrainingMode() {
+        boolean matched = false;
+        if (bundle != null) {
+            matched = TRAINING_MODE_SMART.equals(
+                bundle.getString(KEY_TRAINING_MODE)
+            );
+        }
+        return matched;
+    }
+
+    protected boolean isFreeTrainingMode() {
+        boolean matched = false;
+        if (bundle != null) {
+            matched = TRAINING_MODE_FREE.equals(
+                bundle.getString(KEY_TRAINING_MODE)
+            );
+        }
+        return matched;
     }
 }

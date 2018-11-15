@@ -312,7 +312,7 @@ public class CourseActivity extends NavigationActivity {
                     //vid.stopPlayback(); //不可呼叫，不然會無法再法再度播放
                     //vid.seekTo(0);
                     //vid.setVideoURI(u); //爛方法，不設定的話，touch event的restart不會work
-                    ViewUtils.showFloatingMessage(
+                    ViewUtils.showShortFloatingMessage(
                         getApplicationContext(),
                         "影片播放完畢..."
                     );
@@ -376,7 +376,7 @@ public class CourseActivity extends NavigationActivity {
                         // 移除等待訊息框
                         dialog.dismiss();
                         // 今天無訓練課程，請至CoachBot服務產生今日課程
-                        ViewUtils.showFloatingMessage(
+                        ViewUtils.showShortFloatingMessage(
                             getApplicationContext(),
                             "今天無訓練課程，請至CoachBot服務產生今日訓練課程"
                         );

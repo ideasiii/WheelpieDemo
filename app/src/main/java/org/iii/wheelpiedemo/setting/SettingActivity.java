@@ -14,6 +14,7 @@ import android.widget.EditText;
 
 import org.iii.more.restapiclient.Config;
 import org.iii.more.restapiclient.Response;
+import org.iii.wheelpiedemo.course.util.JSONUtils;
 import org.iii.wheelpiedemo.menu.NavigationActivity;
 import org.iii.wheelpiedemo.R;
 import org.iii.wheelpiedemo.common.Logs;
@@ -121,18 +122,7 @@ public class SettingActivity extends NavigationActivity {
         return jsonString;
     }
 
-    private boolean isAPIResultSuccess(String apiResponse) {
-        boolean result = false;
-        if (apiResponse != null && apiResponse.length() != 0) {
-            try {
-                JSONObject jsonResp = new JSONObject(apiResponse);
-                result = jsonResp.optBoolean("result");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        return result;
-    }
+
 
     private void initViewByAPIResponse(PhysicalInfo physicalInfo) {
         if (physicalInfo != null) {
@@ -268,7 +258,7 @@ public class SettingActivity extends NavigationActivity {
                         // 移除等待訊息框
                         dialog.dismiss();
                         // 無個人設定資料，請輸入個人資訊
-                        ViewUtils.showFloatingMessage(
+                        ViewUtils.showShortFloatingMessage(
                             getApplicationContext(),
                             "無個人設定資料，請輸入個人資訊"
                         );
@@ -279,11 +269,11 @@ public class SettingActivity extends NavigationActivity {
                     // 處理個人設定API結果
                     if (strMsg != null) {
                         //判斷是否更新成功
-                        if (isAPIResultSuccess(strMsg)) {
+                        if (JSONUtils.isAPIResultSuccess(strMsg)) {
                             // 移除等待訊息框
                             dialog.dismiss();
                             // 成功 -> Toast 成功
-                            ViewUtils.showFloatingMessage(
+                            ViewUtils.showShortFloatingMessage(
                                 getApplicationContext(),
                                 "儲存成功"
                             );
@@ -291,7 +281,7 @@ public class SettingActivity extends NavigationActivity {
                             // 移除等待訊息框
                             dialog.dismiss();
                             // 失敗 -> Toast 失敗
-                            ViewUtils.showFloatingMessage(
+                            ViewUtils.showShortFloatingMessage(
                                 getApplicationContext(),
                                 "儲存失敗"
                             );
@@ -300,7 +290,7 @@ public class SettingActivity extends NavigationActivity {
                         // 移除等待訊息框
                         dialog.dismiss();
                         // 目前網路有問題，儲存請稍後再試
-                        ViewUtils.showFloatingMessage(
+                        ViewUtils.showShortFloatingMessage(
                             getApplicationContext(),
                             "目前網路有問題，儲存請稍後再試"
                         );

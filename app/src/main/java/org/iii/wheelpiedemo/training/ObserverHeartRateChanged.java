@@ -25,16 +25,16 @@ import org.json.JSONObject;
 public class ObserverHeartRateChanged {
     private Integer restHeartRate;
     private Integer maxHeartRate;
-    private static RestApiHeaderClient restApiHeaderClient = new RestApiHeaderClient();
-    private static String physicalInfoAPIURL = "https://dsicoach.win/api/user/physicalInfo";
-    private String userToken;
+//    private static RestApiHeaderClient restApiHeaderClient = new RestApiHeaderClient();
+//    private static String physicalInfoAPIURL = "https://dsicoach.win/api/user/physicalInfo";
+//    private String userToken;
     private Long startTime = null;
     private ArrayList<HashMap<Long, String>> rules;
     private HashMap<String, HashMap<String, Integer>> hrZoneRange;
     private Integer currRuleIdx = 0;
 
     private ObservableSpeech speechContentObservable;
-    private Context mContext;
+//    private Context mContext;
 
 //    public ObserverHeartRateChanged(Context mContext, String courseType, ObservableSpeech speechContentObservable) {
     public ObserverHeartRateChanged(Integer restHeartRate, Integer maxHeartRate, String courseType, ObservableSpeech speechContentObservable) {
@@ -102,7 +102,6 @@ public class ObserverHeartRateChanged {
             rangeMap.put("min", (maxHeartRate-restHeartRate)*HRRmin/100+restHeartRate);
             rangeMap.put("max", (maxHeartRate-restHeartRate)*HRRmax/100+restHeartRate);
             hrZoneMap.put(zone, rangeMap);
-            Log.d("HeartRateRules", zone+HRRmin+HRRmax);
         }
         return hrZoneMap;
     }
@@ -130,7 +129,6 @@ public class ObserverHeartRateChanged {
             rule.put(TimeUnit.MINUTES.toMillis(time), zone);
             rules.add(rule);
         }
-        Log.d("HeartRateRules", Arrays.toString(rules.toArray()));
         return rules;
     }
 

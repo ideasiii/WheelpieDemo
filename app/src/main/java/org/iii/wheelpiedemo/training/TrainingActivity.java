@@ -88,10 +88,12 @@ public class TrainingActivity extends Activity
     private static RestApiHeaderClient restApiHeaderClient = new RestApiHeaderClient();
     private static String trainingAPIURL = "https://dsicoach.win/api/plan/my-training/dayTraining";
     private static String courseAPIURL = "https://dsicoach.win/api/plan/my-course/plan/day-view";
+    private static String physicalInfoAPIURL = "https://dsicoach.win/api/user/physicalInfo";
     private static ArrayList<Float> tmpHR_value = new ArrayList<Float>();
     private final int MSG_DAY_TRAINING_API_RESPONSE = 0;
     private final int MSG_DAY_VIEW_API_RESPONSE = 1;
     private final int MSG_CONTENT_VIEW_LOGIN = 9;
+    private final int MSG_PHYSICALINFO_API_RESPONSE = 333;
     private final String PREF_USER_TOKEN_KEY = "userToken";
     private String userToken;
     private TextView tv_status;
@@ -131,7 +133,7 @@ public class TrainingActivity extends Activity
     private ObservableSpeech speechContentObservable;
     private ObserverSpeechChanged speechContentObserver;
     private TextToSpeech tts;
-    public Context mContext;
+//    public Context mContext;
 
     /**
      * ANT+ Library
@@ -288,6 +290,40 @@ public class TrainingActivity extends Activity
                 
                 case 3:
                     break;
+                /**
+                 * For HeartRate Supervision.
+                 */
+                case MSG_PHYSICALINFO_API_RESPONSE:
+                    Integer restHeartRate = 61;
+                    Integer maxHeartRate = 162;
+                    JSONObject response = (JSONObject) msg.obj;
+                    Logs.showTrace("handler get: "+response.toString());
+                    try{
+                        int resp_code = response.getInt("code");
+                        if(resp_code == -1){
+                            Logs.showTrace("Call API fail: PhysicalInfo");
+                        }else{
+                            strMsg = getResponseJSONString(response);
+                            JSONObject physicalInfoObj = new JSONObject(strMsg);
+                            JSONObject user = physicalInfoObj.getJSONObject("user");
+                            try{
+                                JSONObject heartRate = user.getJSONObject("physical");
+                                restHeartRate = heartRate.getInt("restHeartRate");
+                                maxHeartRate = heartRate.getInt("maxHeartRate");
+                            }catch (JSONException e){
+                                Logs.showTrace("physicalinfo heartrate is null, so use default value");
+                            }
+                        }
+                    }
+                    catch (JSONException e)
+                    {
+                        e.printStackTrace();
+                        break;
+                    }
+                    hrObservable = new ObservableHeartRate();
+                    hrObserver = new ObserverHeartRateChanged(restHeartRate,maxHeartRate,"E1+M1+A1", speechContentObservable);
+                    hrObservable.addObserver(hrObserver.HeartRateChanged);
+                    break;
                 
                 case MSG_DAY_TRAINING_API_RESPONSE:
                     JSONObject resp = (JSONObject) msg.obj;
@@ -325,7 +361,6 @@ public class TrainingActivity extends Activity
                         e.printStackTrace();
                         break;
                     }
-                
             }
         }
     };
@@ -396,9 +431,38 @@ public class TrainingActivity extends Activity
         @Override
         public void onResponse(JSONObject jsonObject)
         {
-            Logs.showTrace("[API] onResponse Data: " + jsonObject.toString());
+            Logs.showTrace("[Training API] onResponse Data: " + jsonObject.toString());
             Message message = new Message();
             message.what = MSG_DAY_TRAINING_API_RESPONSE;
+            message.obj = jsonObject;
+            handler.sendMessage(message);
+        }
+    };
+
+    /**
+     * To get restHeartRate and maxHeartRate for HeartRate Supervision
+     */
+    private void requestPhysicalInfoAPI()
+    {
+        restApiHeaderClient.setResponseListener(physicalInfoResponseListener);
+        HashMap<String, String> param = new HashMap<String, String>();
+        HashMap<String, String> headers = new HashMap<String, String>();
+        headers.put("Authorization", String.format("Bearer %s", userToken));
+        Response response = new Response();
+        int nResponse_id = restApiHeaderClient.HttpsGet(physicalInfoAPIURL, Config.HTTP_DATA_TYPE
+                .X_WWW_FORM, param, response, headers);
+        Logs.showTrace("[API] http response id: " + nResponse_id);
+    }
+
+    private RestApiHeaderClient.ResponseListener physicalInfoResponseListener = new RestApiHeaderClient
+            .ResponseListener()
+    {
+        @Override
+        public void onResponse(JSONObject jsonObject)
+        {
+            Logs.showTrace("[Physical API] onResponse Data: " + jsonObject.toString());
+            Message message = new Message();
+            message.what = MSG_PHYSICALINFO_API_RESPONSE;
             message.obj = jsonObject;
             handler.sendMessage(message);
         }
@@ -423,10 +487,10 @@ public class TrainingActivity extends Activity
         startbutton.setTag(0);
         stopbutton.setTag(0);
 
-        /**
-         * For ObserverHeartRateChanged to access sharedPreference.
-         */
-        mContext = this;
+//        /**
+//         * For ObserverHeartRateChanged to access sharedPreference.
+//         */
+//        mContext = this;
 
         /**
          * Instantiate TTS
@@ -477,14 +541,6 @@ public class TrainingActivity extends Activity
         speechContentObserver = new ObserverSpeechChanged(tts);
         speechContentObserver.setRestingInterval(3000);
         speechContentObservable.addObserver(speechContentObserver.SpeechChanged);
-
-        /**
-         * Initialization for HeartRate Supervision, Make observer subscribes to observable(HeartRate).
-         * Therefore, when HeartRate changes, observer checks correctness.
-         */
-        hrObservable = new ObservableHeartRate();
-        hrObserver = new ObserverHeartRateChanged(61,162,"E1+M1+A1", speechContentObservable);
-        hrObservable.addObserver(hrObserver.HeartRateChanged);
 
         TrainingMode = (TextView) view1.findViewById(R.id.exercise_mode_content);//找出第一個視窗中訓練類型的字串框格
         TrainingType = (TextView) view1.findViewById(R.id.exercise_type_content);//找出第一個視窗中訓練模式的字串框格
@@ -538,6 +594,7 @@ public class TrainingActivity extends Activity
             @Override
             public void onClick(View v)
             {
+                requestPhysicalInfoAPI();
                 Logs.showTrace("startbutton onClick:" + v.getTag());
                 int nRun = (int) v.getTag();
                 

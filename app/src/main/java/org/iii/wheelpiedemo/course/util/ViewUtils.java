@@ -43,11 +43,19 @@ public class ViewUtils {
         }
     }
 
-    public static void showFloatingMessage(Context context, String message) {
+    public static void showLongFloatingMessage(Context context, String message) {
+        showFloatingMessage(context, message, Toast.LENGTH_LONG);
+    }
+
+    public static void showShortFloatingMessage(Context context, String message) {
+        showFloatingMessage(context, message, Toast.LENGTH_SHORT);
+    }
+
+    private static void showFloatingMessage(Context context, String message, int duration) {
         Toast toast = Toast.makeText(
             context,
             message,
-            Toast.LENGTH_LONG
+            duration
         );
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
@@ -55,5 +63,19 @@ public class ViewUtils {
 
     public static CourseChart extractChartInfo (JSONObject chart) {
         return new CourseChart(chart);
+    }
+
+    public static boolean isNumeric(String str)
+    {
+        return str.matches("-?\\d+(.\\d+)?");
+    }
+
+    /**
+     * 從字串中取得整數，如果不是數字則回傳0
+     * @param str
+     * @return
+     */
+    public static int optInteger(String str) {
+        return isNumeric(str) ? Integer.parseInt(str, 10) : 0;
     }
 }

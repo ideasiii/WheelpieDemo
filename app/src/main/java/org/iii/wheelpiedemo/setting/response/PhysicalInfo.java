@@ -6,11 +6,13 @@ import org.json.JSONObject;
 public class PhysicalInfo {
     private int maxHeartRate;
     private int restHeartRate;
+    private int weight;
 
     public PhysicalInfo(JSONObject response) {
         if (response != null) {
             this.maxHeartRate = response.optInt("maxHeartRate");
             this.restHeartRate = response.optInt("restHeartRate");
+            this.weight = response.optInt("weight");
         }
     }
 
@@ -20,6 +22,10 @@ public class PhysicalInfo {
 
     public int getRestHeartRate() {
         return restHeartRate;
+    }
+
+    public int getWeight() {
+        return weight;
     }
 
     static public PhysicalInfo parseResponse (String apiResponse) {

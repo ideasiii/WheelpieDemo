@@ -208,7 +208,7 @@ public abstract class Activity_HeartRateDisplayBase extends Activity
      */
     public void subscribeToHrEvents()
     {
-        wheelPiesClient.start();
+        wheelPiesClient.start(null);
         hrPcc.subscribeHeartRateDataEvent(new IHeartRateDataReceiver()
         {
             @Override

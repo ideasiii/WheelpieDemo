@@ -75,7 +75,9 @@ abstract class Http {
         try {
             jsonResponse.put("id", response.Id);
             jsonResponse.put("code", -1);
-            String strParameter = getPostDataString(parameters);
+            String strParameter = http_data_type == HTTP_DATA_TYPE.JSON ?
+                getJSONDataString(parameters):
+                getPostDataString(parameters);
             Logs.showTrace("[Http] POST : URL=" + httpsURL + " Data Type=" + http_data_type.toString() + " Parameter:" + strParameter);
             URL url = new URL(httpsURL);
             HttpURLConnection con = (HttpURLConnection)url.openConnection();

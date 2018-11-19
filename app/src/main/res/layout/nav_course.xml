@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+            <!-- 修改activity_course為你的頁面layout -->
+            <include layout="@layout/activity_course" />
+        </FrameLayout>
+
+        <!-- 修改menu_nav為你頁面的選單專屬id -->
+        <android.support.design.widget.BottomNavigationView
+            android:id="@+id/course_nav"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="9"
+            app:itemIconTint="@color/White"
+            app:itemTextColor="@color/White"
+            app:menu="@menu/navigation" />
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>

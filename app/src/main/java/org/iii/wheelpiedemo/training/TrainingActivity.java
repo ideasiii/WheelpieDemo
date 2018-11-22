@@ -303,7 +303,7 @@ public class TrainingActivity extends Activity
                             JSONObject physicalInfoObj = new JSONObject(strMsg);
                             JSONObject user = physicalInfoObj.getJSONObject("user");
                             try{
-                                JSONObject heartRate = user.getJSONObject("physical");
+                                JSONObject heartRate = user.getJSONObject("physicalInfo");
                                 restHeartRate = heartRate.getInt("restHeartRate");
                                 maxHeartRate = heartRate.getInt("maxHeartRate");
                             }catch (JSONException e){

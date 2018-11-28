@@ -77,6 +77,7 @@ public class TrainingActivity extends Activity
     private TextView timer;
     private TextView TrainingType;
     private TextView TrainingMode;
+    private String TrainingId;
     private boolean startflag = false;
     private int tsec = 0, csec = 0, cmin = 0, chr = 0;
     private static RestApiHeaderClient restApiHeaderClient = new RestApiHeaderClient();
@@ -206,10 +207,11 @@ public class TrainingActivity extends Activity
 //
 // "2h39l3nV4iiYucuXax7Mw6PEQMh4cjkFX7AeW3yVcaiLyIhAHRdAPLixkgS5Mvpv0FcWJMnXUyO9ssEkeb60VyBWm4yEVoPZ1jXIAcnO3ZM9qIgcRXiTKdEYkOTcZWFryyo2hFTgQwMVpprXDpGyBlHJUru8g9QOeOYNYET9jsRUz0IX6e6bPuw3K3FNsBfHmUbukwYgEnDBLP6VYOAul9njlS4DKVda3yD6WGFXcjkbKeRtPb8dY98dJkpXsWUg");
         headers.put("Authorization", String.format("Bearer %s", userToken));
+//        Logs.showTrace("usertoken:" + "Bearer " + userToken);
         Response response = new Response();
         int nResponse_id = restApiHeaderClient.HttpsGet(courseAPIURL, Config.HTTP_DATA_TYPE.X_WWW_FORM,
                 param, response, headers);
-        Logs.showTrace("[API] http response id: " + nResponse_id);
+//        Logs.showTrace("[API] http response id: " + nResponse_id);
     }
     
     //任何Task(如:TimerTask)無法直接改變元件因此要透過Handler來當橋樑
@@ -291,10 +293,15 @@ public class TrainingActivity extends Activity
                             JSONObject dayPlan = new JSONObject(dayPlanJsonObj.getString("dayPlan"));
                             String excerciseType = dayPlan.getString("excerciseType");
                             String excerciseMode = dayPlan.getString("excerciseMode");
-                            //Logs.showTrace("show me data" + excerciseType);
-                            //Logs.showTrace("show me data" + excerciseMode);
+//                            JSONObject dayTraining = new JSONObject(dayPlanJsonObj.getString("dayTraining"));
+//                            String dayTrainingId = dayTraining.getString("id");
+                            Logs.showTrace("------------------show me data" + excerciseType);
+                            Logs.showTrace("------------------show me data" + excerciseMode);
+//                            Logs.showTrace("------------------show me data" + dayTraining);
+//                            Logs.showTrace("------------------show me data" + dayTrainingId);
                             TrainingMode.setText(excerciseMode);
                             TrainingType.setText(excerciseType);
+//                            TrainingId = dayTrainingId;
                             
                             // 呼叫當日課程說明API
                             requestCourseDayViewAPI(trainingId);
@@ -309,11 +316,22 @@ public class TrainingActivity extends Activity
                 
                 case 999:
                     Logs.showTrace("socket send response: 999");
-                    if (mnState == 2)
+//                    Logs.showTrace(String.valueOf(mnState));
+                    if ("2".equals(String.valueOf(msg.obj)))
                     {
                         Logs.showTrace("mnstate = 2, It's time to stop socket pipline");
 //                        wheelPiesClient.stop();
                     }
+                    else
+                    {
+                        Logs.showTrace("socket send response: connected");
+                    }
+                    
+                    break;
+                
+                case 666:
+                    handler.removeMessages(666);
+                    wheelPiesClient.stop();
                     
                     break;
             }
@@ -438,6 +456,7 @@ public class TrainingActivity extends Activity
         
         wheelPiesClient = new WheelPiesClient();
         mnState = 0;
+        wheelPiesClient.start(handler);
         //Button監聽,第一種寫法,在上面先定義listener,function帶入即可
 //        startbutton.setOnClickListener(listener);
         //Button監聽,第二種寫法,(第一個畫面在做的事情)
@@ -530,11 +549,18 @@ public class TrainingActivity extends Activity
                     startflag = true;
                 }
                 
+                Message message = new Message();
+                message.what = 999;
+                message.obj = mnState;
+                handler.sendMessage(message);
+                
                 //切換到speech的頁面
                 Intent intent = null;
                 intent = new Intent(TrainingActivity.this, SpeechActivity.class);
                 startActivity(intent);
-                
+//                startActivityForResult(intent, 666);
+                handler.sendEmptyMessageDelayed(666,3000);
+            
             }
         });
         
@@ -567,6 +593,35 @@ public class TrainingActivity extends Activity
         String strName = intent.getStringExtra("NAME");
         updateChart();
         
+    }
+    
+//    @Override
+//    protected void onStart()
+//    {
+//        Logs.showTrace("----------------start---------------------");
+//        wheelPiesClient.start(handler);
+//        super.onStart();
+//    }
+
+//    @Override
+//    protected void onStop()
+//    {
+//        Logs.showTrace("----------------stop---------------------");
+//        super.onStop();
+//        wheelPiesClient.stop();
+//    }
+    
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        Logs.showTrace("-----------------------requestCode:" + requestCode);
+        Logs.showTrace("-----------------------resultCode:" + resultCode);
+        if (resultCode == 666)
+        {
+            Logs.showTrace("----------------stop---------------------");
+            wheelPiesClient.stop();
+        }
     }
     
     private String getTodayDate()
@@ -728,7 +783,7 @@ public class TrainingActivity extends Activity
     
     public void subscribeToHrEvents()
     {
-        wheelPiesClient.start(handler);
+//        wheelPiesClient.start(handler);
         hrPcc.subscribeHeartRateDataEvent(new AntPlusHeartRatePcc.IHeartRateDataReceiver()
         {
             @Override
@@ -920,6 +975,16 @@ public class TrainingActivity extends Activity
         {
             jsonObject.put("activeId", mstrUUID);
             jsonObject.put("state", mnState);
+//            Logs.showTrace("----------" + "mnState:" + mnState + "----------");
+            if (1 == mnState)//運動開始
+            {
+                jsonObject.put("userToken", String.format("Bearer %s", userToken));
+                jsonObject.put("trainingType", TrainingType.getText().toString());
+                jsonObject.put("trainingMode", TrainingMode.getText().toString());
+//                jsonObject.put("trainingId", TrainingId);
+//                Logs.showTrace(TrainingId);
+                /// TODO: 2018/11/22 還要接最高心率/安靜心率/體重的資料
+            }
             if (2 == mnState) // 運動結束
             {
                 mstrUUID = "";
@@ -928,8 +993,8 @@ public class TrainingActivity extends Activity
             {
                 mnState = 0;
             }
-            /// TODO: 2018/11/9 修正其他數據必須要匯進資料庫
             
+            /// TODO: 2018/11/9 修正其他數據必須要匯進資料庫
             jsonObject.put("estTimestamp", tv_estTimestamp.getText().toString());
             jsonObject.put("computedHeartRate", textView_ComputedHeartRate.getText().toString());
             jsonObject.put("heartBeatCounter", tv_heartBeatCounter.getText().toString());

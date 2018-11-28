@@ -1,4 +1,8 @@
 package org.iii.wheelpiedemo.login;
+import org.iii.wheelpiedemo.common.Logs;
+import org.iii.wheelpiedemo.common.RestApiHeaderClient;
+import org.iii.wheelpiedemo.course.util.JSONUtils;
+import org.iii.wheelpiedemo.course.util.ViewUtils;
 import org.iii.wheelpiedemo.dashboard.DashboardActivity;
 import org.json.JSONException;
 
@@ -35,6 +39,8 @@ import org.iii.more.restapiclient.RestApiClient;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import org.iii.wheelpiedemo.course.util.HttpUtils;
+import org.iii.wheelpiedemo.common.RestApiHeaderClient;
 
 public class LoginActivity extends AppCompatActivity {
     private Button loginPopupBtn;
@@ -52,6 +58,9 @@ public class LoginActivity extends AppCompatActivity {
             initPopup(view);
         }
     };
+    private String userId;
+    private static RestApiHeaderClient restApiHeaderClient = new RestApiHeaderClient();
+    private static String URL_API_USER_INFO = "https://dsicoach.win/api/user/info";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,16 +148,22 @@ public class LoginActivity extends AppCompatActivity {
                     userToken = dataObj.getString("token");
                     Log.d(LOG_TAG, "verification succeed with user token :"+ userToken);
 
+                    // Call userInfo api
+                    restApiHeaderClient.setResponseListener(getUserInfoResponseListener);
+                    HttpUtils.getAuthAPI(
+                            restApiHeaderClient,
+                            URL_API_USER_INFO,
+                            Config.HTTP_DATA_TYPE.X_WWW_FORM,
+                            null,
+                            userToken
+                    );
+
                     // Write the user token into shared preference for other activities to access
                     SharedPreferences sharedPref = getSharedPreferences(
                             getString(R.string.preference_file_key), Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPref.edit();
                     editor.putString("userToken", userToken);
                     editor.commit();
-
-                    // Switch to course activity
-                    startActivity(new Intent(LoginActivity.this, CourseActivity.class));
-//                    startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
 
                     // Log out user from fb (temp solution to force user logging in every time in case token expired.)
                     LoginManager.getInstance().logOut();
@@ -165,6 +180,44 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
     };
+
+    private String extractUserId (String jsonString) {
+        String id = null;
+        if (JSONUtils.isAPIResultSuccess(jsonString)) {
+            try {
+                JSONObject resp = new JSONObject(jsonString);
+                JSONObject user = resp.getJSONObject("user");
+                id = user.getString("id");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return id;
+    }
+
+    private RestApiHeaderClient.ResponseListener getUserInfoResponseListener =
+            new RestApiHeaderClient.ResponseListener() {
+                @Override
+                public void onResponse(JSONObject jsonObject) {
+                    Logs.showTrace("[API User Info] onResponse Data: " + jsonObject.toString());
+                    String strMsg = JSONUtils.getResponseJSONString(jsonObject);
+                    userId = extractUserId(strMsg);
+                    if (userId != null) {
+                        // 取得使用者id成功，Write the userId into shared preference for other activities to access
+                        SharedPreferences sharedPref = getSharedPreferences(
+                                getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putString("userId", userId);
+                        editor.commit();
+
+                        // Switch to course activity
+                        startActivity(new Intent(LoginActivity.this, CourseActivity.class));
+                    } else {
+                        // 取得使用者id失敗
+                        Logs.showTrace("[API User Info] onResponse Data: " + "取得使用者id失敗");
+                    }
+                }
+            };
 
     @SuppressLint("HandlerLeak")
     private Handler theHandler = new Handler()

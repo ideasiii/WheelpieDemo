@@ -43,11 +43,19 @@ public class ViewUtils {
         }
     }
 
-    public static void showFloatingMessage(Context context, String message) {
+    public static void showLongFloatingMessage(Context context, String message) {
+        showFloatingMessage(context, message, Toast.LENGTH_LONG);
+    }
+
+    public static void showShortFloatingMessage(Context context, String message) {
+        showFloatingMessage(context, message, Toast.LENGTH_SHORT);
+    }
+
+    private static void showFloatingMessage(Context context, String message, int duration) {
         Toast toast = Toast.makeText(
             context,
             message,
-            Toast.LENGTH_LONG
+            duration
         );
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();

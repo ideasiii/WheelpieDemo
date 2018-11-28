@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:drawable="@drawable/loading_running_jumbo_00"
+        android:duration="40" />
+    <item
+        android:drawable="@drawable/loading_running_jumbo_01"
+        android:duration="40" />
+    <item
+        android:drawable="@drawable/loading_running_jumbo_02"
+        android:duration="40" />
+    <item
+        android:drawable="@drawable/loading_running_jumbo_03"
+        android:duration="40" />
+    <item
+        android:drawable="@drawable/loading_running_jumbo_04"
+        android:duration="40" />
+    <item
+        android:drawable="@drawable/loading_running_jumbo_05"
+        android:duration="40" />
+    <item
+        android:drawable="@drawable/loading_running_jumbo_06"
+        android:duration="40" />
+    <item
+        android:drawable="@drawable/loading_running_jumbo_07"
+        android:duration="40" />
+    <item
+        android:drawable="@drawable/loading_running_jumbo_08"
+        android:duration="40" />
+    <item
+        android:drawable="@drawable/loading_running_jumbo_09"
+        android:duration="40" />
+    <item
+        android:drawable="@drawable/loading_running_jumbo_10"
+        android:duration="40" />
+    <item
+        android:drawable="@drawable/loading_running_jumbo_11"
+        android:duration="40" />
+    <item
+        android:drawable="@drawable/loading_running_jumbo_12"
+        android:duration="40" />
+    <item
+        android:drawable="@drawable/loading_running_jumbo_13"
+        android:duration="40" />
+    <item
+        android:drawable="@drawable/loading_running_jumbo_14"
+        android:duration="40" />
+    <item
+        android:drawable="@drawable/loading_running_jumbo_15"
+        android:duration="40" />
+    <item
+        android:drawable="@drawable/loading_running_jumbo_16"
+        android:duration="40" />
+    <item
+        android:drawable="@drawable/loading_running_jumbo_17"
+        android:duration="40" />
+    <item
+        android:drawable="@drawable/loading_running_jumbo_18"
+        android:duration="40" />
+    <item
+        android:drawable="@drawable/loading_running_jumbo_19"
+        android:duration="40" />
+    <item
+        android:drawable="@drawable/loading_running_jumbo_20"
+        android:duration="40" />
+    <item
+        android:drawable="@drawable/loading_running_jumbo_21"
+        android:duration="40" />
+    <item
+        android:drawable="@drawable/loading_running_jumbo_22"
+        android:duration="40" />
+    <item
+        android:drawable="@drawable/loading_running_jumbo_23"
+        android:duration="40" />
+    <item
+        android:drawable="@drawable/loading_running_jumbo_24"
+        android:duration="40" />
+</animation-list>

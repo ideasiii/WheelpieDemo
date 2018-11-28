@@ -15,6 +15,9 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
+import android.support.v4.content.res.TypedArrayUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,6 +52,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -77,15 +81,18 @@ public class TrainingActivity extends Activity
     private TextView timer;
     private TextView TrainingType;
     private TextView TrainingMode;
+    private String TrainingId;
     private boolean startflag = false;
     private int tsec = 0, csec = 0, cmin = 0, chr = 0;
     private static RestApiHeaderClient restApiHeaderClient = new RestApiHeaderClient();
     private static String trainingAPIURL = "https://dsicoach.win/api/plan/my-training/dayTraining";
     private static String courseAPIURL = "https://dsicoach.win/api/plan/my-course/plan/day-view";
+    private static String physicalInfoAPIURL = "https://dsicoach.win/api/user/physicalInfo";
     private static ArrayList<Float> tmpHR_value = new ArrayList<Float>();
     private final int MSG_DAY_TRAINING_API_RESPONSE = 0;
     private final int MSG_DAY_VIEW_API_RESPONSE = 1;
     private final int MSG_CONTENT_VIEW_LOGIN = 9;
+    private final int MSG_PHYSICALINFO_API_RESPONSE = 333;
     private final String PREF_USER_TOKEN_KEY = "userToken";
     private String userToken;
     private TextView tv_status;
@@ -117,6 +124,16 @@ public class TrainingActivity extends Activity
     Double fake_calories_value = 0.0;
     DecimalFormat DeFormat = new DecimalFormat("######0.0");
     
+    /**
+     * Initialization for HeartRate Supervision
+     */
+    private ObservableHeartRate hrObservable;
+    private ObserverHeartRateChanged hrObserver;
+    private ObservableSpeech speechContentObservable;
+    private ObserverSpeechChanged speechContentObserver;
+    private TextToSpeech tts;
+//    public Context mContext;
+
     /**
      * ANT+ Library
      */
@@ -206,10 +223,11 @@ public class TrainingActivity extends Activity
 //
 // "2h39l3nV4iiYucuXax7Mw6PEQMh4cjkFX7AeW3yVcaiLyIhAHRdAPLixkgS5Mvpv0FcWJMnXUyO9ssEkeb60VyBWm4yEVoPZ1jXIAcnO3ZM9qIgcRXiTKdEYkOTcZWFryyo2hFTgQwMVpprXDpGyBlHJUru8g9QOeOYNYET9jsRUz0IX6e6bPuw3K3FNsBfHmUbukwYgEnDBLP6VYOAul9njlS4DKVda3yD6WGFXcjkbKeRtPb8dY98dJkpXsWUg");
         headers.put("Authorization", String.format("Bearer %s", userToken));
+//        Logs.showTrace("usertoken:" + "Bearer " + userToken);
         Response response = new Response();
         int nResponse_id = restApiHeaderClient.HttpsGet(courseAPIURL, Config.HTTP_DATA_TYPE.X_WWW_FORM,
                 param, response, headers);
-        Logs.showTrace("[API] http response id: " + nResponse_id);
+//        Logs.showTrace("[API] http response id: " + nResponse_id);
     }
     
     //任何Task(如:TimerTask)無法直接改變元件因此要透過Handler來當橋樑
@@ -269,7 +287,42 @@ public class TrainingActivity extends Activity
                     //s字串為00:00:00格式
                     timer.setText(s);
                     break;
-                
+
+                /**
+                 * For HeartRate Supervision.
+                 */
+                case MSG_PHYSICALINFO_API_RESPONSE:
+                    Integer restHeartRate = 61;
+                    Integer maxHeartRate = 162;
+                    JSONObject response = (JSONObject) msg.obj;
+                    Logs.showTrace("handler get: "+response.toString());
+                    try{
+                        int resp_code = response.getInt("code");
+                        if(resp_code == -1){
+                            Logs.showTrace("Call API fail: PhysicalInfo");
+                        }else{
+                            strMsg = getResponseJSONString(response);
+                            JSONObject physicalInfoObj = new JSONObject(strMsg);
+                            JSONObject user = physicalInfoObj.getJSONObject("user");
+                            try{
+                                JSONObject heartRate = user.getJSONObject("physicalInfo");
+                                restHeartRate = heartRate.getInt("restHeartRate");
+                                maxHeartRate = heartRate.getInt("maxHeartRate");
+                            }catch (JSONException e){
+                                Logs.showTrace("physicalinfo heartrate is null, so use default value");
+                            }
+                        }
+                    }
+                    catch (JSONException e)
+                    {
+                        e.printStackTrace();
+                        break;
+                    }
+                    hrObservable = new ObservableHeartRate();
+                    hrObserver = new ObserverHeartRateChanged(restHeartRate,maxHeartRate,"E1+M1+A1", speechContentObservable);
+                    hrObservable.addObserver(hrObserver.HeartRateChanged);
+                    break;
+
                 case MSG_DAY_TRAINING_API_RESPONSE:
                     JSONObject resp = (JSONObject) msg.obj;
                     try
@@ -291,10 +344,15 @@ public class TrainingActivity extends Activity
                             JSONObject dayPlan = new JSONObject(dayPlanJsonObj.getString("dayPlan"));
                             String excerciseType = dayPlan.getString("excerciseType");
                             String excerciseMode = dayPlan.getString("excerciseMode");
-                            //Logs.showTrace("show me data" + excerciseType);
-                            //Logs.showTrace("show me data" + excerciseMode);
+//                            JSONObject dayTraining = new JSONObject(dayPlanJsonObj.getString("dayTraining"));
+//                            String dayTrainingId = dayTraining.getString("id");
+                            Logs.showTrace("------------------show me data" + excerciseType);
+                            Logs.showTrace("------------------show me data" + excerciseMode);
+//                            Logs.showTrace("------------------show me data" + dayTraining);
+//                            Logs.showTrace("------------------show me data" + dayTrainingId);
                             TrainingMode.setText(excerciseMode);
                             TrainingType.setText(excerciseType);
+//                            TrainingId = dayTrainingId;
                             
                             // 呼叫當日課程說明API
                             requestCourseDayViewAPI(trainingId);
@@ -309,11 +367,22 @@ public class TrainingActivity extends Activity
                 
                 case 999:
                     Logs.showTrace("socket send response: 999");
-                    if (mnState == 2)
+//                    Logs.showTrace(String.valueOf(mnState));
+                    if ("2".equals(String.valueOf(msg.obj)))
                     {
                         Logs.showTrace("mnstate = 2, It's time to stop socket pipline");
 //                        wheelPiesClient.stop();
                     }
+                    else
+                    {
+                        Logs.showTrace("socket send response: connected");
+                    }
+                    
+                    break;
+                
+                case 666:
+                    handler.removeMessages(666);
+                    wheelPiesClient.stop();
                     
                     break;
             }
@@ -380,9 +449,38 @@ public class TrainingActivity extends Activity
         @Override
         public void onResponse(JSONObject jsonObject)
         {
-            Logs.showTrace("[API] onResponse Data: " + jsonObject.toString());
+            Logs.showTrace("[Training API] onResponse Data: " + jsonObject.toString());
             Message message = new Message();
             message.what = MSG_DAY_TRAINING_API_RESPONSE;
+            message.obj = jsonObject;
+            handler.sendMessage(message);
+        }
+    };
+
+    /**
+     * To get restHeartRate and maxHeartRate for HeartRate Supervision
+     */
+    private void requestPhysicalInfoAPI()
+    {
+        restApiHeaderClient.setResponseListener(physicalInfoResponseListener);
+        HashMap<String, String> param = new HashMap<String, String>();
+        HashMap<String, String> headers = new HashMap<String, String>();
+        headers.put("Authorization", String.format("Bearer %s", userToken));
+        Response response = new Response();
+        int nResponse_id = restApiHeaderClient.HttpsGet(physicalInfoAPIURL, Config.HTTP_DATA_TYPE
+                .X_WWW_FORM, param, response, headers);
+        Logs.showTrace("[API] http response id: " + nResponse_id);
+    }
+
+    private RestApiHeaderClient.ResponseListener physicalInfoResponseListener = new RestApiHeaderClient
+            .ResponseListener()
+    {
+        @Override
+        public void onResponse(JSONObject jsonObject)
+        {
+            Logs.showTrace("[Physical API] onResponse Data: " + jsonObject.toString());
+            Message message = new Message();
+            message.what = MSG_PHYSICALINFO_API_RESPONSE;
             message.obj = jsonObject;
             handler.sendMessage(message);
         }
@@ -406,7 +504,56 @@ public class TrainingActivity extends Activity
 //        TextView backbutton = (TextView) view2.findViewById(R.id.textView14);//找出第二個視窗中的按鈕
         startbutton.setTag(0);
         stopbutton.setTag(1);
-        
+
+        /**
+         * Instantiate TTS
+         */
+        tts = new TextToSpeech(TrainingActivity.this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                // TODO Auto-generated method stub
+                if(status == TextToSpeech.SUCCESS){
+                    int result=tts.setLanguage(Locale.TAIWAN);
+//                    if(result==TextToSpeech.LANG_MISSING_DATA ||
+//                            result==TextToSpeech.LANG_NOT_SUPPORTED){
+//                        Log.e("error", "This Language is not supported");
+//                    }
+//                    else{
+//                        Log.e("error", "convertTextToSpeech");
+//                    }
+                    Log.e("success", "Initilization success with result code: "+result);
+                }
+                else
+                    Log.e("error", "Initilization Failed!");
+            }
+        });
+        tts.setOnUtteranceProgressListener(new UtteranceProgressListener(){
+            @Override
+            public void onStart(String utteranceId) {
+                // Speaking started.
+                speechContentObserver.setSpeakingStatus(true);
+            }
+
+            @Override
+            public void onDone(String utteranceId) {
+                // Speaking stopped.
+                speechContentObserver.setSpeakingStatus(false);
+            }
+
+            @Override
+            public void onError(String utteranceId) {
+                // There was an error.
+            }
+        });
+
+        /**
+         * Initialization for TTS, make observer subscribes to observable(speech content).
+         * Therefore, when speech content changes, observer speaks.
+         */
+        speechContentObservable = new ObservableSpeech();
+        speechContentObserver = new ObserverSpeechChanged(tts);
+        speechContentObserver.setRestingInterval(3000);
+        speechContentObservable.addObserver(speechContentObserver.SpeechChanged);
         TrainingMode = (TextView) view1.findViewById(R.id.exercise_mode_content);//找出第一個視窗中訓練類型的字串框格
         TrainingType = (TextView) view1.findViewById(R.id.exercise_type_content);//找出第一個視窗中訓練模式的字串框格
         lineChartView = view1.findViewById(R.id.chartLine); //找出第一個視窗中折線圖的image
@@ -438,6 +585,7 @@ public class TrainingActivity extends Activity
         
         wheelPiesClient = new WheelPiesClient();
         mnState = 0;
+        wheelPiesClient.start(handler);
         //Button監聽,第一種寫法,在上面先定義listener,function帶入即可
 //        startbutton.setOnClickListener(listener);
         //Button監聽,第二種寫法,(第一個畫面在做的事情)
@@ -458,6 +606,7 @@ public class TrainingActivity extends Activity
             @Override
             public void onClick(View v)
             {
+                requestPhysicalInfoAPI();
 //                Logs.showTrace("startbutton onClick:" + v.getTag());
                 int nRun = (int) v.getTag();
                 
@@ -504,7 +653,14 @@ public class TrainingActivity extends Activity
             @Override
             public void onClick(View v)
             {
-                
+                /**
+                 * Stop HeartRate Supervision & TTS when the stop button is clicked
+                 */
+                hrObservable.deleteObserver(hrObserver.HeartRateChanged);
+                speechContentObservable.deleteObserver(speechContentObserver.SpeechChanged);
+
+                v.setTag(1);
+
                 int nRun = (int) v.getTag();
                 
                 if (nRun == 1)
@@ -530,11 +686,18 @@ public class TrainingActivity extends Activity
                     startflag = true;
                 }
                 
+                Message message = new Message();
+                message.what = 999;
+                message.obj = mnState;
+                handler.sendMessage(message);
+                
                 //切換到speech的頁面
                 Intent intent = null;
                 intent = new Intent(TrainingActivity.this, SpeechActivity.class);
                 startActivity(intent);
-                
+//                startActivityForResult(intent, 666);
+                handler.sendEmptyMessageDelayed(666,3000);
+            
             }
         });
         
@@ -567,6 +730,35 @@ public class TrainingActivity extends Activity
         String strName = intent.getStringExtra("NAME");
         updateChart();
         
+    }
+    
+//    @Override
+//    protected void onStart()
+//    {
+//        Logs.showTrace("----------------start---------------------");
+//        wheelPiesClient.start(handler);
+//        super.onStart();
+//    }
+
+//    @Override
+//    protected void onStop()
+//    {
+//        Logs.showTrace("----------------stop---------------------");
+//        super.onStop();
+//        wheelPiesClient.stop();
+//    }
+    
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        Logs.showTrace("-----------------------requestCode:" + requestCode);
+        Logs.showTrace("-----------------------resultCode:" + resultCode);
+        if (resultCode == 666)
+        {
+            Logs.showTrace("----------------stop---------------------");
+            wheelPiesClient.stop();
+        }
     }
     
     private String getTodayDate()
@@ -728,7 +920,7 @@ public class TrainingActivity extends Activity
     
     public void subscribeToHrEvents()
     {
-        wheelPiesClient.start(handler);
+//        wheelPiesClient.start(handler);
         hrPcc.subscribeHeartRateDataEvent(new AntPlusHeartRatePcc.IHeartRateDataReceiver()
         {
             @Override
@@ -736,6 +928,11 @@ public class TrainingActivity extends Activity
             int computedHeartRate, final long heartBeatCount, final BigDecimal heartBeatEventTime, final
             AntPlusHeartRatePcc.DataState dataState)
             {
+                /**
+                 * Update HeartRate Observable when New HeartRateData is received
+                 */
+                hrObservable.setValue(computedHeartRate);
+
                 // Mark heart rate with asterisk if zero detected
                 final String textHeartRate = String.valueOf(computedHeartRate) + ((AntPlusHeartRatePcc
                         .DataState.ZERO_DETECTED.equals(dataState)) ? "*" : "");
@@ -920,6 +1117,16 @@ public class TrainingActivity extends Activity
         {
             jsonObject.put("activeId", mstrUUID);
             jsonObject.put("state", mnState);
+//            Logs.showTrace("----------" + "mnState:" + mnState + "----------");
+            if (1 == mnState)//運動開始
+            {
+                jsonObject.put("userToken", String.format("Bearer %s", userToken));
+                jsonObject.put("trainingType", TrainingType.getText().toString());
+                jsonObject.put("trainingMode", TrainingMode.getText().toString());
+//                jsonObject.put("trainingId", TrainingId);
+//                Logs.showTrace(TrainingId);
+                /// TODO: 2018/11/22 還要接最高心率/安靜心率/體重的資料
+            }
             if (2 == mnState) // 運動結束
             {
                 mstrUUID = "";
@@ -928,8 +1135,8 @@ public class TrainingActivity extends Activity
             {
                 mnState = 0;
             }
-            /// TODO: 2018/11/9 修正其他數據必須要匯進資料庫
             
+            /// TODO: 2018/11/9 修正其他數據必須要匯進資料庫
             jsonObject.put("estTimestamp", tv_estTimestamp.getText().toString());
             jsonObject.put("computedHeartRate", textView_ComputedHeartRate.getText().toString());
             jsonObject.put("heartBeatCounter", tv_heartBeatCounter.getText().toString());

@@ -82,22 +82,22 @@ public class SpeechActivity extends Activity implements TextToSpeech.OnInitListe
             }
         }
     };
-    private String getResponseJSONString(JSONObject clientResp)
-    {
-        String jsonString = null;
-        if (clientResp != null)
-        {
-            try
-            {
-                jsonString = ((JSONObject) clientResp).getString("data");
-            }
-            catch (JSONException e)
-            {
-                e.printStackTrace();
-            }
-        }
-        return jsonString;
-    }
+//    private String getResponseJSONString(JSONObject clientResp)
+//    {
+//        String jsonString = null;
+//        if (clientResp != null)
+//        {
+//            try
+//            {
+//                jsonString = ((JSONObject) clientResp).getString("data");
+//            }
+//            catch (JSONException e)
+//            {
+//                e.printStackTrace();
+//            }
+//        }
+//        return jsonString;
+//    }
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/Black_Gray"
+              android:gravity="top"
+              android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/chat_textViewp2Title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:gravity="center"
+        android:text="體能狀況指數"
+        android:textSize="40sp"
+        android:textStyle="bold"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="220dp">
+        <ImageView
+            android:id="@+id/chat_imageViewp2Circle"
+            android:layout_width="match_parent"
+            android:layout_height="220dp"
+            android:src="@drawable/chat_bg_g"/>
+
+        <TextView
+            android:id="@+id/chat_textViewp2Score"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="..."
+            android:textSize="100dp"
+            android:textColor="#839e2e"/>
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="20dp">
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="250dp">
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/chat_bg_dgray"/>
+        <TextView
+            android:id="@+id/chat_textViewp2Comment1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:text="狀況評估中..."
+            android:textColor="@color/Black_List"
+            android:textSize="25dp"
+            android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/chat_textViewp2Comment2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:text=""
+            android:textSize="20dp"
+            android:layout_below="@+id/chat_textViewp2Comment1"/>
+    </RelativeLayout>
+
+
+</LinearLayout>

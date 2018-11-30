@@ -22,6 +22,7 @@ import org.iii.wheelpiedemo.R;
 import org.iii.wheelpiedemo.common.Logs;
 import org.iii.wheelpiedemo.common.RestApiHeaderClient;
 import org.iii.wheelpiedemo.dashboard.DashboardActivity;
+import org.iii.wheelpiedemo.menu.NavigationActivity;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -29,7 +30,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 
-public class SpeechActivity extends Activity implements TextToSpeech.OnInitListener
+public class SpeechActivity extends NavigationActivity implements TextToSpeech.OnInitListener
 {
     
     private int voiceRecognitionRequestCode = 777;
@@ -102,7 +103,9 @@ public class SpeechActivity extends Activity implements TextToSpeech.OnInitListe
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_speech);
+        setContentView(R.layout.nav_speech);
+        // 初始共用menu
+        initCommonNavigationView();
 //        recordVoice = (ImageView) findViewById(R.id.imageViewSpeechBtn);
         textToAPIResp = (TextView) findViewById(R.id.chat_textViewAnswer);
         testButton = (ImageView) findViewById(R.id.chat_apiImage);
@@ -134,8 +137,13 @@ public class SpeechActivity extends Activity implements TextToSpeech.OnInitListe
         startActivityForResult(ttsIntent, ACT_CHECK_TTS_DATA);
 
     }
-    
-//    private View.OnClickListener textToAPIDo = new View.OnClickListener()
+
+    @Override
+    public int getBottomNavigationViewId() {
+        return R.id.speech_nav;
+    }
+
+    //    private View.OnClickListener textToAPIDo = new View.OnClickListener()
 //    {
 //        @Override
 //        public void onClick(View v)

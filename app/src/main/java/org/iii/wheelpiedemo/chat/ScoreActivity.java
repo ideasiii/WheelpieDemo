@@ -19,6 +19,7 @@ import org.iii.more.restapiclient.Response;
 import org.iii.wheelpiedemo.R;
 import org.iii.wheelpiedemo.common.Logs;
 import org.iii.wheelpiedemo.common.RestApiHeaderClient;
+import org.iii.wheelpiedemo.menu.NavigationActivity;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -30,7 +31,7 @@ import java.util.logging.Handler;
 /**
  * Created by Ruska on 11/12/2018
  */
-public class ScoreActivity extends Activity implements TextToSpeech.OnInitListener
+public class ScoreActivity extends NavigationActivity implements TextToSpeech.OnInitListener
 {
     private ImageView circleAddColor = null;
     private TextView TRIMPScore = null;
@@ -201,7 +202,8 @@ public class ScoreActivity extends Activity implements TextToSpeech.OnInitListen
     protected void onCreate(Bundle saveInstanceState)
     {
         super.onCreate(saveInstanceState);
-        setContentView(R.layout.activity_score);
+        setContentView(R.layout.nav_score);
+        initCommonNavigationView();
         Logs.showTrace("[state] onCreate");
         circleAddColor = (ImageView)findViewById(R.id.chat_imageViewp2Circle);
         TRIMPScore = (TextView)findViewById(R.id.chat_textViewp2Score);
@@ -215,7 +217,12 @@ public class ScoreActivity extends Activity implements TextToSpeech.OnInitListen
         ttsIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
         startActivityForResult(ttsIntent, ACT_CHECK_TTS_DATA);
     }
-    
+
+    @Override
+    public int getBottomNavigationViewId() {
+        return R.id.score_nav;
+    }
+
 //    @Override
 //    protected void onStart()
 //    {

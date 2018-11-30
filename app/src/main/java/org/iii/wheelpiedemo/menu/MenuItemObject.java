@@ -1,6 +1,7 @@
 package org.iii.wheelpiedemo.menu;
 
 import org.iii.wheelpiedemo.R;
+import org.iii.wheelpiedemo.chat.ScoreActivity;
 import org.iii.wheelpiedemo.chat.SpeechActivity;
 import org.iii.wheelpiedemo.course.CourseActivity;
 import org.iii.wheelpiedemo.dashboard.DashboardActivity;
@@ -13,7 +14,7 @@ import java.util.Map;
 public enum MenuItemObject {
     FREE(R.string.menu_free, R.layout.training_main, 0, TrainingActivity.class),
     TRAINING(R.string.menu_training, R.layout.training_main, 1, TrainingActivity.class),
-    EVALUATION(R.string.menu_evaluation, R.layout.activity_setting, 2, SettingActivity.class),
+    EVALUATION(R.string.menu_evaluation, R.layout.activity_score, 2, ScoreActivity.class),
     COURSE(R.string.menu_course, R.layout.activity_course, 3, CourseActivity.class),
     SETTING(R.string.menu_setting, R.layout.activity_setting, 4, SettingActivity.class),
     DASHBOARD(R.string.menu_dashboard, R.layout.dashboard, 5, DashboardActivity.class),

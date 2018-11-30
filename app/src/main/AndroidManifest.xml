@@ -16,7 +16,6 @@
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
         <activity android:name=".MainActivity">
-        <!--<activity android:name=".chat.ScoreActivity">-->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -62,6 +61,7 @@
             android:name=".sample.TrainingSampleActivity">
         </activity>
         <activity android:name=".setting.SettingActivity" />
+        <activity android:name=".chat.ScoreActivity" />
     </application>
 
 </manifest>

@@ -46,6 +46,10 @@ public class DashboardActivity extends NavigationActivity{
         webview.getSettings().setJavaScriptEnabled(true);
         webview.getSettings().setDomStorageEnabled(true);
 
+        webview.clearCache(true);
+        webview.getSettings().setAppCacheEnabled(false);
+        webview.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+
         //For testing environment
         webview.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
 

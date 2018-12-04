@@ -27,6 +27,7 @@ import org.iii.more.restapiclient.Config;
 import org.iii.more.restapiclient.Response;
 import org.iii.wheelpiedemo.R;
 import org.iii.wheelpiedemo.course.CourseActivity;
+import org.iii.wheelpiedemo.training.TrainingActivity;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
@@ -211,7 +212,7 @@ public class LoginActivity extends AppCompatActivity {
                         editor.commit();
 
                         // Switch to course activity
-                        startActivity(new Intent(LoginActivity.this, CourseActivity.class));
+                        startActivity(new Intent(LoginActivity.this, TrainingActivity.class));
                     } else {
                         // 取得使用者id失敗
                         Logs.showTrace("[API User Info] onResponse Data: " + "取得使用者id失敗");

@@ -59,6 +59,7 @@ import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.iii.wheelpiedemo.menu.NavigationActivity;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -72,7 +73,7 @@ import lecho.lib.hellocharts.model.Viewport;
 import lecho.lib.hellocharts.view.LineChartView;
 
 @SuppressLint("Registered")
-public class TrainingActivity extends Activity
+public class TrainingActivity extends NavigationActivity
 {
     
     /**
@@ -94,7 +95,9 @@ public class TrainingActivity extends Activity
     private final int MSG_CONTENT_VIEW_LOGIN = 9;
     private final int MSG_PHYSICALINFO_API_RESPONSE = 333;
     private final String PREF_USER_TOKEN_KEY = "userToken";
+    private final String PREF_USER_ID_KEY = "userId";
     private String userToken;
+    private String userId;
     private TextView tv_status;
     private TextView tv_estTimestamp;
     private TextView tv_rssi;
@@ -150,7 +153,7 @@ public class TrainingActivity extends Activity
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key),
                 Context.MODE_PRIVATE);
         userToken = sharedPref.getString(PREF_USER_TOKEN_KEY, null);
-        
+        userId = sharedPref.getString(PREF_USER_ID_KEY,null);
         if (userToken != null)
         {
             isLoggedIn = true;
@@ -158,7 +161,6 @@ public class TrainingActivity extends Activity
         
         return isLoggedIn;
     }
-    
     
     private String getResponseJSONString(JSONObject clientResp)
     {
@@ -191,6 +193,7 @@ public class TrainingActivity extends Activity
             JSONObject dayPlan = resp.getJSONObject("dayPlan");
             JSONObject dayTraining = dayPlan.getJSONObject("dayTraining");
             id = String.valueOf(dayTraining.getInt("id"));
+            TrainingId = id;
         }
         catch (JSONException e)
         {
@@ -292,8 +295,8 @@ public class TrainingActivity extends Activity
                  * For HeartRate Supervision.
                  */
                 case MSG_PHYSICALINFO_API_RESPONSE:
-                    Integer restHeartRate = 61;
-                    Integer maxHeartRate = 162;
+                    Integer restHeartRate = 75;
+                    Integer maxHeartRate = 195;
                     JSONObject response = (JSONObject) msg.obj;
                     Logs.showTrace("handler get: "+response.toString());
                     try{
@@ -319,7 +322,7 @@ public class TrainingActivity extends Activity
                         break;
                     }
                     hrObservable = new ObservableHeartRate();
-                    hrObserver = new ObserverHeartRateChanged(restHeartRate,maxHeartRate,"E1+M1+A1", speechContentObservable);
+                    hrObserver = new ObserverHeartRateChanged(restHeartRate,maxHeartRate,"E1+M1+A1", speechContentObservable);//要監督的時間改數值exE10+M10
                     hrObservable.addObserver(hrObserver.HeartRateChanged);
                     break;
 
@@ -344,15 +347,10 @@ public class TrainingActivity extends Activity
                             JSONObject dayPlan = new JSONObject(dayPlanJsonObj.getString("dayPlan"));
                             String excerciseType = dayPlan.getString("excerciseType");
                             String excerciseMode = dayPlan.getString("excerciseMode");
-//                            JSONObject dayTraining = new JSONObject(dayPlanJsonObj.getString("dayTraining"));
-//                            String dayTrainingId = dayTraining.getString("id");
                             Logs.showTrace("------------------show me data" + excerciseType);
                             Logs.showTrace("------------------show me data" + excerciseMode);
-//                            Logs.showTrace("------------------show me data" + dayTraining);
-//                            Logs.showTrace("------------------show me data" + dayTrainingId);
                             TrainingMode.setText(excerciseMode);
                             TrainingType.setText(excerciseType);
-//                            TrainingId = dayTrainingId;
                             
                             // 呼叫當日課程說明API
                             requestCourseDayViewAPI(trainingId);
@@ -495,10 +493,13 @@ public class TrainingActivity extends Activity
         
         //畫面切換
         LayoutInflater inflater = getLayoutInflater();
-        final View view1 = inflater.inflate(R.layout.training_main, null);//找出第一個視窗
+        final View view1 = inflater.inflate(R.layout.nav_training, null);//找出第一個視窗
         final View view2 = inflater.inflate(R.layout.training_device_connection, null);//找出第二個視窗
         setContentView(view1); //顯示目前第一個視窗
-        
+        // 初始共用menu
+        initCommonNavigationView();
+    
+    
         final ImageView startbutton = (ImageView) view1.findViewById(R.id.startbutton);//找出第一個視窗中start的按鈕
         final ImageView stopbutton = (ImageView) view1.findViewById(R.id.stopbutton);//找出第一個視窗中stop的按鈕
 //        TextView backbutton = (TextView) view2.findViewById(R.id.textView14);//找出第二個視窗中的按鈕
@@ -732,6 +733,12 @@ public class TrainingActivity extends Activity
         
     }
     
+    @Override
+    public int getBottomNavigationViewId()
+    {
+        return R.id.training_nav;
+    }
+
 //    @Override
 //    protected void onStart()
 //    {
@@ -1120,11 +1127,11 @@ public class TrainingActivity extends Activity
 //            Logs.showTrace("----------" + "mnState:" + mnState + "----------");
             if (1 == mnState)//運動開始
             {
-                jsonObject.put("userToken", String.format("Bearer %s", userToken));
+                jsonObject.put("userId", userId);
                 jsonObject.put("trainingType", TrainingType.getText().toString());
                 jsonObject.put("trainingMode", TrainingMode.getText().toString());
-//                jsonObject.put("trainingId", TrainingId);
-//                Logs.showTrace(TrainingId);
+                jsonObject.put("trainingId", TrainingId);
+            
                 /// TODO: 2018/11/22 還要接最高心率/安靜心率/體重的資料
             }
             if (2 == mnState) // 運動結束

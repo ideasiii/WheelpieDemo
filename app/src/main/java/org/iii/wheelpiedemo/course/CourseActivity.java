@@ -78,7 +78,6 @@ public class CourseActivity extends NavigationActivity {
     private ImageView mProgressBar;
     private AnimationDrawable animationDrawable;
     private long videoDuration;
-    private String apiResponse = "{\"planDayView\":{\"id\":355,\"dayTraining\":{\"id\":32261,\"done\":false,\"action\":\"E30(HRR60%)+2ST\",\"description\":\"E心率區間60%跑30分鐘\\n快步跑2組\",\"contents\":[{\"title\":\"靜態熱身\",\"steps\":[\"上半身熱身操5分鐘\",\"下半身熱身操5分鐘\"]},{\"title\":\"第1階段訓練\",\"steps\":[\"輕鬆跑(維持儲備心律60%)30分鐘\"],\"hrrChartInfo\":{\"chart\":{\"type\":\"block\"},\"title\":{},\"subtitle\":{},\"xAxis\":{\"text\":\"時間(分鐘)\",\"tickInterval\":10},\"yAxis\":{\"text\":\"HRR心率(%)\",\"tickInterval\":20},\"series\":{\"data\":[{\"xStart\":0,\"xEnd\":30,\"yStart\":59,\"yEnd\":74,\"color\":\"#55FFFF\"}]}}},{\"title\":\"第2階段訓練\",\"steps\":[\"快步跑(維持步頻180)10秒鐘\",\"靜/動態休息45秒鐘\",\"快步跑(維持步頻180)10秒鐘\"],\"strideChartInfo\":{\"chart\":{},\"title\":{\"text\":\"第2階段訓練\"},\"subtitle\":{\"text\":\"\"},\"xAxis\":{\"text\":\"時間(sec)\"},\"yAxis\":{\"text\":\"步頻(spm)\"},\"series\":{\"data\":[{\"xStart\":0,\"xEnd\":10,\"yStart\":160,\"yEnd\":200},{\"xStart\":10,\"xEnd\":55,\"yStart\":0,\"yEnd\":160},{\"xStart\":55,\"xEnd\":65,\"yStart\":160,\"yEnd\":200}]}}},{\"title\":\"靜態收操\",\"steps\":[\"上半身收操5分鐘\",\"下半身收操5分鐘\"]}],\"trainable\":true,\"dayInfo\":\"輕鬆跑(DAY1)\",\"classInfo\":{\"code\":\"EZ00001\",\"contents\":[{\"text\":\"\",\"url\":\"\",\"image\":\"\",\"description\":\"\"},{\"text\":\"跑前的暖身這是為了提高體溫、提升心跳、並增加關節與肌肉的活動範圍，如此能降低受傷的風險，且跑起步來也會更舒適流暢。暖身首部曲應該從腳踝、膝蓋、髖部、腰、肩、手腕、頸部依序進行，接著以快走或小跑步的方式讓身體熱起來，感覺到身體微微出汗即可\",\"url\":\"\",\"image\":\"\",\"description\":\"\"},{\"text\":\"\",\"url\":\"https://www.youtube.com/watch?v=Ts5A0-n5-J8\",\"image\":\"\",\"description\":\"關節操\"},{\"text\":\"\",\"url\":\"\",\"image\":\"\",\"description\":\"\"},{\"text\":\"輕鬆跑訓練是有氧耐力訓練的有效方法之一，體感是可以聊天且舒服的速度，如果你覺得喘不過氣來，就代表你的心率太高的，此時請放慢你的速度。\",\"url\":\"\",\"image\":\"\",\"description\":\"\"},{\"text\":\"\",\"url\":\"https://www.youtube.com/watch?v=7LCgUMsod1Q&feature=youtu.be\",\"image\":\"\",\"description\":\"Eazy Running HRR60%\"},{\"text\":\"快步跑是指在不耗盡體力的情況下提升你的整體速度並消除E配速與LSD的副作用。快步跑的重點是要加快你的「步頻」，再來才是腳掌上拉的「幅度」，如果前兩項都能做到再來才要求「速度」。也就是說速度並非快步跑的重點，步頻才是，跑此項目時，不要跨大步，不要管速度，甚至原地跑也可以。\",\"url\":\"\",\"image\":\"\",\"description\":\"\"},{\"text\":\"\",\"url\":\"https://www.youtube.com/watch?v=t0ufhZ8AULI&feature=youtu.be\",\"image\":\"\",\"description\":\"ST\"},{\"text\":\"\",\"url\":\"\",\"image\":\"\",\"description\":\"\"},{\"text\":\"將主運動強度減緩，讓代謝恢復正常，同時排除運動時產生的代謝廢物，冷卻與再伸展合稱為「收操」。在這個逐漸放慢節奏的過程中，運動所產生的代謝廢物也會逐漸消散，原本沉重的雙腿會漸感輕鬆，不若剛練習完的當下那麼緊繃。\",\"url\":\"\",\"image\":\"\",\"description\":\"\"},{\"text\":\"\",\"url\":\"https://www.youtube.com/watch?v=dxDeO-5KT9o&feature=youtu.be\",\"image\":\"\",\"description\":\"收操\"}]}}},\"result\":true}";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -382,7 +381,8 @@ public class CourseActivity extends NavigationActivity {
             }
             //是否可以訓練
             btnTraining = findViewById(R.id.button_start_training);
-            btnTraining.setEnabled(dayTraining.isTrainable());
+            //btnTraining.setEnabled(dayTraining.isTrainable());
+            btnTraining.setEnabled(true);
             btnTraining.setVisibility(View.VISIBLE);
         }
     }

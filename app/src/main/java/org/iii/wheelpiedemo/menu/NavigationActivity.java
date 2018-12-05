@@ -42,7 +42,9 @@ public abstract class NavigationActivity extends AppCompatActivity
     }
 
     public void initNavigationViewState() {
+        // 取得目前class名稱
         String subClassName = this.getClass().getName();
+        // 查詢對應MenuItemObject
         MenuItemObject selectedItem = MenuItemObject.lookupByClassName(subClassName);
         int checkedMenuIndex;
         String mode;
@@ -57,10 +59,12 @@ public abstract class NavigationActivity extends AppCompatActivity
                 selectedItem = MenuItemObject.TRAINING;
             }
         }
+        // 取得menu的index值
         checkedMenuIndex = selectedItem.getmMenuIndex();
         if (checkedMenuIndex > 4) {
             checkedMenuIndex = 4;
         }
+        // 設定作用中的menu圖示
         bottomNavigationView.getMenu().getItem(checkedMenuIndex).setChecked(true);
     }
 

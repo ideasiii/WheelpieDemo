@@ -322,7 +322,7 @@ public class TrainingActivity extends NavigationActivity
                         break;
                     }
                     hrObservable = new ObservableHeartRate();
-                    hrObserver = new ObserverHeartRateChanged(restHeartRate,maxHeartRate,"E1+M1+A1", speechContentObservable);//要監督的時間改數值exE10+M10
+                    hrObserver = new ObserverHeartRateChanged(restHeartRate,maxHeartRate,"E10+M20+E5", speechContentObservable);//要監督的時間改數值exE10+M10
                     hrObservable.addObserver(hrObserver.HeartRateChanged);
                     break;
 

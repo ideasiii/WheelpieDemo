@@ -20,6 +20,7 @@ import org.iii.wheelpiedemo.R;
 import org.iii.wheelpiedemo.common.Logs;
 import org.iii.wheelpiedemo.common.RestApiHeaderClient;
 import org.iii.wheelpiedemo.menu.NavigationActivity;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -77,8 +78,14 @@ public class ScoreActivity extends NavigationActivity implements TextToSpeech.On
             JSONObject resp = new JSONObject(jsonString);
             JSONObject statusIndicator = resp.getJSONObject("statusIndicator");
             JSONObject chartInfo = statusIndicator.getJSONObject("chartInfo");
-            JSONObject subtitle = chartInfo.getJSONObject("subtitle");
-            TRIMPScore = String.valueOf(subtitle.getInt("text"));
+            JSONArray series = chartInfo.getJSONArray("series");
+            JSONObject  Pt = series.getJSONObject(2);
+            JSONArray data = Pt.getJSONArray("data");
+            JSONObject today_data = data.getJSONObject(1);
+            TRIMPScore = String.valueOf(today_data.getInt("value"));
+//            JSONObject yAxis = chartInfo.getJSONObject("yAxis"); // test
+//            TRIMPScore = String.valueOf(yAxis.getInt("tickInterval"));// test
+            Logs.showTrace("[Score] get form API: " + TRIMPScore);
         }
         catch (JSONException e)
         {
@@ -110,9 +117,11 @@ public class ScoreActivity extends NavigationActivity implements TextToSpeech.On
                     } else if (TRIMPScore_INPUT_API<1 & TRIMPScore_INPUT_API>=-2){
                         TRIMPScoreResponse1.setText("狀況普通");
                         TRIMPScoreResponse2.setText("你的分數在70%的跑者當中，不要氣餒，再接再厲！");
+                        text = "你的分數在70%的跑者當中，不要氣餒，再接再厲！";
                     } else {
                         TRIMPScoreResponse1.setText("狀況偏弱");
                         TRIMPScoreResponse2.setText("你的分數落於70%跑者以外，再加把勁！讓教練幫你破PB");
+                        text = "你的分數落於70%跑者以外，再加把勁！讓教練幫你破PB";
                     }
                     saySomething(text.toString().trim(), 1);
                     Logs.showTrace("SOUND OK");
@@ -145,7 +154,7 @@ public class ScoreActivity extends NavigationActivity implements TextToSpeech.On
 //                        Logs.showTrace(e.toString());
 //                    }
                 case MSG_SCORE_ASK_API_RESPONSE:
-                    JSONObject resp = (JSONObject) msg.obj;
+//                    JSONObject resp = (JSONObject) msg.obj;
 //                    try
 //                    {
                         //String resp_code = resp.getString("code");
@@ -216,6 +225,16 @@ public class ScoreActivity extends NavigationActivity implements TextToSpeech.On
         Intent ttsIntent = new Intent();
         ttsIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
         startActivityForResult(ttsIntent, ACT_CHECK_TTS_DATA);
+//        if (isUserLoggedIn())
+//        {
+//            // 呼叫當日課程訓練API
+////            requestTodayTrainingAPI("2018-10-22");
+//            userToken
+//        }
+//        else
+//        {
+//            handler.sendEmptyMessage(MSG_CONTENT_VIEW_LOGIN);
+//        }
     }
 
     @Override
@@ -261,37 +280,46 @@ public class ScoreActivity extends NavigationActivity implements TextToSpeech.On
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
-//    private void requestScoreAskAPI(String startDateString, String endDateString)
-//    {
-//        restApiHeaderClient.setResponseListener(requestScoreResponseListener);
-//        Logs.showTrace("[state] onAPIHeaderClient");
-//        HashMap<String, String> param = new HashMap<String, String>();
-//        param.put("startDate", startDateString);
-//        param.put("endDate", endDateString);
-//        HashMap<String, String> headers = new HashMap<String, String>();
-////        headers.put("Authorization", "Bearer " +
-////
-//// "2h39l3nV4iiYucuXax7Mw6PEQMh4cjkFX7AeW3yVcaiLyIhAHRdAPLixkgS5Mvpv0FcWJMnXUyO9ssEkeb60VyBWm4yEVoPZ1jXIAcnO3ZM9qIgcRXiTKdEYkOTcZWFryyo2hFTgQwMVpprXDpGyBlHJUru8g9QOeOYNYET9jsRUz0IX6e6bPuw3K3FNsBfHmUbukwYgEnDBLP6VYOAul9njlS4DKVda3yD6WGFXcjkbKeRtPb8dY98dJkpXsWUg");
-//        headers.put("Authorization", String.format("Bearer %s", userToken));
-//        Response response = new Response();
-//        int nResponse_id = restApiHeaderClient.HttpsGet(ScoreAPIURL, Config.HTTP_DATA_TYPE.X_WWW_FORM,
-//                param, response, headers);
-//        Logs.showTrace("[API] http response id: " + nResponse_id);
-//    }
+    private void requestScoreAskAPI(String startDateString, String endDateString)
+    {
+        restApiHeaderClient.setResponseListener(requestScoreResponseListener);
+        Logs.showTrace("[state] onAPIHeaderClient");
+        HashMap<String, String> param = new HashMap<String, String>();
+        param.put("startDate", startDateString);
+        param.put("endDate", endDateString);
+        HashMap<String, String> headers = new HashMap<String, String>();
+//        headers.put("Authorization", "Bearer " +
 //
-//    private RestApiHeaderClient.ResponseListener requestScoreResponseListener = new RestApiHeaderClient
-//            .ResponseListener()
-//    {
-//        @Override
-//        public void onResponse(JSONObject jsonObject)
-//        {
-//            Logs.showTrace("[API] onResponse Data: " + jsonObject.toString());
-//            Message message = new Message();
-//            message.what = MSG_SCORE_ASK_API_RESPONSE;
-//            message.obj = jsonObject;
-//            handler.sendMessage(message);
-//        }
-//    };
+// "2h39l3nV4iiYucuXax7Mw6PEQMh4cjkFX7AeW3yVcaiLyIhAHRdAPLixkgS5Mvpv0FcWJMnXUyO9ssEkeb60VyBWm4yEVoPZ1jXIAcnO3ZM9qIgcRXiTKdEYkOTcZWFryyo2hFTgQwMVpprXDpGyBlHJUru8g9QOeOYNYET9jsRUz0IX6e6bPuw3K3FNsBfHmUbukwYgEnDBLP6VYOAul9njlS4DKVda3yD6WGFXcjkbKeRtPb8dY98dJkpXsWUg");
+        headers.put("Authorization", String.format("Bearer %s", userToken));
+        Logs.showTrace("[AAAAAAABB]" + String.format("Bearer %s", userToken));
+        Response response = new Response();
+        int nResponse_id = restApiHeaderClient.HttpsGet(ScoreAPIURL, Config.HTTP_DATA_TYPE.X_WWW_FORM,
+                param, response, headers);
+        Logs.showTrace("[API] http response id: " + nResponse_id);
+    }
+
+    private RestApiHeaderClient.ResponseListener requestScoreResponseListener = new RestApiHeaderClient
+            .ResponseListener()
+    {
+        @Override
+        public void onResponse(JSONObject jsonObject)
+        {
+            Logs.showTrace("[API] onResponse Data: " + jsonObject.toString());
+            String strMsg = null;
+            strMsg = getResponseJSONString((JSONObject) jsonObject);
+            String TRIMPScore = extractTRIMPScore(strMsg);
+            double TRIMPScored = Double.valueOf(TRIMPScore);
+            Message message = new Message();
+//            message.what = MSG_SCORE_ASK_API_RESPONSE; // case 2
+            message.what = _SCORE_ASK_API_RESPONSE_; // case 1
+            message.obj = TRIMPScored;
+            Logs.showTrace("[AAAAAABBb]"+TRIMPScore);
+            System.out.println(TRIMPScore.getClass());
+            System.out.println(TRIMPScore.toString());
+            handler.sendMessage(message);
+        }
+    };
     private void saySomething(String text, int qmode) {
         if (qmode == 1)
             mTTS.speak(text, TextToSpeech.QUEUE_ADD, null);
@@ -310,16 +338,28 @@ public class ScoreActivity extends NavigationActivity implements TextToSpeech.On
 //                    saySomething("來吧，告訴我你喜歡什麼", 0);
                     // 收api體能指數
                     // 先塞一個常數 TRIMPScore_INPUT_API
-//                    String startDate = getStartTime();
-//                    Logs.showTrace("[API input 1] startDate: " + startDate);
-//                    String endDate = getEndTime();
-//                    Logs.showTrace("[API input 2] endDate: " + endDate);
+                    String startDate = getStartTime();
+                    Logs.showTrace("[API input 1] startDate: " + startDate);
+                    String endDate = getEndTime();
+                    Logs.showTrace("[API input 2] endDate: " + endDate);
 //                    requestScoreAskAPI(startDate,endDate);
-                    Message message = new Message();
-                    message.what = _SCORE_ASK_API_RESPONSE_;
-                    message.obj = TRIMPScore_INPUT_API;
-                    Log.d("message","OK");
-                    handler.sendMessage(message);
+                    if (isUserLoggedIn())
+                    {
+                        // 呼叫當日課程訓練API
+//            requestTodayTrainingAPI("2018-10-22");
+//                        requestTodayTrainingAPI(getTodayDate());
+                        Logs.showTrace("[show] userToken: " + userToken);
+                        requestScoreAskAPI(startDate,endDate);
+                    }
+                    else
+                    {
+                        Logs.showTrace("[show] userToken: nope");
+                        Message message = new Message();
+                        message.what = _SCORE_ASK_API_RESPONSE_; // case 1
+                        message.obj = TRIMPScore_INPUT_API;
+                        Log.d("message","OK");
+                        handler.sendMessage(message);
+                    }
                 }
             }
         } else {
@@ -327,7 +367,7 @@ public class ScoreActivity extends NavigationActivity implements TextToSpeech.On
                     Toast.LENGTH_LONG).show();
         }
     }
-    public String getStartTime(){
+    public String getEndTime(){
         
         Calendar currentTime = Calendar.getInstance();
         StringBuffer sb = new StringBuffer();
@@ -337,13 +377,13 @@ public class ScoreActivity extends NavigationActivity implements TextToSpeech.On
         return sb.toString();
         
     }
-    public String getEndTime(){
+    public String getStartTime(){
         
         Calendar currentTime = Calendar.getInstance();
         StringBuffer sb = new StringBuffer();
         sb.append(currentTime.get(Calendar.YEAR)).append("-");
         sb.append(currentTime.get(Calendar.MONTH)+1).append("-"); //沒有補0的月份
-        currentTime.add(Calendar.DATE, -7);
+        currentTime.add(Calendar.DATE, -1);
         sb.append(currentTime.get(Calendar.DAY_OF_MONTH));
         return sb.toString();
         

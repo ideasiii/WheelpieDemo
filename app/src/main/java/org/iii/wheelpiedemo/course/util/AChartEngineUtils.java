@@ -84,7 +84,16 @@ public class AChartEngineUtils {
 
     private static double getXMax(CourseChart info) {
         //return info != null ?  Math.floor(info.getMaxXAixsValue())/10+ 0.7 : 0;
-        return info != null ?  Math.floor(info.getMaxXAixsValue())/10 + 2 : 0;
+        int maxValue = 0;
+        if (info!= null) {
+            maxValue = info.getMaxXAixsValue();
+            if (maxValue > 10) {
+                maxValue = (int) (Math.floor(maxValue)/10 + 2);
+            } else {
+                maxValue = maxValue + 1;
+            }
+        }
+        return maxValue;
     }
 
     private static double getYMax(CourseChart info) {
@@ -93,8 +102,9 @@ public class AChartEngineUtils {
 
     private static ArrayList<RangeChartData> createRangeChartData(CourseChart info) {
         ArrayList<RangeChartData> data = new ArrayList<RangeChartData>();
+        int timeGranularity = 10;
 
-        if (info!=null &&info.data.size()>0) {
+        if (info!=null && info.data.size()>0) {
             for(SquareBlock sb : info.data) {
                 int xStart = sb.getxStart();
                 // x起始是否從可被10整除
@@ -106,16 +116,22 @@ public class AChartEngineUtils {
 //                }
                 // 從切齊的x開始，到結束的x範圍
                 int xDiff = sb.getxEnd() - xStart;
+
+                if (info.data.size() == 1 && xDiff <= 10) {
+                    timeGranularity = xDiff > 5 ? 5 : 1;
+                    //timeGranularity = 5;
+                }
                 // 計算為10的n倍
-                int splitNums = (xDiff) / 10;
+                int splitNums = (xDiff) / timeGranularity;
                 // 加入n筆資料
                 for (int splitIdx=0; splitIdx < splitNums; splitIdx+=1) {
-                    data.add(new RangeChartData(xStart, xStart+10, sb.getyStart(), sb.getyEnd()));
-                    xStart += 10;
+                    data.add(new RangeChartData(xStart, xStart+timeGranularity, sb.getyStart(), sb.getyEnd()));
+                    xStart += timeGranularity;
                 }
-                if (xDiff % 10 != 0) {
+                if (xDiff % timeGranularity != 0) {
                     data.add(new RangeChartData(xStart, sb.getxEnd(), sb.getyStart(), sb.getyEnd()));
                 }
+                info.setDrawXRegularity(timeGranularity);
             }
         }
         return data;
@@ -150,7 +166,7 @@ public class AChartEngineUtils {
         int[] colors = new int[] { Color.CYAN };
         XYMultipleSeriesRenderer renderer = buildBarRenderer(colors);
         setChartSettings(renderer,
-            "",//"Monthly temperature range",
+            String.format("提醒：目前時間軸間隔為：%d%s", info.getDrawXRegularity(), info.getxUnit()),//"Monthly temperature range",
             info.getxAxisTitle(),
             info.getyAxisTitle(),
             0.5,
@@ -170,7 +186,7 @@ public class AChartEngineUtils {
         renderer.addYTextLabel(50, "50");
         renderer.addYTextLabel(100, "100");
         renderer.addYTextLabel(150, "150");
-
+        // order: top, left, bottom, right
         renderer.setMargins(new int[] {30, 70, 15, 10});
         renderer.setYLabelsAlign(Paint.Align.RIGHT);
 

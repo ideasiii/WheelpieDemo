@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             android:orientation="horizontal"
-            android:visibility="gone">
+            android:visibility="visible">
 
             <ImageView
                 android:id="@+id/imageViewTrainging"
@@ -56,7 +56,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             android:orientation="horizontal"
-            android:visibility="gone">
+            android:visibility="visible">
 
             <ImageView
                 android:id="@+id/imageViewANT"
@@ -64,7 +64,7 @@
                 android:layout_height="80dp"
                 android:layout_weight="1"
                 android:scaleType="centerInside"
-                android:src="@drawable/ant"/>
+                android:src="@drawable/ant" />
 
             <ImageView
                 android:id="@+id/imageViewSpeech"
@@ -88,7 +88,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:visibility="gone">
+            android:visibility="visible">
 
             <ImageView
                 android:id="@+id/imageViewLineChart"
@@ -96,7 +96,7 @@
                 android:layout_height="80dp"
                 android:layout_weight="1"
                 android:scaleType="centerInside"
-                android:src="@drawable/linechart"/>
+                android:src="@drawable/linechart" />
 
             <ImageView
                 android:id="@+id/imageViewApi"
@@ -104,14 +104,14 @@
                 android:layout_height="80dp"
                 android:layout_weight="1"
                 android:scaleType="centerInside"
-                android:src="@drawable/api"/>
+                android:src="@drawable/api" />
 
             <ImageView
                 android:id="@+id/imageViewVideoBtn"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:layout_weight="1"
-                android:src="@drawable/video"/>
+                android:src="@drawable/video" />
         </LinearLayout>
 
 
